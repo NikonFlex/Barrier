@@ -8,20 +8,10 @@ public class Toolbar : MonoBehaviour
 {
   public enum ButtonID
   {
-    NEW,
-    OPEN,
-    SAVE,
     START,
     STOP,
     PAUSE,
-    EDIT,
-    STUDENT,
-    SAVELOG,
-    WEBCAM,
     SETTINGS,
-    ACCIDENTS,
-    FAULTS,
-    ABOUT,
     EXIT
   };
 
@@ -97,9 +87,8 @@ public class Toolbar : MonoBehaviour
       m_currentButton.Pressed = false;
 
     m_currentButton = tbb;
-
-    OnButtonClick(tbb.id, m_currentButton.Pressed);
-    //Instructor.GUI.OnToolbarButtonClicked(tbb.id, m_currentButton.Pressed);
+    if (OnButtonClick != null)
+      OnButtonClick(tbb.id, m_currentButton.Pressed);
   }
 
   public void EnableButton(ButtonID id, bool enabled)
