@@ -44,38 +44,17 @@ public class Torpedo : MonoBehaviour
 
       m_circleObject.GetComponent<MeshRenderer>().material.color = 
          new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
+      float scaleFactor = Mathf.PingPong(Time.time * 0.5f, 0.7f) + 0.3f;
+      m_circleObject.transform.localScale = new Vector3(scaleFactor, 1, scaleFactor);
    }
 
    GameObject createCircle()
    {
       var g = new GameObject("Circle");
-      Mesh mesh = new Mesh();
-      g.AddComponent<MeshFilter>().mesh = mesh;
+      g.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(m_circleSize, 100); ;
       var meshReneder = g.AddComponent<MeshRenderer>();
       meshReneder.material = m_circleMaterial;
       meshReneder.material.color = new Color(1, 0, 0, 0.4f);
-
-      var vertexList = new List<Vector3>();
-      vertexList.Add(new Vector3(0, 0, 0));
-      float deltaAngle = 5;
-      for (float a = 0; a <= 360; a += deltaAngle)
-      {
-         Quaternion rotation = Quaternion.Euler(0, a, 0);
-         Vector3 v = rotation * Vector3.forward * m_circleSize;
-         vertexList.Add(v);
-      }
-
-      var idxList = new List<int>();
-      for (int itr = 1; itr < vertexList.Count - 1; itr ++)
-      {
-         idxList.Add(0);
-         idxList.Add(itr);
-         idxList.Add(itr + 1);
-      }
-
-      mesh.vertices = vertexList.ToArray();
-      mesh.normals = Enumerable.Repeat(Vector3.up, mesh.vertices.Length).ToArray();
-      mesh.triangles = idxList.ToArray();
       g.transform.SetParent(transform, false);
       g.transform.localPosition = new Vector3(0, 0.5f, 0);
       return g;
@@ -85,45 +64,10 @@ public class Torpedo : MonoBehaviour
    {
       var g = new GameObject("ArrowLine");
       Mesh mesh = new Mesh();
-      g.AddComponent<MeshFilter>().mesh = mesh;
+      g.AddComponent<MeshFilter>().mesh = Utils.CreateLinedMesh(m_arrowLength, m_arrowWidth, m_arrowWidth * 2);
       var meshReneder = g.AddComponent<MeshRenderer>();
       meshReneder.material = m_arrow.GetComponent<MeshRenderer>().material;
 
-//      meshReneder.material = m_circleMaterial;
-//      meshReneder.material.color = new Color(1, 0, 0, 0.4f);
-
-      var vertexList = new List<Vector3>();
-      var uvList = new List<Vector2>();
-      float step = m_arrowWidth*2;
-      float halfWidth = m_arrowWidth/2;
-
-      float uv = 0;
-      for (float x = 0; x <= m_arrowLength; x += step)
-      {
-         vertexList.Add(new Vector3(-halfWidth, 0, x));
-         vertexList.Add(new Vector3(halfWidth, 0, x));
-
-         uvList.Add(new Vector2(-uv, 0f));
-         uvList.Add(new Vector2(-uv, 1f));
-         uv += 1;
-      }
-
-      var idxList = new List<int>();
-      for (int itr = 0; itr < vertexList.Count - 4; itr+=2)
-      {
-         idxList.Add(itr);
-         idxList.Add(itr + 2);
-         idxList.Add(itr + 1);
-
-         idxList.Add(itr + 1);
-         idxList.Add(itr + 2);
-         idxList.Add(itr + 3);
-      }
-
-      mesh.vertices = vertexList.ToArray();
-      mesh.normals = Enumerable.Repeat(Vector3.up, mesh.vertices.Length).ToArray();
-      mesh.triangles = idxList.ToArray();
-      mesh.uv = uvList.ToArray();
       g.transform.SetParent(transform, false);
       g.transform.localPosition = new Vector3(0, 0.5f, 0);
       return g;

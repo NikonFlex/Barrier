@@ -67,10 +67,11 @@
     <Compile Include="Assets\GUI\Toolbar.cs" />
     <Compile Include="Assets\GUI\ToolbarButton.cs" />
     <Compile Include="Assets\Scripts\CameraController.cs" />
+    <Compile Include="Assets\Scripts\Main.cs" />
     <Compile Include="Assets\Scripts\SectorDrawer.cs" />
+    <Compile Include="Assets\Scripts\Ship.cs" />
     <Compile Include="Assets\Scripts\Torpedo.cs" />
-    <Compile Include="Assets\Scripts\main.cs" />
-    <Compile Include="Assets\Scripts\ship.cs" />
+    <Compile Include="Assets\Scripts\Utils.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

@@ -9,7 +9,7 @@ public enum ViewType
    Free
 };
 
-public class main : MonoBehaviour
+public class Main : MonoBehaviour
 {
 
    Toolbar[] m_toolbars;
