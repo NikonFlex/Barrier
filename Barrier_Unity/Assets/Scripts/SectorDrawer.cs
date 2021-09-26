@@ -52,7 +52,6 @@ public class SectorDrawer : MonoBehaviour
    {
 
    }
-
    public void ShowSectors(bool draw)
    {
       foreach (var m in m_sectorMeshes)
@@ -62,65 +61,13 @@ public class SectorDrawer : MonoBehaviour
    GameObject createSectorMesh(sector s)
    {
       var g = new GameObject("Sector");
-      Mesh mesh = new Mesh();
-      g.AddComponent<MeshFilter>().mesh = mesh;
+      g.AddComponent<MeshFilter>().mesh = Utils.CreateSectorMesh(s.width, s.range_min, s.range_max, m_sectorSubdivNum);
       var meshReneder = g.AddComponent<MeshRenderer>();
       meshReneder.material = m_sectorMaterial;
       meshReneder.material.color = s.color;
 
-      var vertexList = new List<Vector3>();
-      float deltaAngle = s.width / 2 / m_sectorSubdivNum;
-      for (float a = -s.width / 2; a <= s.width / 2; a += deltaAngle)
-      {
-         Quaternion rotation = Quaternion.Euler(0, a, 0);
-         Vector3 v0 = rotation * Vector3.back * s.range_min + Vector3.up / 2;
-         Vector3 v1 = rotation * Vector3.back * s.range_max + Vector3.up / 2;
-         //Vector3 v0 = Vector3.back * s.range_min + Vector3.up / 2;
-         //Vector3 v1 = Vector3.back * s.range_max + Vector3.up / 2;
-
-         vertexList.Add(v0);
-         vertexList.Add(v1);
-
-
-         //          GameObject sphere1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-         //          sphere1.transform.SetParent(m_origin.transform, false);
-         //          sphere1.transform.localScale = new Vector3(20, 20, 20);
-         //          sphere1.transform.localPosition = v0;
-         // 
-         //          GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-         //          sphere2.transform.parent = m_origin.transform;
-         //          sphere2.transform.localScale = new Vector3(10, 10, 10);
-         //          sphere2.transform.localPosition = v1;
-      }
-
-      var idxList = new List<int>();
-      for (int itr = 0; itr < vertexList.Count - 2; itr += 2)
-      {
-         idxList.Add(itr + 0);
-         idxList.Add(itr + 1);
-         idxList.Add(itr + 2);
-
-         idxList.Add(itr + 2);
-         idxList.Add(itr + 1);
-         idxList.Add(itr + 3);
-      }
-
-      Color[] colors = new Color[vertexList.Count];
-      int i = 0;
-      while (i < vertexList.Count)
-      {
-         colors[i] = s.color;
-         i++;
-      }
-      mesh.vertices = vertexList.ToArray();
-      mesh.normals = Enumerable.Repeat(Vector3.up, mesh.vertices.Length).ToArray();
-      mesh.triangles = idxList.ToArray();
-      //mesh.colors = colors;
       g.transform.SetParent(m_origin.transform, false);
       return g;
    }
 
-   private void drawSector(sector s)
-   {
-   }
 }
