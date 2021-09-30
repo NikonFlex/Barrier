@@ -5,3 +5,5 @@ Barrier_Unity/obj
 *.vs
 *.suo
 *.log
+*.csproj
+*.sln
