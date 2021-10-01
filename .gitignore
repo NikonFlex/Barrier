@@ -1,9 +1,11 @@
 Barrier_Unity/Library
 Barrier_Unity/Temp
 Barrier_Unity/obj
+Barrier_Unity/UserSettings
 *.pdb
 *.vs
 *.suo
 *.log
 *.csproj
 *.sln
+*.vsconfig
