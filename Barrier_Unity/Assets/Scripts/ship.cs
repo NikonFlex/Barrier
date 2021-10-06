@@ -32,7 +32,5 @@ public class Ship : MonoBehaviour
       g.transform.SetParent(transform, false);
       g.transform.localPosition = new Vector3(0, 0.5f, 0);
       return g;
-
    }
-
 }

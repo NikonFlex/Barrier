@@ -20,15 +20,13 @@ public class Torpedo : MonoBehaviour
    // Start is called before the first frame update
    void Start()
    {
-      m_circleObject = createCircle();
+      //m_circleObject = createCircle();
       m_arrowedLineObject = createForwardArrowedLine();
    }
 
    // Update is called once per frame
    void Update()
    {
-
-
       float step = m_speed * Time.deltaTime;
       Vector3 pos = transform.position;
 
@@ -42,16 +40,16 @@ public class Torpedo : MonoBehaviour
       pos += transform.forward*step;
       transform.position = pos;
 
-      m_circleObject.GetComponent<MeshRenderer>().material.color = 
-         new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
-      float scaleFactor = Mathf.PingPong(Time.time * 0.5f, 0.7f) + 0.3f;
-      m_circleObject.transform.localScale = new Vector3(scaleFactor, 1, scaleFactor);
+      //m_circleObject.GetComponent<MeshRenderer>().material.color = 
+      //   new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
+      //float scaleFactor = Mathf.PingPong(Time.time * 0.5f, 0.7f) + 0.3f;
+      //m_circleObject.transform.localScale = new Vector3(scaleFactor, 1, scaleFactor);
    }
 
    GameObject createCircle()
    {
       var g = new GameObject("Circle");
-      g.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(m_circleSize, 100); ;
+      g.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(m_circleSize, 100);
       var meshReneder = g.AddComponent<MeshRenderer>();
       meshReneder.material = m_circleMaterial;
       meshReneder.material.color = new Color(1, 0, 0, 0.4f);

@@ -2705,11 +2705,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b564f7eac569444c97eb52d45e1d4c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _torpedo: {fileID: 1723057348}
-  _bouy1: {fileID: 1334585019}
-  _bouy2: {fileID: 303954981}
-  _range: 10000
-  _angle: 3
+  m_torpedo: {fileID: 1723057348}
+  m_bouy1: {fileID: 1334585019}
+  m_bouy2: {fileID: 303954981}
+  m_range: 10000
+  m_bearingRange: 5
+  m_bearingError: 5
+  m_material: {fileID: 2100000, guid: 3363be8f1b297ed42b2b7f3ae8d633ab, type: 2}
 --- !u!4 &1537873268
 Transform:
   m_ObjectHideFlags: 0
@@ -3512,6 +3514,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c5a1e263e66316428de5b2ca873cee7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Speed: 5
+  m_arrow: {fileID: 1570377727}
 --- !u!114 &989579520519464195
 MonoBehaviour:
   m_ObjectHideFlags: 0

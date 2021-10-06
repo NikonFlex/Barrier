@@ -117,4 +117,28 @@ static class Utils
       return mesh;
    }
 
+   static public Mesh CreateRombusMesh(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
+   {
+      Mesh mesh = new Mesh();
+
+      var vertexList = new List<Vector3>();
+      vertexList.Add(p1);
+      vertexList.Add(p2);
+      vertexList.Add(p3);
+      vertexList.Add(p4);
+
+      var idxList = new List<int>();
+      idxList.Add(0);
+      idxList.Add(1);
+      idxList.Add(2);
+      idxList.Add(0);
+      idxList.Add(2);
+      idxList.Add(3);
+
+      mesh.vertices = vertexList.ToArray();
+      mesh.normals = Enumerable.Repeat(Vector3.up, mesh.vertices.Length).ToArray();
+      mesh.triangles = idxList.ToArray();
+      return mesh;
+   }
+
 }
