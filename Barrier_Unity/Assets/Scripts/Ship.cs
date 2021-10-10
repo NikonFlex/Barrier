@@ -16,6 +16,8 @@ public class Ship : MonoBehaviour
    // Update is called once per frame
    void Update()
    {
+      if (!Scenario.Instance.IsRunning)
+         return;
       float step = m_Speed * Time.deltaTime;
       Vector3 pos = transform.position;
       pos.z += step;

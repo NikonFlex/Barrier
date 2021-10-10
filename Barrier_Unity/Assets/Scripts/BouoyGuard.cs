@@ -25,9 +25,9 @@ public class BouoyGuard : MonoBehaviour
       //m_mesh.transform.localPosition = new Vector3(0, 0.25f, 0);
 
 
-      m_errorBeg = Random.RandomRange(-m_bearingError/2f, m_bearingError/2);
+      m_errorBeg = Random.Range(-m_bearingError/2f, m_bearingError/2);
       m_errorCur = m_errorBeg;
-      m_errorEnd = Random.RandomRange(-m_bearingError / 2f, m_bearingError / 2);
+      m_errorEnd = Random.Range(-m_bearingError / 2f, m_bearingError / 2);
       m_errorTime = Time.time;
 
       StartCoroutine(timerCoroutine());

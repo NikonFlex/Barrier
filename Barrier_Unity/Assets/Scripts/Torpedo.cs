@@ -5,7 +5,7 @@ using System.Linq;
 
 public class Torpedo : MonoBehaviour
 {
-   [SerializeField] float m_speed = 15;
+   [SerializeField] float m_speed = 30;
    [SerializeField] float m_circleSize = 500;
    [SerializeField] float m_arrowLength = 6000;
    [SerializeField] float m_arrowWidth = 100;
@@ -27,6 +27,10 @@ public class Torpedo : MonoBehaviour
    // Update is called once per frame
    void Update()
    {
+
+      if (!Scenario.Instance.IsRunning)
+         return;
+
       float step = m_speed * Time.deltaTime;
       Vector3 pos = transform.position;
 

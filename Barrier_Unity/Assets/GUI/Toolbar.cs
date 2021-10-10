@@ -29,24 +29,17 @@ public class Toolbar : MonoBehaviour
    void Start()
    {
       List<GameObject> panelList = new List<GameObject>();
-      foreach (ToolbarButton g in FindObjectsOfType<ToolbarButton>())
+      foreach (var tb in GetComponentsInChildren<ToolbarButton>())
       {
-         if (g.transform.root != transform.root)
-            continue;
-         Button b = g.GetComponent<Button>();
-         if (b == null)
-            continue;
+         Button b = tb.GetComponent<Button>();
 
          b.onClick.AddListener(() => onButtonClick(b));
          //print ( "toolbar add button " + b );
-         if (g.panel != null)
-            panelList.Add(g.panel);
-
-
+         if (tb.panel != null)
+            panelList.Add(tb.panel);
       }
 
       m_panels = panelList.ToArray();
-
    }
 
    void onButtonClick(Button b)
@@ -54,7 +47,6 @@ public class Toolbar : MonoBehaviour
       ToolbarButton tbb = b.gameObject.GetComponent<ToolbarButton>();
       if (tbb == null)
          return;
-
 
       GameObject currentPanel = tbb.panel;
       if (currentPanel != null)
@@ -104,7 +96,6 @@ public class Toolbar : MonoBehaviour
             b.Enabled = enabled;
             return;
          }
-
       }
    }
    public void SetButtonText(ButtonID id, string text)
