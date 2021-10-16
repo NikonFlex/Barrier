@@ -53,6 +53,7 @@ public class Torpedo : MonoBehaviour
    GameObject createCircle()
    {
       var g = new GameObject("Circle");
+      g.layer = 6;
       g.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(m_circleSize, 100);
       var meshReneder = g.AddComponent<MeshRenderer>();
       meshReneder.material = m_circleMaterial;
@@ -65,6 +66,7 @@ public class Torpedo : MonoBehaviour
    GameObject createForwardArrowedLine()
    {
       var g = new GameObject("ArrowLine");
+      g.layer = 6;
       Mesh mesh = new Mesh();
       g.AddComponent<MeshFilter>().mesh = Utils.CreateLinedMesh(m_arrowLength, m_arrowWidth, m_arrowWidth * 2);
       var meshReneder = g.AddComponent<MeshRenderer>();

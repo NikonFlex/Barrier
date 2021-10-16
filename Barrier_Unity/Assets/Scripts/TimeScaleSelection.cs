@@ -5,9 +5,11 @@ public class TimeScaleSelection : MonoBehaviour
 {
    void Start()
    {
-      GetComponent<Dropdown>().onValueChanged.AddListener(delegate
+      var dd = GetComponent<Dropdown>();
+      Time.timeScale = float.Parse(dd.options[dd.value].text);
+      dd.onValueChanged.AddListener(delegate
       {
-         dropdownValueChanged(GetComponent<Dropdown>());
+         dropdownValueChanged(dd);
       });
    }
 

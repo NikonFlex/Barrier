@@ -15,6 +15,7 @@ public class Main : MonoBehaviour
    [SerializeField] GameObject _scenarioPanel;
    [SerializeField] GameObject _targetInfoPanel;
    [SerializeField] GameObject _mapPanel;
+   [SerializeField] GameObject _settingsPanel;
    Toolbar[] m_toolbars;
    private CameraController m_cameraController;
    // Start is called before the first frame update
@@ -59,6 +60,8 @@ public class Main : MonoBehaviour
       _scenarioPanel.SetActive(Scenario.Instance.IsAlive);
       _targetInfoPanel.SetActive(Scenario.Instance.IsAlive);
       _mapPanel.SetActive(Scenario.Instance.IsAlive);
+      if (Scenario.Instance.IsAlive && _settingsPanel.activeInHierarchy)
+         _settingsPanel.SetActive(false);
    }
 
    void updateToolbarButtons()
@@ -72,6 +75,7 @@ public class Main : MonoBehaviour
                tb.EnableButton(Toolbar.ButtonID.PAUSE, true);
                tb.EnableButton(Toolbar.ButtonID.START, false);
                tb.EnableButton(Toolbar.ButtonID.STOP, true);
+               tb.EnableButton(Toolbar.ButtonID.SETTINGS, false);
                break;
             }
             case Scenario.Mode.Paused:
@@ -79,6 +83,7 @@ public class Main : MonoBehaviour
                tb.EnableButton(Toolbar.ButtonID.PAUSE, true);
                tb.EnableButton(Toolbar.ButtonID.START, true);
                tb.EnableButton(Toolbar.ButtonID.STOP, true);
+               tb.EnableButton(Toolbar.ButtonID.SETTINGS, false);
                break;
             }
             case Scenario.Mode.Finished:
@@ -87,6 +92,7 @@ public class Main : MonoBehaviour
                tb.EnableButton(Toolbar.ButtonID.PAUSE, false);
                tb.EnableButton(Toolbar.ButtonID.START, true);
                tb.EnableButton(Toolbar.ButtonID.STOP, false);
+               tb.EnableButton(Toolbar.ButtonID.SETTINGS, true);
                break;
             }
          }

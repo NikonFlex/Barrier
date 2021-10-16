@@ -27,6 +27,7 @@ public class Ship : MonoBehaviour
    GameObject createDirectionLine()
    {
       var g = new GameObject("ArrowLine");
+      g.layer = 6;
       g.AddComponent<MeshFilter>().mesh = Utils.CreateLinedMesh(1000, 50, 100);
       var meshReneder = g.AddComponent<MeshRenderer>();
       meshReneder.material = m_arrow.GetComponent<MeshRenderer>().material;
