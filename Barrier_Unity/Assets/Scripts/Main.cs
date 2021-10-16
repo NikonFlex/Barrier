@@ -14,6 +14,7 @@ public class Main : MonoBehaviour
 
    [SerializeField] GameObject _scenarioPanel;
    [SerializeField] GameObject _targetInfoPanel;
+   [SerializeField] GameObject _mapPanel;
    Toolbar[] m_toolbars;
    private CameraController m_cameraController;
    // Start is called before the first frame update
@@ -57,6 +58,7 @@ public class Main : MonoBehaviour
    {
       _scenarioPanel.SetActive(Scenario.Instance.IsAlive);
       _targetInfoPanel.SetActive(Scenario.Instance.IsAlive);
+      _mapPanel.SetActive(Scenario.Instance.IsAlive);
    }
 
    void updateToolbarButtons()
