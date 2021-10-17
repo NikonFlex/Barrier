@@ -6,6 +6,7 @@ public enum ViewType
 {
    Top,
    Iso,
+   FollowObject,
    Free
 };
 

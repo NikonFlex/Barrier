@@ -20,7 +20,7 @@ public class Ship : MonoBehaviour
          return;
       float step = m_Speed * Time.deltaTime;
       Vector3 pos = transform.position;
-      pos.z += step;
+      pos += transform.forward * step;
       transform.position = pos;
    }
 

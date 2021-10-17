@@ -46,6 +46,7 @@ public class TargetInfo
 {
    public float Bearing = 0;
    public float Distance = -1;
+   public Vector3 TargetPos;
 }
 
 public class Scenario : MonoBehaviour
@@ -141,10 +142,9 @@ public class Scenario : MonoBehaviour
       {
          Distance = (_ship.position - _torpedo.position).magnitude,
          // TODO: use ship direction and 
-         Bearing = Vector2.Angle(
-            new Vector2(_ship.position.x, _ship.position.z),
-            new Vector2(_torpedo.position.x, _torpedo.position.z))
-      };
+         TargetPos = _torpedo.position,
+         Bearing = Vector3.SignedAngle(_ship.forward, (_torpedo.position - transform.position).normalized, Vector3.up)
+   };
 }
 
    private IScenarioPhase currentPhase => _phases[(int)_currentState];
