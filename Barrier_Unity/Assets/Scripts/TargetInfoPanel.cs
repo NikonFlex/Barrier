@@ -1,4 +1,4 @@
-using System.Collections;
+п»їusing System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -18,8 +18,8 @@ public class TargetInfoPanel : MonoBehaviour
       var t = Scenario.Instance.TargetInfo;
       if (t != null)
       {
-         _distanceText.SetText($"Дистанция: {t.Distance:0.#} м");
-         _bearingText.SetText($"Пеленг: {t.Bearing:0.#°}");
+         _distanceText.SetText($"Р”РёСЃС‚Р°РЅС†РёСЏ: {t.Distance:0.#} Рј");
+         _bearingText.SetText($"РџРµР»РµРЅРі: {t.Bearing:0.#В°}");
       }
    }
 }

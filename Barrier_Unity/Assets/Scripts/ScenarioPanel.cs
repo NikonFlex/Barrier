@@ -1,4 +1,4 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -15,7 +15,7 @@ public class ScenarioPanel : MonoBehaviour
    // Update is called once per frame
    void Update()
    {
-      _timeText.SetText($"¬ÂÏˇ: {Scenario.Instance.ScenarioTime:0.#}");
+      _timeText.SetText($"–í—Ä–µ–º—è: {Scenario.Instance.ScenarioTime:0.#}");
       _phaseText.SetText(Scenario.Instance.CurrentPhase.Title);
    }
 }
