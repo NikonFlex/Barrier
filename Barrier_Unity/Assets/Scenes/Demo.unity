@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5389,6 +5389,12 @@ MonoBehaviour:
   m_origin: {fileID: 919132148589263873}
   m_sectorSubdivNum: 100
   m_sectorMaterial: {fileID: 2100000, guid: 6aa0cafa1cc92fb4a8c9db3052371db0, type: 2}
+  a: 3
+  b: 5
+  h: 10
+  k: 10
+  theta: 45
+  resolution: 1000
 --- !u!114 &1173577972
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7305,8 +7311,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_torpedo: {fileID: 1723057348}
-  m_bouy1: {fileID: 1334585019}
-  m_bouy2: {fileID: 303954981}
+  m_bouy1: {fileID: 1334585018}
+  m_bouy2: {fileID: 303954980}
   m_range: 10000
   m_bearingRange: 5
   m_bearingError: 5

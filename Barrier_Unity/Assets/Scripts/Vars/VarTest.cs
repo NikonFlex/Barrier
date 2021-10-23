@@ -6,11 +6,11 @@ public class VarTest : MonoBehaviour
    void Start()
    {
       //AttributeHelper.SerialzeToYaml("settings.yaml");
-      AttributeHelper.DeserializeFromYaml("settings.yaml");
-
-      VarSync.OnVariableUpdate += onVariableUpdate;
-
-      VarSync.Set(VarName.SOME_FLOAT, 0.5f);
+//       AttributeHelper.DeserializeFromYaml("settings.yaml");
+// 
+//       VarSync.OnVariableUpdate += onVariableUpdate;
+// 
+//       VarSync.Set(VarName.SOME_FLOAT, 0.5f);
    }
 
    private void onVariableUpdate(VarName v, object value)
