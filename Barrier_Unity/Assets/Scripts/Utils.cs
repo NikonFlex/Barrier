@@ -74,71 +74,161 @@ static class Utils
 
    static public Mesh CreateSectorMesh(float width, float minRange, float maxRange, int numSegments)
    {
-      Mesh mesh = new Mesh();
+        Mesh mesh = new Mesh();
 
-      var vertexList = new List<Vector3>();
-      float deltaAngle = width / 2 / numSegments;
-      for (float a = -width / 2; a <= width / 2; a += deltaAngle)
-      {
-         Quaternion rotation = Quaternion.Euler(0, a, 0);
-         Vector3 v0 = rotation * Vector3.back * minRange + Vector3.up / 2;
-         Vector3 v1 = rotation * Vector3.back * maxRange + Vector3.up / 2;
+        var vertexList = new List<Vector3>();
+        float deltaAngle = width / 2 / numSegments;
+        for (float a = -width / 2; a <= width / 2; a += deltaAngle)
+        {
+            Quaternion rotation = Quaternion.Euler(0, a, 0);
+            Vector3 v0 = rotation * Vector3.back * minRange + Vector3.up / 2;
+            Vector3 v1 = rotation * Vector3.back * maxRange + Vector3.up / 2;
 
-         vertexList.Add(v0);
-         vertexList.Add(v1);
+            vertexList.Add(v0);
+            vertexList.Add(v1);
 
 
-         //          GameObject sphere1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-         //          sphere1.transform.SetParent(m_origin.transform, false);
-         //          sphere1.transform.localScale = new Vector3(20, 20, 20);
-         //          sphere1.transform.localPosition = v0;
-         // 
-         //          GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-         //          sphere2.transform.parent = m_origin.transform;
-         //          sphere2.transform.localScale = new Vector3(10, 10, 10);
-         //          sphere2.transform.localPosition = v1;
-      }
+            //          GameObject sphere1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //          sphere1.transform.SetParent(m_origin.transform, false);
+            //          sphere1.transform.localScale = new Vector3(20, 20, 20);
+            //          sphere1.transform.localPosition = v0;
+            // 
+            //          GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //          sphere2.transform.parent = m_origin.transform;
+            //          sphere2.transform.localScale = new Vector3(10, 10, 10);
+            //          sphere2.transform.localPosition = v1;
+        }
 
-      var idxList = new List<int>();
-      for (int itr = 0; itr < vertexList.Count - 2; itr += 2)
-      {
-         idxList.Add(itr + 0);
-         idxList.Add(itr + 1);
-         idxList.Add(itr + 2);
+        var idxList = new List<int>();
+        for (int itr = 0; itr < vertexList.Count - 2; itr += 2)
+        {
+            idxList.Add(itr + 0);
+            idxList.Add(itr + 1);
+            idxList.Add(itr + 2);
 
-         idxList.Add(itr + 2);
-         idxList.Add(itr + 1);
-         idxList.Add(itr + 3);
-      }
+            idxList.Add(itr + 2);
+            idxList.Add(itr + 1);
+            idxList.Add(itr + 3);
+        }
 
-      mesh.vertices = vertexList.ToArray();
-      mesh.normals = Enumerable.Repeat(Vector3.up, mesh.vertices.Length).ToArray();
-      mesh.triangles = idxList.ToArray();
-      return mesh;
-   }
+        mesh.vertices = vertexList.ToArray();
+        mesh.normals = Enumerable.Repeat(Vector3.up, mesh.vertices.Length).ToArray();
+        mesh.triangles = idxList.ToArray();
+        return mesh;
+    }
 
-   static public Mesh CreateRombusMesh(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
+   static public Mesh CreateEllipseMesh(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
    {
-      Mesh mesh = new Mesh();
+        List<Vector3> positions = new List<Vector3>();
+        Quaternion q = Quaternion.AngleAxis(180, Vector3.forward);
+        Vector3 center = new Vector3(0.0f, 0.0f, 0.0f);
+        positions.Add(center);
 
-      var vertexList = new List<Vector3>();
-      vertexList.Add(p1);
-      vertexList.Add(p2);
-      vertexList.Add(p3);
-      vertexList.Add(p4);
+        int resolution = 100;
+        float a = (p1 - p3).magnitude / 2;
+        float b = (p2 - p4).magnitude / 2;
+        for (int i = 0; i <= resolution; i += 1)
+        {
+            float angle = (float)i / (float)resolution * 2.0f * Mathf.PI;
+            positions.Add(new Vector3(a * Mathf.Cos(angle), 0.0f, b * Mathf.Sin(angle)));
+            positions[i] = q * positions[i] + center;
+        }
 
-      var idxList = new List<int>();
-      idxList.Add(0);
-      idxList.Add(1);
-      idxList.Add(2);
-      idxList.Add(0);
-      idxList.Add(2);
-      idxList.Add(3);
+        Mesh mesh = new Mesh();
+        mesh.vertices = positions.ToArray();
+        var tris = new List<int>();
+        for (int i = 1; i < positions.Count - 1; i += 1)
+        {
+            tris.Add(0);
+            tris.Add(i);
+            tris.Add(i + 1);
+        }
+        tris.Add(0);
+        tris.Add(positions.Count - 2);
+        tris.Add(1);
+        mesh.triangles = tris.ToArray();
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
+        return mesh;
+    }
 
-      mesh.vertices = vertexList.ToArray();
-      mesh.normals = Enumerable.Repeat(Vector3.up, mesh.vertices.Length).ToArray();
-      mesh.triangles = idxList.ToArray();
-      return mesh;
-   }
+    static public Mesh CreateRombusMesh(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
+    {
+        Mesh mesh = new Mesh();
 
+        var vertexList = new List<Vector3>();
+        vertexList.Add(p1);
+        vertexList.Add(p2);
+        vertexList.Add(p3);
+        vertexList.Add(p4);
+
+        var idxList = new List<int>();
+        idxList.Add(0);
+        idxList.Add(1);
+        idxList.Add(2);
+        idxList.Add(0);
+        idxList.Add(2);
+        idxList.Add(3);
+
+        mesh.vertices = vertexList.ToArray();
+        mesh.normals = Enumerable.Repeat(Vector3.up, mesh.vertices.Length).ToArray();
+        mesh.triangles = idxList.ToArray();
+        return mesh;
+    }
+    static public Mesh CreateSplineMesh(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
+    {
+        Mesh mesh = new Mesh();
+
+        List<Vector3> spl = new List<Vector3>();
+        int subdiv = 20;
+        spl.AddRange(bsp(p1, p2, p3, p4, subdiv));
+        spl.AddRange(bsp(p2, p3, p4, p1, subdiv));
+        spl.AddRange(bsp(p3, p4, p1, p2, subdiv));
+        spl.AddRange(bsp(p4, p1, p2, p3, subdiv));
+        mesh.vertices = spl.ToArray();
+
+        var tris = new List<int>();
+        for (int i = 1; i < spl.Count - 1; i += 1)
+        {
+            tris.Add(0);
+            tris.Add(i);
+            tris.Add(i + 1);
+        }
+        tris.Add(0);
+        tris.Add(spl.Count - 2);
+        tris.Add(1);
+        mesh.triangles = tris.ToArray();
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
+        return mesh;
+    }
+    static public Vector3[] bsp(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4, int divisions)
+    {
+        Vector2 p1 = new Vector2(v1.x, v1.z);
+        Vector2 p2 = new Vector2(v2.x, v2.z);
+        Vector2 p3 = new Vector2(v3.x, v3.z);
+        Vector2 p4 = new Vector2(v4.x, v4.z);
+        var spline = new List<Vector3>();
+        double[] a = new double[5];
+        double[] b = new double[5];
+        a[0] = (-p1.x + 3 * p2.x - 3 * p3.x + p4.x) / 6.0;
+        a[1] = (3 * p1.x - 6 * p2.x + 3 * p3.x) / 6.0;
+        a[2] = (-3 * p1.x + 3 * p3.x) / 6.0;
+        a[3] = (p1.x + 4 * p2.x + p3.x) / 6.0;
+        b[0] = (-p1.y + 3 * p2.y - 3 * p3.y + p4.y) / 6.0;
+        b[1] = (3 * p1.y - 6 * p2.y + 3 * p3.y) / 6.0;
+        b[2] = (-3 * p1.y + 3 * p3.y) / 6.0;
+        b[3] = (p1.y + 4 * p2.y + p3.y) / 6.0;
+
+        spline.Add(new Vector3((float)a[3], 0, (float)b[3]));
+
+        int i;
+        for (i = 1; i <= divisions - 1; i++)
+        {
+            float t = System.Convert.ToSingle(i) / System.Convert.ToSingle(divisions);
+            spline.Add(new Vector3((float)((a[2] + t * (a[1] + t * a[0])) * t + a[3]), 0, (float)((b[2] + t * (b[1] + t * b[0])) * t + b[3])));
+        }
+
+        return spline.ToArray();
+    }
 }
