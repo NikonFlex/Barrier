@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-enum PacketState
+public enum PacketState
 {
    None = 0,
    Fly = 1,
    SplashDown = 2,
+   OnWater = 3
 }
 
 public class Packet : MonoBehaviour
@@ -19,6 +20,8 @@ public class Packet : MonoBehaviour
    Vector3 _prevPos;
    bool _isOnParashut = false;
    private Vector3 _startPos;
+
+   public PacketState State => _state;
 
    void Start()
    {
@@ -33,17 +36,13 @@ public class Packet : MonoBehaviour
       switch (_state)
       {
          case PacketState.Fly:
-         StartCoroutine(Fly());
-         //Fly();
-         break;
+            StartCoroutine(Fly());
+            break;
 
          case PacketState.SplashDown:
-         if (!_isOnParashut)
-            StartCoroutine(SplashDown());
-         break;
-
-         default:
-         break;
+            if (!_isOnParashut)
+               StartCoroutine(SplashDown());
+            break;
       }
    }
 
@@ -112,6 +111,7 @@ public class Packet : MonoBehaviour
       }
       print("buoy on water");
 
-      _state = PacketState.None;
+      _state = PacketState.OnWater;
+      gameObject.AddComponent<Bouoy>();
    }
 }

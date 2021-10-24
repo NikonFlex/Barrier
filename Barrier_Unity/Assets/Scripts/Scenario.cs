@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public enum ScenarioPhaseState
 {
@@ -53,6 +54,8 @@ public class Scenario : MonoBehaviour
 {
    [SerializeField] Transform _ship;
    [SerializeField] Transform _torpedo;
+   private List<Packet> _bouoyPackets = new List<Packet>();
+   private List<Bouoy> _bouoys = new List<Bouoy>();
 
    public enum Mode
    {
@@ -70,6 +73,11 @@ public class Scenario : MonoBehaviour
    public bool IsAlive => isAlive;
    public bool IsRunning => isRunning;
    public TargetInfo TargetInfo => isRunning ? calcTargetInfo() : null;
+   public Packet[] BouoyPackets => _bouoyPackets.ToArray();
+   public Bouoy[] Bouoys => _bouoys.ToArray();
+
+   public void OnPacketLaunch(Packet p) => _bouoyPackets.Add(p);
+   public void OnBouyHatched(Bouoy b) => _bouoys.Add(b);
 
    public void StartScenario()
    {
@@ -105,11 +113,10 @@ public class Scenario : MonoBehaviour
    {
       // add stub phases
       var phases = new List<IScenarioPhase>();
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 3));
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByAntenna, "Цель обнаружена МСЦ", 3));
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.BuoysLaunched, "Буи выстрелили", 5));
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.BuoysOnPlace, "Буи приводнились", 5));
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.BuoysStartScan, "Буи в работе", 3));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 0.1f));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByAntenna, "Цель обнаружена МСЦ", 0.5f));
+      phases.Add(new PhaseLaunchBouys());
+      phases.Add(new PhaseBouysReady());
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByBuoys, "Цель запеленгована буями", 2));
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesLaunched, "Ракеты выпущены", 2));
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesStrike, "Ракеты достигли цели", 2));
@@ -165,4 +172,43 @@ public class Scenario : MonoBehaviour
    private ScenarioPhaseState _currentState;
 
    private static Scenario _instance;
+}
+
+class PhaseLaunchBouys : IScenarioPhase
+{
+   public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysLaunched;
+   public override string Title => "Буи выстрелили";
+   public override bool IsFinished => checkFinished();
+
+   public override void Start()
+   {
+      GameObject.FindObjectOfType<BuoyLauncher>().LaunchBuouys();
+   }
+
+   private bool checkFinished()
+   {
+      if (Scenario.Instance.BouoyPackets.Length == 0)
+         return false;
+      return Scenario.Instance.BouoyPackets.All(p => p.State == PacketState.OnWater);
+   }
+}
+
+
+class PhaseBouysReady : IScenarioPhase
+{
+   public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysOnPlace;
+   public override string Title => "Буи готовятся";
+   public override bool IsFinished => checkFinished();
+
+   public override void Start()
+   {
+   }
+
+   private bool checkFinished()
+   {
+      if (Scenario.Instance.Bouoys.Length == 0)
+         return false;
+
+      return Scenario.Instance.Bouoys.All(b => b.State == BouoyState.Working);
+   }
 }

@@ -2,6 +2,9 @@
 
 public enum VarName
 {
+   // ===============================
+   // ДОБАВЛЯТЬ В КОНЕЦ!!!!!!!!!!!!!!
+   // ===============================
    [VarName(HideInInspector = true)]
    UNDEFINED,
    [VarName(DisplayText = "Пеленг на цель", Persist = true, HideInInspector = true, Units = "Град", DefaultValue = 180f)]
@@ -26,6 +29,8 @@ public enum VarName
    BuoysSettingPostionError,
    [VarName(DisplayText = "Погрешность пеленга буя", Persist = true, HideInInspector = true, Units = "град", DefaultValue = 10)]
    BuoysBearingError,
+   [VarName(DisplayText = "Время готовности буя", Persist = true, HideInInspector = true, Units = "сек", DefaultValue = 3)]
+   BuoyReadyTime,
 
    // runtime vars
    [VarName(Persist = false, DefaultValue = 0f, FormatPrecision = 2)]
