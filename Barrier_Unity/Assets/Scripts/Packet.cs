@@ -68,7 +68,7 @@ public class Packet : MonoBehaviour
          //          if ((pos - Target).magnitude > (transform.position - Target).magnitude)
          //             break_flag = true;
          if ((transform.position - Target).magnitude < 100 || 
-            (_speedVector.y < 0 && pos.y < ScenarioVariables.BuoysOpenConeHeight) )
+            (_speedVector.y < 0 && pos.y < VarSync.GetFloat(VarName.BuoysOpenConeHeight)))
             break_flag = true;
          transform.position = pos;
          yield return null;

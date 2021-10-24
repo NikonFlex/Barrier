@@ -13,6 +13,7 @@ public struct VarData
 
       type = VarData.Type.Undefined;
       if      (o is bool)   { type = Type.Bool; }
+      else if (o is int)    { type = Type.Float; }
       else if (o is float)  { type = Type.Float; }
       else if (o is string) { type = Type.String; }
       else if (o is float[])

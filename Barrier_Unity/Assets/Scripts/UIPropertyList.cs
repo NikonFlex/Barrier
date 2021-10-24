@@ -11,7 +11,7 @@ public class UIPropertyList : MonoBehaviour
       GameObject numericPrefab = Resources.Load("TemplateNumericProperty") as GameObject;
       GameObject togglePrefab = Resources.Load("TemplateToggleProperty") as GameObject;
       GameObject dropdownPrefab = Resources.Load("TemplateDropdownProperty") as GameObject;
-      foreach (UIProperty prop in Category == PropCategory.Common ? CommonProperties.Props : ScenarioProperties.Props)
+      foreach (UIProperty prop in ScenarioProperties.GetProps())
       {
          GameObject instance = null;
          if (prop is NumericProperty np)
@@ -19,6 +19,9 @@ public class UIPropertyList : MonoBehaviour
             instance = Instantiate(numericPrefab, transform.position, transform.rotation);
             Text tu = instance.transform.Find("Units").GetComponent<Text>();
             tu.text = np.Units;
+
+            InputField inp = instance.transform.Find("Input").GetComponent<InputField>();
+            inp.text = VarSync.GetFloat(np.Var).ToString();
          }
          else if (prop is ToggleProperty tp)
             instance = Instantiate(togglePrefab, transform.position, transform.rotation);
@@ -26,11 +29,13 @@ public class UIPropertyList : MonoBehaviour
          {
             instance = Instantiate(dropdownPrefab, transform.position, transform.rotation);
             Dropdown d = instance.transform.Find("Dropdown").GetComponent<Dropdown>();
+            d.value = VarSync.GetInt(dp.Var);
             d.AddOptions(new List<string>(dp.Options));
          }
 
          Text t = instance.transform.Find("Text").GetComponent<Text>();
          t.text = prop.Title;
+         instance.GetComponent<VarLinkUI>().V = prop.Var;
          instance.transform.SetParent(transform);
       }
 

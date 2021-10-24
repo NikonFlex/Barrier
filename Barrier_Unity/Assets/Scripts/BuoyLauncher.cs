@@ -42,14 +42,14 @@ public class BuoyLauncher : MonoBehaviour
          var trg = Scenario.Instance.TargetInfo;
          if (trg != null)
          {
-            float d = ScenarioVariables.DistanceBetweenBuoys;
+            float d = VarSync.GetFloat(VarName.BouysDistanceBetween);
             float distance = trg.Distance - d * Mathf.Sqrt(3) / 2f;
-            if (distance > ScenarioVariables.MaxBuoysShootDisance)
-               distance = ScenarioVariables.MaxBuoysShootDisance;
+            Mathf.Clamp(distance, 0, VarSync.GetFloat(VarName.BuoysShootRange));
             Vector3 dirToTarget = (trg.TargetPos - transform.position).normalized;
             Vector3 left = Vector3.Cross(dirToTarget, Vector3.up).normalized;
-            Vector3 p1 = left * d / 2  + dirToTarget * distance + Vector3.up*ScenarioVariables.BuoysOpenConeHeight;
-            Vector3 p2 = -left * d / 2  + dirToTarget * distance + Vector3.up * ScenarioVariables.BuoysOpenConeHeight;
+            Vector3 openConeHeightPos = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
+            Vector3 p1 = left * d / 2  + dirToTarget * distance + openConeHeightPos;
+            Vector3 p2 = -left * d / 2  + dirToTarget * distance + openConeHeightPos;
             var o1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
             o1.transform.position = p1;
             var o2 = GameObject.CreatePrimitive(PrimitiveType.Cube);

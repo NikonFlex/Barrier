@@ -57,6 +57,30 @@ public static class VarSync
       return (o != null && o is T) ? (T)o : def;
    }
 
+   static public float GetFloat(VarName v)
+   {
+      object o = GetObject(v);
+      if (o == null)
+         o = v.GetDefValue();
+      if (o != null && (o is float || o is int))
+         return (float)o;
+      return 0f;
+   }
+
+   static public bool GetBool(VarName v)
+   {
+      return Get(v, false);
+   }
+
+   static public int GetInt(VarName v)
+   {
+      return (int)Get(v, 0f);
+   }
+   static public string GetString(VarName v)
+   {
+      return Get(v, "");
+   }
+
    static public Vector2 Get(VarName v, Vector2 def)
    {
       float[] arr = Get(v, new float[0]);
@@ -108,38 +132,49 @@ public static class VarSync
    static public void Set(VarName v, bool value, bool forceUpdate = false)
    {
       if (Get(v, false) != value || forceUpdate)
-         fireUpdate(v, new VarData(value));
+         updateVariableInternal(v, new VarData(value), forceUpdate);
    }
 
-   static public void Set(VarName v, string value)
+   static public void Set(VarName v, string value, bool forceUpdate = false)
    {
-      if (Get(v, "") != value)
-         fireUpdate(v, new VarData(value));
+      if (Get(v, "") != value || forceUpdate)
+         updateVariableInternal(v, new VarData(value), forceUpdate);
    }
 
-   static public void Set(VarName v, float value)
-   {
-      if (isChanged(v, value))
-         fireUpdate(v, new VarData(value));
-   }
-
-   static public void Set(VarName v, float[] value)
+   static public void Set(VarName v, float value, bool forceUpdate = false)
    {
       if (isChanged(v, value))
-         fireUpdate(v, new VarData(value));
+         updateVariableInternal(v, new VarData(value), forceUpdate);
    }
 
-   static public void Set(VarName v, Vector2 value)
+   static public void Set(VarName v, float[] value, bool forceUpdate = false)
+   {
+      if (isChanged(v, value))
+         updateVariableInternal(v, new VarData(value), forceUpdate);
+   }
+
+   static public void Set(VarName v, Vector2 value, bool forceUpdate = false)
    {
       float[] arr = new float[2] { value.x, value.y };
       if (isChanged(v, arr))
-         fireUpdate(v, new VarData(arr));
+         updateVariableInternal(v, new VarData(value), forceUpdate);
    }
 
-   static public void Set(VarName v, Vector3 value)
+   static public void Set(VarName v, Vector3 value, bool forceUpdate = false)
    {
       float[] arr = new float[3] { value.x, value.y, value.z };
       if (isChanged(v, arr))
-         fireUpdate(v, new VarData(arr));
+         updateVariableInternal(v, new VarData(value), forceUpdate);
    }
+
+   static public void updateVariableInternal(VarName v, VarData data, bool forceUpdate)
+   {
+      bool diff = _vars[(int)v].value != data.value;
+
+      _vars[(int)v] = data;
+
+      if (diff || forceUpdate)
+         fireUpdate(v, data);
+   }
+
 }

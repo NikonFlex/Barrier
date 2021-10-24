@@ -5,7 +5,7 @@ public class VarTest : MonoBehaviour
    // Start is called before the first frame update
    void Start()
    {
-      //AttributeHelper.SerialzeToYaml("settings.yaml");
+      AttributeHelper.SerialzeToYaml("settings.yaml");
 //       AttributeHelper.DeserializeFromYaml("settings.yaml");
 // 
 //       VarSync.OnVariableUpdate += onVariableUpdate;

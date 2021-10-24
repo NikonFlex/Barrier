@@ -118,8 +118,15 @@ public class Scenario : MonoBehaviour
    // Update is called once per frame
    void Update() 
    {
+      VarSync.Set(VarName.CurrentTime, _currentTime);
+      VarSync.Set(VarName.ScenarioPhaseName, currentPhase.Title, true);
+
       if (_currentMode != Mode.Running)
          return;
+
+      TargetInfo trg = calcTargetInfo();
+      VarSync.Set(VarName.TargetBearing, trg != null ? trg.Bearing : 0f );
+      VarSync.Set(VarName.TargetDistance, trg != null ? trg.Distance : 0f);
 
       _currentTime += Time.deltaTime;
 
