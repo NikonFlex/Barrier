@@ -129,7 +129,27 @@ public class BouoyGuard : MonoBehaviour
         m_splineZone.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 1, Mathf.PingPong(Time.time, 0.5f));
     }
 
-    private Vector3 getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22)
+    public bool IsBouoy1Null()
+   {
+      return m_bouy1 == null;
+   }
+
+   public bool IsBouoy2Null()
+   {
+      return m_bouy2 == null;
+   }
+
+   public void SetBouoy1(GameObject g_obj)
+   {
+      m_bouy1 = g_obj;
+   }
+
+   public void SetBouoy2(GameObject g_obj)
+   {
+      m_bouy2 = g_obj;
+   }
+
+   private Vector3 getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22)
     {
         p11.y = 1;
         p12.y = 1;

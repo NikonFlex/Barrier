@@ -31,6 +31,11 @@ public class Bouoy : MonoBehaviour
       yield return new WaitForSeconds(VarSync.GetFloat(VarName.BuoyReadyTime));
       _state = BouoyState.Working;
       print("bouy start work");
+      BouoyGuard bouoy_guard = FindObjectOfType<BouoyGuard>();
+      if (bouoy_guard.GetComponent<BouoyGuard>().IsBouoy1Null() == true)
+         bouoy_guard.GetComponent<BouoyGuard>().SetBouoy1(gameObject);
+      else if (bouoy_guard.GetComponent<BouoyGuard>().IsBouoy2Null() == true)
+         bouoy_guard.GetComponent<BouoyGuard>().SetBouoy2(gameObject);
       yield return null;
    }
 }
