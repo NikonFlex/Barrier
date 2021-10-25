@@ -81,11 +81,20 @@ public class Scenario : MonoBehaviour
 
    public void StartScenario()
    {
+      SetUpTargetPosition();
       _currentTime = _startTime = Time.time;
       _currentMode = Mode.Running;
       _currentState = ScenarioPhaseState.Idle;
       currentPhase.Start();
    }
+
+   private void SetUpTargetPosition()
+    {
+        float bearing = VarSync.GetFloat(VarName.StartBearingToTarget);
+        float distance = VarSync.GetFloat(VarName.StartDistanceToTarget);
+
+        _torpedo.position = Quaternion.AngleAxis(bearing, Vector3.up) * _ship.forward.normalized * distance;
+    }
 
    public void PauseScenario()
    {
