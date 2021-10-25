@@ -54,8 +54,8 @@ public class Scenario : MonoBehaviour
 {
    [SerializeField] Transform _ship;
    [SerializeField] Transform _torpedo;
-   private List<Packet> _bouoyPackets = new List<Packet>();
-   private List<Bouoy> _bouoys = new List<Bouoy>();
+   private List<Packet> _buoyPackets = new List<Packet>();
+   private List<Buoy> _buoys = new List<Buoy>();
 
    public enum Mode
    {
@@ -73,11 +73,11 @@ public class Scenario : MonoBehaviour
    public bool IsAlive => isAlive;
    public bool IsRunning => isRunning;
    public TargetInfo TargetInfo => isRunning ? calcTargetInfo() : null;
-   public Packet[] BouoyPackets => _bouoyPackets.ToArray();
-   public Bouoy[] Bouoys => _bouoys.ToArray();
+   public Packet[] BuoyPackets => _buoyPackets.ToArray();
+   public Buoy[] Buoys => _buoys.ToArray();
 
-   public void OnPacketLaunch(Packet p) => _bouoyPackets.Add(p);
-   public void OnBouyHatched(Bouoy b) => _bouoys.Add(b);
+   public void OnPacketLaunch(Packet p) => _buoyPackets.Add(p);
+   public void OnBouyHatched(Buoy b) => _buoys.Add(b);
 
    public void StartScenario()
    {
@@ -196,9 +196,9 @@ class PhaseLaunchBouys : IScenarioPhase
 
    private bool checkFinished()
    {
-      if (Scenario.Instance.BouoyPackets.Length == 0)
+      if (Scenario.Instance.BuoyPackets.Length == 0)
          return false;
-      return Scenario.Instance.BouoyPackets.All(p => p.State == PacketState.OnWater);
+      return Scenario.Instance.BuoyPackets.All(p => p.State == PacketState.OnWater);
    }
 }
 
@@ -215,9 +215,9 @@ class PhaseBouysReady : IScenarioPhase
 
    private bool checkFinished()
    {
-      if (Scenario.Instance.Bouoys.Length == 0)
+      if (Scenario.Instance.Buoys.Length == 0)
          return false;
 
-      return Scenario.Instance.Bouoys.All(b => b.State == BouoyState.Working);
+      return Scenario.Instance.Buoys.All(b => b.State == BuoyState.Working);
    }
 }

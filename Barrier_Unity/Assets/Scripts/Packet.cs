@@ -112,6 +112,6 @@ public class Packet : MonoBehaviour
       print("buoy on water");
 
       _state = PacketState.OnWater;
-      gameObject.AddComponent<Bouoy>();
+      gameObject.AddComponent<Buoy>();
    }
 }
