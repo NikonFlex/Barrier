@@ -8,7 +8,7 @@ public enum VarName
    [VarName(HideInInspector = true)]
    UNDEFINED,
    [VarName(DisplayText = "Пеленг на цель", Persist = true, HideInInspector = true, Units = "Град", DefaultValue = 180f)]
-   BearingToTarget,
+   StartBearingToTarget,
    [VarName(DisplayText = "Использовать МСЦ", Persist = true, HideInInspector = true, DefaultValue = true)]
    MSC_USE,
    [VarName(DisplayText = "Дистанция МСЦ", Persist = true, HideInInspector = true, DefaultValue = 800f)]
@@ -41,6 +41,10 @@ public enum VarName
    TargetDistance,
    [VarName(Persist = false, DefaultValue = "")]
    ScenarioPhaseName,
+
+   // TODO: перенести наверх, когда будет сделано https://bitbucket.org/blurman/barrier/issues/11
+   [VarName(DisplayText = "Расстояние до цели", Persist = true, HideInInspector = true, Units = "м", DefaultValue = 7000f)]
+   StartDistanceToTarget,
 
    VARSYNC_LAST
 };
