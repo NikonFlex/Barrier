@@ -4874,8 +4874,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_torpedo: {fileID: 1723057348}
-  m_bouy1: {fileID: 1334585018}
-  m_bouy2: {fileID: 303954980}
+  m_bouy1: {fileID: 0}
+  m_bouy2: {fileID: 0}
   m_range: 10000
   m_bearingRange: 5
   m_bearingError: 5

@@ -81,20 +81,20 @@ public class Scenario : MonoBehaviour
 
    public void StartScenario()
    {
-      SetUpTargetPosition();
+      setUpTargetPosition();
       _currentTime = _startTime = Time.time;
       _currentMode = Mode.Running;
       _currentState = ScenarioPhaseState.Idle;
       currentPhase.Start();
    }
 
-   private void SetUpTargetPosition()
-    {
-        float bearing = VarSync.GetFloat(VarName.StartBearingToTarget);
-        float distance = VarSync.GetFloat(VarName.StartDistanceToTarget);
+   private void setUpTargetPosition()
+   {
+      float bearing = VarSync.GetFloat(VarName.StartBearingToTarget);
+      float distance = VarSync.GetFloat(VarName.StartDistanceToTarget);
 
-        _torpedo.position = Quaternion.AngleAxis(bearing, Vector3.up) * _ship.forward.normalized * distance;
-    }
+      _torpedo.position = Quaternion.AngleAxis(bearing, Vector3.up) * _ship.forward * distance;
+   }
 
    public void PauseScenario()
    {
@@ -118,7 +118,7 @@ public class Scenario : MonoBehaviour
 
    void Awake() => _instance = this;
 
-   void Start() 
+   void Start()
    {
       // add stub phases
       var phases = new List<IScenarioPhase>();
@@ -132,7 +132,7 @@ public class Scenario : MonoBehaviour
       _phases = phases.ToArray();
    }
    // Update is called once per frame
-   void Update() 
+   void Update()
    {
       VarSync.Set(VarName.CurrentTime, _currentTime);
       VarSync.Set(VarName.ScenarioPhaseName, currentPhase.Title, true);
@@ -141,7 +141,7 @@ public class Scenario : MonoBehaviour
          return;
 
       TargetInfo trg = calcTargetInfo();
-      VarSync.Set(VarName.TargetBearing, trg != null ? trg.Bearing : 0f );
+      VarSync.Set(VarName.TargetBearing, trg != null ? trg.Bearing : 0f);
       VarSync.Set(VarName.TargetDistance, trg != null ? trg.Distance : 0f);
 
       _currentTime += Time.deltaTime;
@@ -167,11 +167,11 @@ public class Scenario : MonoBehaviour
          // TODO: use ship direction and 
          TargetPos = _torpedo.position,
          Bearing = Vector3.SignedAngle(_ship.forward, (_torpedo.position - transform.position).normalized, Vector3.up)
-   };
-}
+      };
+   }
 
    private IScenarioPhase currentPhase => _phases[(int)_currentState];
-   private bool isRunning=> _currentMode == Mode.Running;
+   private bool isRunning => _currentMode == Mode.Running;
    private bool isAlive => _currentMode != Mode.Stoped && _currentMode != Mode.Finished;
 
    private IScenarioPhase[] _phases;
