@@ -5,7 +5,7 @@ using System;
 public static class VarSync
 {
    static private VarData[] _vars = new VarData[(int)VarName.VARSYNC_LAST];
- 
+
    static public VarData[] vars { get { return _vars; } }
 
    static VarSync()
@@ -42,7 +42,7 @@ public static class VarSync
 
          object defVal = i.GetDefValue();
 
-         if(defVal != null)
+         if (defVal != null)
          {
             _vars[(int)i] = new VarData(defVal);
             fireUpdate(i, _vars[(int)i]);
@@ -76,6 +76,7 @@ public static class VarSync
    {
       return (int)Get(v, 0f);
    }
+
    static public string GetString(VarName v)
    {
       return Get(v, "");
@@ -109,7 +110,7 @@ public static class VarSync
       if (prec == 0)
          return oldVal != val;
 
-      if (val == 0 && oldVal != 0) 
+      if (val == 0 && oldVal != 0)
          return true;
 
       return Mathf.Abs(oldVal - val) >= prec;
@@ -131,50 +132,60 @@ public static class VarSync
 
    static public void Set(VarName v, bool value, bool forceUpdate = false)
    {
-      if (Get(v, false) != value || forceUpdate)
-         updateVariableInternal(v, new VarData(value), forceUpdate);
+      if (forceUpdate || Get(v, false) != value)
+         updateVariableInternal(v, new VarData(value));
    }
 
    static public void Set(VarName v, string value, bool forceUpdate = false)
    {
-      if (Get(v, "") != value || forceUpdate)
-         updateVariableInternal(v, new VarData(value), forceUpdate);
+      if (forceUpdate || Get(v, "") != value)
+         updateVariableInternal(v, new VarData(value));
    }
 
    static public void Set(VarName v, float value, bool forceUpdate = false)
    {
-      if (isChanged(v, value))
-         updateVariableInternal(v, new VarData(value), forceUpdate);
+      if (forceUpdate || isChanged(v, value))
+         updateVariableInternal(v, new VarData(value));
    }
 
    static public void Set(VarName v, float[] value, bool forceUpdate = false)
    {
-      if (isChanged(v, value))
-         updateVariableInternal(v, new VarData(value), forceUpdate);
+      if (forceUpdate || isChanged(v, value))
+         updateVariableInternal(v, new VarData(value));
    }
 
    static public void Set(VarName v, Vector2 value, bool forceUpdate = false)
    {
       float[] arr = new float[2] { value.x, value.y };
-      if (isChanged(v, arr))
-         updateVariableInternal(v, new VarData(value), forceUpdate);
+      if (forceUpdate || isChanged(v, arr))
+         updateVariableInternal(v, new VarData(value));
    }
 
    static public void Set(VarName v, Vector3 value, bool forceUpdate = false)
    {
       float[] arr = new float[3] { value.x, value.y, value.z };
-      if (isChanged(v, arr))
-         updateVariableInternal(v, new VarData(value), forceUpdate);
+      if (forceUpdate || isChanged(v, arr))
+         updateVariableInternal(v, new VarData(value));
    }
 
-   static public void updateVariableInternal(VarName v, VarData data, bool forceUpdate)
+   static public void updateVariableInternal(VarName v, VarData data)
    {
-      bool diff = _vars[(int)v].value != data.value;
-
       _vars[(int)v] = data;
-
-      if (diff || forceUpdate)
-         fireUpdate(v, data);
+      fireUpdate(v, data);
    }
 
+   public static VarName ToVarName(this string s)
+   {
+      try
+      {
+         if (string.IsNullOrEmpty(s))
+            return VarName.UNDEFINED;
+         return (VarName)Enum.Parse(typeof(VarName), s);
+      }
+      catch (ArgumentException e)
+      {
+         Debug.LogError($"Exception {e} in type convert from {s}");
+         return VarName.UNDEFINED;
+      }
+   }
 }

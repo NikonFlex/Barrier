@@ -16,7 +16,7 @@ public class UIPropertyList : MonoBehaviour
          GameObject instance = null;
          if (prop is NumericProperty np)
          {
-            instance = Instantiate(numericPrefab, transform.position, transform.rotation);
+            instance = Instantiate(numericPrefab, transform.position, transform.rotation, transform);
             Text tu = instance.transform.Find("Units").GetComponent<Text>();
             tu.text = np.Units;
 
@@ -24,10 +24,10 @@ public class UIPropertyList : MonoBehaviour
             inp.text = VarSync.GetFloat(np.Var).ToString();
          }
          else if (prop is ToggleProperty tp)
-            instance = Instantiate(togglePrefab, transform.position, transform.rotation);
+            instance = Instantiate(togglePrefab, transform.position, transform.rotation, transform);
          else if (prop is DropdownProperty dp)
          {
-            instance = Instantiate(dropdownPrefab, transform.position, transform.rotation);
+            instance = Instantiate(dropdownPrefab, transform.position, transform.rotation, transform);
             Dropdown d = instance.transform.Find("Dropdown").GetComponent<Dropdown>();
             d.value = VarSync.GetInt(dp.Var);
             d.AddOptions(new List<string>(dp.Options));
@@ -35,8 +35,7 @@ public class UIPropertyList : MonoBehaviour
 
          Text t = instance.transform.Find("Text").GetComponent<Text>();
          t.text = prop.Title;
-         instance.GetComponent<VarLinkUI>().V = prop.Var;
-         instance.transform.SetParent(transform);
+         instance.GetComponent<VarLinkUI>().V.Name = prop.Var.ToString();
       }
 
    }

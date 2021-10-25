@@ -11,13 +11,16 @@ public class VarLinkUI : MonoBehaviour
       Toggle,
       Dropdown
    }
+   
    //private UIType _uiType = UIType.Undefined;
    private Toggle _toggle;
    private InputField _input;
    private Dropdown _dropdown;
    private TMP_Text _tmpText;
    private Text     _text;
-   public  VarName V;
+   public VarNameSelector V;
+   private VarName _v => V.Name.ToVarName();
+   
    void Start()
     {
       _toggle = GetComponentInChildren<Toggle>();
@@ -50,46 +53,44 @@ public class VarLinkUI : MonoBehaviour
 
    private void onToggleValueChanged(Toggle _toggle, bool value)
    {
-      VarSync.Set(V, value);
+      VarSync.Set(_v, value);
    }
 
    private void onInputValueChanged(InputField _input, string value)
    {
-      VarSync.Set(V, float.Parse(value));
+      VarSync.Set(_v, float.Parse(value));
    }
 
    private void onDropdownValueChanged(Dropdown _dropdown, int value)
    {
-      VarSync.Set(V, value);
+      VarSync.Set(_v, value);
    }
 
    private void updateUI()
    {
-      string formatStr = $"F{V.GetFormatPrecision()}";
+      string formatStr = $"F{_v.GetFormatPrecision()}";
       string strVal = "";
-      if (V.GetVarType() == VarType.Float)
-         strVal = VarSync.GetFloat(V).ToString(formatStr);
-      else if (V.GetVarType() == VarType.String)
-         strVal = VarSync.GetString(V);
+      if (_v.GetVarType() == VarType.Float)
+         strVal = VarSync.GetFloat(_v).ToString(formatStr);
+      else if (_v.GetVarType() == VarType.String)
+         strVal = VarSync.GetString(_v);
 
       if (_input != null)
          _input.text = strVal;
       else if (_toggle != null)
-         _toggle.isOn = VarSync.GetBool(V);
+         _toggle.isOn = VarSync.GetBool(_v);
       else if (_dropdown != null)
-         _dropdown.value = VarSync.GetInt(V);
+         _dropdown.value = VarSync.GetInt(_v);
       else if (_tmpText != null)
          _tmpText.text = strVal;
       else if (_text != null)
          _text.text = strVal;
-
    }
 
    private void onVariableUpdate(VarName v, object value)
    {
-      if (v == V)
+      if (_v == v)
          updateUI();
-
    }
 
 }

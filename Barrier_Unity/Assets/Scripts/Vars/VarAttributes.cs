@@ -109,15 +109,6 @@ public static class AttributeHelper
       return vp.DisplayText;
    }
 
-   public static void SetDisplayText(this VarName varName, string displayText)
-   {
-      VarNamePersistAttribute vp;
-      if (!m_Persist.Data.TryGetValue(varName, out vp))
-         return;
-
-      vp.DisplayText = displayText;
-   }
-
    public static object GetDefValue(this VarName varName)
    {
       VarNamePersistAttribute vp;
