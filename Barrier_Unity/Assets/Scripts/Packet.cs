@@ -63,7 +63,7 @@ public class Packet : MonoBehaviour
          pos += _speedVector * Time.deltaTime;
          _speedVector.y -= g * Time.deltaTime;
          transform.rotation = Quaternion.LookRotation(_speedVector.normalized);
-         print($"d = {(transform.position - _startPos).magnitude},  dt = {(transform.position - Target).magnitude} ");
+         //print($"d = {(transform.position - _startPos).magnitude},  dt = {(transform.position - Target).magnitude} ");
          //          if ((pos - Target).magnitude > (transform.position - Target).magnitude)
          //             break_flag = true;
          if ((transform.position - Target).magnitude < 100 || 
@@ -77,7 +77,7 @@ public class Packet : MonoBehaviour
 
    private IEnumerator SplashDown()
    {
-      print($"buoy on parashut on height {transform.position.y}");
+      print($"packet '{gameObject.name}' on parashut on height {transform.position.y}");
       _isOnParashut = true;
       _prevPos = transform.position;
       while (transform.position.y > 0)
@@ -109,7 +109,7 @@ public class Packet : MonoBehaviour
 
          yield return null;
       }
-      print("buoy on water");
+      print($"bouy '{gameObject.name}' on water");
 
       _state = PacketState.OnWater;
       gameObject.AddComponent<Buoy>();

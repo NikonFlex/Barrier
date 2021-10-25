@@ -45,6 +45,8 @@ public enum VarName
    // TODO: перенести наверх, когда будет сделано https://bitbucket.org/blurman/barrier/issues/11
    [VarName(DisplayText = "Расстояние до цели", Persist = true, HideInInspector = true, Units = "м", DefaultValue = 7000f)]
    StartDistanceToTarget,
+   [VarName(DisplayText = "Дальность обнаружения буями", Persist = true, HideInInspector = true, Units = "м", DefaultValue = 5000)]
+   BuoysDetectRange,
 
    VARSYNC_LAST
 };

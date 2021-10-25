@@ -11,6 +11,7 @@ public class BuoyLauncher : MonoBehaviour
    private Quaternion _finishRotation;
    private bool _haveTarget = false;
    private bool _busy = false;
+   private int _buoysCounter = 0;
 
    public bool ShootToTarget(Vector3 targetPos)
    {
@@ -97,7 +98,7 @@ public class BuoyLauncher : MonoBehaviour
 
       GameObject packetPrefab = Resources.Load("packet") as GameObject;
       var packetInstance = Instantiate(packetPrefab, _packetPos.position, _packetPos.rotation);
-
+      packetInstance.name = $"bouy {_buoysCounter++}";
       Packet packet = packetInstance.GetComponent<Packet>();
       packet.Target = pos;
       packet.Launch(_launchSpeed, transform.forward);

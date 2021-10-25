@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,14 +6,15 @@ using System.Linq;
 
 public enum ScenarioPhaseState
 {
-   Idle, // öåëü íå îáíàðóæåíà.
-   TargetDetectedByAntenna,// - öåëü îáíàðóæåíà àíòåííîé
-   BuoysLaunched,// - Áóè âûïóùåíû
-   BuoysOnPlace,  // - Áóè ïðèâîäíèëèñü
-   BuoysStartScan, // - Íà÷àëî ñêàíèðîâàíèÿ áóÿìè
-   TargetDetectedByBuoys, // - Öåëü îáíàðóæåíà áóÿìè
-   MissilesLaunched, // - Ðàêåòû âûïóùåíû
-   MissilesStrike //- Ðàêåòû âçîðâàëèñü
+   Idle, // Ñ†ÐµÐ»ÑŒ Ð½Ðµ Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶ÐµÐ½Ð°.
+   TargetDetectedByAntenna,// - Ñ†ÐµÐ»ÑŒ Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶ÐµÐ½Ð° Ð°Ð½Ñ‚ÐµÐ½Ð½Ð¾Ð¹
+   BuoysLaunched,// - Ð‘ÑƒÐ¸ Ð²Ñ‹Ð¿ÑƒÑ‰ÐµÐ½Ñ‹
+   BuoysOnPlace,  // - Ð‘ÑƒÐ¸ Ð¿Ñ€Ð¸Ð²Ð¾Ð´Ð½Ð¸Ð»Ð¸ÑÑŒ
+   BuoysStartScan, // - ÐÐ°Ñ‡Ð°Ð»Ð¾ ÑÐºÐ°Ð½Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ñ Ð±ÑƒÑÐ¼Ð¸
+   TargetDetectedByBuoys, // - Ð¦ÐµÐ»ÑŒ Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶ÐµÐ½Ð° Ð±ÑƒÑÐ¼Ð¸
+   MissilesLaunched, // - Ð Ð°ÐºÐµÑ‚Ñ‹ Ð²Ñ‹Ð¿ÑƒÑ‰ÐµÐ½Ñ‹
+   MissilesStrike, //- Ð Ð°ÐºÐµÑ‚Ñ‹ Ð²Ð·Ð¾Ñ€Ð²Ð°Ð»Ð¸ÑÑŒ
+   ScenarioFinished //- ÐžÐºÐ¾Ð½Ñ‡Ð°Ð½Ð¸Ðµ ÑƒÐ¿Ñ€Ð°Ð¶ÐµÐ½Ð¸Ñ
 }
 
 public abstract class IScenarioPhase
@@ -66,7 +67,7 @@ public class Scenario : MonoBehaviour
    }
 
    public static Scenario Instance => _instance;
-   public ScenarioPhaseState State => _currentState;
+   public ScenarioPhaseState State => currentPhase.ScenarioState;
    public Mode CurrentMode => _currentMode;
    public float ScenarioTime => _currentTime - _startTime;
    public IScenarioPhase CurrentPhase => currentPhase;
@@ -84,7 +85,7 @@ public class Scenario : MonoBehaviour
       setUpTargetPosition();
       _currentTime = _startTime = Time.time;
       _currentMode = Mode.Running;
-      _currentState = ScenarioPhaseState.Idle;
+      _currentPhaseIndex = 0;
       currentPhase.Start();
    }
 
@@ -122,13 +123,15 @@ public class Scenario : MonoBehaviour
    {
       // add stub phases
       var phases = new List<IScenarioPhase>();
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Öåëü íå îáíàðóæåíà", 0.1f));
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByAntenna, "Öåëü îáíàðóæåíà ÌÑÖ", 0.5f));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Ð¦ÐµÐ»ÑŒ Ð½Ðµ Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶ÐµÐ½Ð°", 0.1f));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByAntenna, "Ð¦ÐµÐ»ÑŒ Ð¾Ð±Ð½Ð°Ñ€ÑƒÐ¶ÐµÐ½Ð° ÐœÐ¡Ð¦", 0.5f));
       phases.Add(new PhaseLaunchBouys());
       phases.Add(new PhaseBouysReady());
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByBuoys, "Öåëü çàïåëåíãîâàíà áóÿìè", 2));
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesLaunched, "Ðàêåòû âûïóùåíû", 2));
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesStrike, "Ðàêåòû äîñòèãëè öåëè", 2));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByBuoys, "Ð¦ÐµÐ»ÑŒ Ð·Ð°Ð¿ÐµÐ»ÐµÐ½Ð³Ð¾Ð²Ð°Ð½Ð° Ð±ÑƒÑÐ¼Ð¸", 2));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesLaunched, "Ð Ð°ÐºÐµÑ‚Ñ‹ Ð²Ñ‹Ð¿ÑƒÑ‰ÐµÐ½Ñ‹", 2));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesStrike, "Ð Ð°ÐºÐµÑ‚Ñ‹ Ð´Ð¾ÑÑ‚Ð¸Ð³Ð»Ð¸ Ñ†ÐµÐ»Ð¸", 2));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.ScenarioFinished, "Ð£Ð¿Ñ€Ð°Ð¶Ð½ÐµÐ½Ð¸Ðµ Ð¾ÐºÐ¾Ð½Ñ‡ÐµÐ½Ð¾", 2));
+      
       _phases = phases.ToArray();
    }
    // Update is called once per frame
@@ -149,13 +152,13 @@ public class Scenario : MonoBehaviour
       if (!currentPhase.IsFinished)
          return;
 
-      int nextState = (int)_currentState + 1;
-      if (nextState >= Enum.GetNames(typeof(ScenarioPhaseState)).Length)
+      int nextIndex = (int)_currentPhaseIndex + 1;
+      if (nextIndex >= _phases.Length)
       {
          _currentMode = Mode.Finished;
          return;
       }
-      _currentState = (ScenarioPhaseState)(nextState);
+      _currentPhaseIndex = nextIndex;
       currentPhase.Start();
    }
 
@@ -170,7 +173,7 @@ public class Scenario : MonoBehaviour
       };
    }
 
-   private IScenarioPhase currentPhase => _phases[(int)_currentState];
+   private IScenarioPhase currentPhase => _phases[(int)_currentPhaseIndex];
    private bool isRunning => _currentMode == Mode.Running;
    private bool isAlive => _currentMode != Mode.Stoped && _currentMode != Mode.Finished;
 
@@ -178,7 +181,7 @@ public class Scenario : MonoBehaviour
    private Mode _currentMode = Mode.Stoped;
    private float _startTime;
    private float _currentTime;
-   private ScenarioPhaseState _currentState;
+   private int _currentPhaseIndex;
 
    private static Scenario _instance;
 }
@@ -186,7 +189,7 @@ public class Scenario : MonoBehaviour
 class PhaseLaunchBouys : IScenarioPhase
 {
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysLaunched;
-   public override string Title => "Áóè âûñòðåëèëè";
+   public override string Title => "Ð‘ÑƒÐ¸ Ð²Ñ‹ÑÑ‚Ñ€ÐµÐ»Ð¸Ð»Ð¸";
    public override bool IsFinished => checkFinished();
 
    public override void Start()
@@ -206,7 +209,7 @@ class PhaseLaunchBouys : IScenarioPhase
 class PhaseBouysReady : IScenarioPhase
 {
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysOnPlace;
-   public override string Title => "Áóè ãîòîâÿòñÿ";
+   public override string Title => "Ð‘ÑƒÐ¸ Ð³Ð¾Ñ‚Ð¾Ð²ÑÑ‚ÑÑ";
    public override bool IsFinished => checkFinished();
 
    public override void Start()

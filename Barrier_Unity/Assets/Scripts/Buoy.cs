@@ -30,8 +30,8 @@ public class Buoy : MonoBehaviour
       _state = BuoyState.PreparingToWork;
       yield return new WaitForSeconds(VarSync.GetFloat(VarName.BuoyReadyTime));
       _state = BuoyState.Working;
-      print("bouy start work");
-      FindObjectOfType<BuoyGuard>().GetComponent<BuoyGuard>().AddBuoy(gameObject);
+      print($"bouy '{gameObject.name}' start work");
+      FindObjectOfType<BuoyGuard>().AddBuoy(this);
       yield return null;
    }
 }
