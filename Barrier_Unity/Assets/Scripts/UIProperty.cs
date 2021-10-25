@@ -84,17 +84,16 @@ static public class ScenarioProperties
 
    private static UIProperty createPropertyFromVariable(VarName vn)
    {
-      var attrs = vn.GetAttributes();
-      if (!attrs.Persist)
+      if (!vn.IsPerist())
          return null;
-      switch(attrs.Vt)
+      switch(vn.GetVarType())
       {
          case VarType.Float:
-            return new NumericProperty(vn, attrs.DisplayText, attrs.Units, VarSync.GetFloat(vn));
+            return new NumericProperty(vn, vn.GetDisplayText(), vn.GetUnits(), VarSync.GetFloat(vn));
          case VarType.Bool:
-            return new ToggleProperty(vn, attrs.DisplayText, VarSync.GetBool(vn));
+            return new ToggleProperty(vn, vn.GetDisplayText(), VarSync.GetBool(vn));
          case VarType.Enum:
-            return new DropdownProperty(vn, attrs.DisplayText, attrs.Variants);
+            return new DropdownProperty(vn, vn.GetDisplayText(), vn.GetVariants());
          default:
             Debug.LogError($"Can't create UIProperty for {vn}");
          return null;

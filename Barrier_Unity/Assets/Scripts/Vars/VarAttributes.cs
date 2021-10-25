@@ -85,8 +85,6 @@ public static class AttributeHelper
       return attr;
    }
 
-   public static VarNameAttribute GetAttributes(this VarName varName) => getAttributes(varName);
-
    public static VarType GetVarType(this VarName varName)
    {
       VarNameAttribute va = getAttributes(varName);
@@ -138,38 +136,39 @@ public static class AttributeHelper
    public static float GetPrecision(this VarName varName)
    {
       VarNameAttribute va = getAttributes(varName);
-      if (va == null)
-         return 0;
-
-      return va.Precision;
+      return va == null ? 0f : va.Precision;
    }
 
    public static float GetFormatPrecision(this VarName varName)
    {
       VarNameAttribute va = getAttributes(varName);
-      if (va == null)
-         return 0;
-
-      return va.FormatPrecision;
+      return va == null ? 0f : va.FormatPrecision;
    }
 
    public static bool IsHideInInspector(this VarName varName)
    {
       VarNameAttribute va = getAttributes(varName);
-      if (va == null)
-         return false;
-
-      return va.HideInInspector;
+      return va == null ? false : va.HideInInspector;
    }
 
    public static bool IsPerist(this VarName varName)
    {
       VarNameAttribute va = getAttributes(varName);
-      if (va == null)
-         return false;
-
-      return va.Persist;
+      return va == null ? false : va.Persist;
    }
+
+   public static string GetUnits(this VarName varName)
+   {
+      VarNameAttribute va = getAttributes(varName);
+      return va == null ? "" : va.Units;
+   }
+
+   public static string[] GetVariants(this VarName varName)
+   {
+      VarNameAttribute va = getAttributes(varName);
+      return va == null ? new string[0] : va.Variants;
+   }
+
    public static bool SerialzeToYaml(string path)
    {
       try
