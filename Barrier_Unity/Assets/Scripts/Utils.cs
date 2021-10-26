@@ -44,6 +44,47 @@ static class Utils
       return mesh;
    }
 
+   static public Mesh CreateOfssetedLinedMesh(List<Vector3> way_points, int width)
+   {
+      Mesh mesh = new Mesh();
+
+      int half_width = width / 2;
+      List<Vector3> vertex_list = new List<Vector3>();
+      int counter = 1;
+      for (int i = 0; i < way_points.Count - 1; i++)
+      {
+         Vector3 p1 = way_points[i];
+         Vector3 p2 = way_points[i + 1];
+         Vector3 dir = p2 - p1;
+         var prp = PerpTo(dir) * width / 2; // peprpendicular to dir
+         vertex_list.Add(p1 - prp);
+         vertex_list.Add(p1 + prp);
+      }
+
+      var idxList = new List<int>();
+      for (int itr = 0; itr < vertex_list.Count - 2; itr += 2)
+      {
+         idxList.Add(itr);
+         idxList.Add(itr + 2);
+         idxList.Add(itr + 3);
+
+         idxList.Add(itr);
+         idxList.Add(itr + 3);
+         idxList.Add(itr + 1);
+      }
+
+      mesh.vertices = vertex_list.ToArray();
+      mesh.triangles = idxList.ToArray();
+      mesh.RecalculateNormals();
+      mesh.RecalculateTangents();
+      return mesh;
+   }
+
+   static private Vector3 PerpTo(Vector3 dir)
+   {
+      return Quaternion.AngleAxis(90, Vector3.up) * dir.normalized;
+   }
+
    static public Mesh CreateCircleMesh(float radius, int numSegments)
    {
       Mesh mesh = new Mesh();
