@@ -19,6 +19,7 @@ public class BuoyGuard : MonoBehaviour
    private GameObject m_rombZone;
    private GameObject m_elipseZone;
    private GameObject m_splineZone;
+
    void Start()
    {
       m_rombZone = new GameObject("romb_zone");
@@ -59,6 +60,7 @@ public class BuoyGuard : MonoBehaviour
    {
       if (m_bouy1 == null || m_bouy2 == null)
          return;
+      
       float range = VarSync.GetFloat(VarName.BuoysDetectRange);
       m_errorCur = Mathf.Lerp(m_errorBeg, m_errorEnd, Time.time - m_errorTime);
 
@@ -78,11 +80,23 @@ public class BuoyGuard : MonoBehaviour
       Vector3 p2r = m_bouy2.transform.position + vr * range + Vector3.up;
       Vector3 p2l = m_bouy2.transform.position + vl * range + Vector3.up;
 
-      Vector3 c1 = getCross(p1, p1l, p2, p2l);
-      Vector3 c2 = getCross(p1, p1r, p2, p2l);
-      Vector3 c3 = getCross(p1, p1r, p2, p2r);
-      Vector3 c4 = getCross(p1, p1l, p2, p2r);
+      Vector3 c1 = Vector3.zero; 
+      bool f1 = getCross(p1, p1l, p2, p2l, out c1);
+      Vector3 c2 = Vector3.zero;
+      bool f2 = getCross(p1, p1r, p2, p2l, out c2);
+      Vector3 c3 = Vector3.zero;
+      bool f3 = getCross(p1, p1r, p2, p2r, out c3);
+      Vector3 c4 = Vector3.zero;
+      bool f4 = getCross(p1, p1l, p2, p2r, out c4);
 
+      if (!(f1 && f2 && f3 && f4))
+      {
+         m_rombZone.GetComponent<MeshFilter>().mesh = Utils.CreateRombusMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
+         m_elipseZone.GetComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
+         m_splineZone.GetComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
+         return;
+      }
+      
       Vector3[] vertices = { c1 - c1, c2 - c1, c3 - c1, c4 - c1 };
 
       m_rombZone.GetComponent<MeshFilter>().mesh = Utils.CreateRombusMesh(vertices[0], vertices[1], vertices[2], vertices[3]);
@@ -109,6 +123,18 @@ public class BuoyGuard : MonoBehaviour
       m_splineZone.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 1, Mathf.PingPong(Time.time, 0.5f));
    }
 
+   private void OnDrawGizmos()
+   {
+      Gizmos.color = Color.red;
+      Gizmos.DrawSphere(m_torpedo.position, 100);
+
+      Gizmos.color = Color.green;
+      if(m_bouy1 != null)
+         Gizmos.DrawSphere(m_bouy1.GetComponent<Transform>().position, 100);
+      if (m_bouy2 != null)
+         Gizmos.DrawSphere(m_bouy2.GetComponent<Transform>().position, 100);
+   }
+
    public void AddBuoy(Buoy b)
    {
       if (m_bouy1 == null)
@@ -131,7 +157,7 @@ public class BuoyGuard : MonoBehaviour
       m_errorEnd = Random.Range(-bearingError / 2f, bearingError / 2);
    }
 
-   private Vector3 getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22)
+   private bool getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22, out Vector3 cross)
    {
       p11.y = 1;
       p12.y = 1;
@@ -141,13 +167,19 @@ public class BuoyGuard : MonoBehaviour
       Vector3 f1 = Vector3.Cross(p11, p12);
       Vector3 f2 = Vector3.Cross(p21, p22);
 
-      Vector3 cross = Vector3.Cross(f1, f2);
+      cross = Vector3.Cross(f1, f2);
+
+      if (Mathf.Abs(cross.y) < 0.01f)
+      {
+         cross = Vector3.zero;
+         return false;
+      }
 
       cross.x = cross.x / cross.y;
       cross.z = cross.z / cross.y;
       cross.y = 0;
 
-      return cross;
+      return true;
    }
 
    private Vector3 getDir(Vector3 v, float a)
