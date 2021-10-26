@@ -55,24 +55,22 @@ static class Utils
       {
          Vector3 p1 = way_points[i];
          Vector3 p2 = way_points[i + 1];
-         Vector3 dir = p1 - p2;
+         Vector3 dir = p2 - p1;
          var prp = PerpTo(dir) * width / 2; // peprpendicular to dir
          vertex_list.Add(p1 - prp);
          vertex_list.Add(p1 + prp);
-         vertex_list.Add(p2 + prp);
-         vertex_list.Add(p2 - prp);
       }
 
       var idxList = new List<int>();
-      for (int itr = 0; itr < vertex_list.Count - 4; itr += 4)
+      for (int itr = 0; itr < vertex_list.Count - 2; itr += 2)
       {
          idxList.Add(itr);
          idxList.Add(itr + 2);
          idxList.Add(itr + 3);
 
          idxList.Add(itr);
+         idxList.Add(itr + 3);
          idxList.Add(itr + 1);
-         idxList.Add(itr + 2);
       }
 
       mesh.vertices = vertex_list.ToArray();

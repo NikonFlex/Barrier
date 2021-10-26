@@ -2541,7 +2541,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &979977665
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -5334,7 +5334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7907fa38b9f902047a812ba65f304ea5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_speed: 30
+  m_speed: 60
   m_circleSize: 1000
   m_arrowLength: 8000
   m_arrowWidth: 400
@@ -5342,6 +5342,7 @@ MonoBehaviour:
   m_circleMaterial: {fileID: 2100000, guid: 3363be8f1b297ed42b2b7f3ae8d633ab, type: 2}
   m_arrow: {fileID: 1391170010}
   m_targetShip: {fileID: 919132148589263873}
+  _distBeetweenWaysPoints: 30
 --- !u!4 &1723057348
 Transform:
   m_ObjectHideFlags: 0
