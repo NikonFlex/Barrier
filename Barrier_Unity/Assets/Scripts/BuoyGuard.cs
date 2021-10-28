@@ -20,6 +20,10 @@ public class BuoyGuard : MonoBehaviour
    private GameObject m_elipseZone;
    private GameObject m_splineZone;
 
+   private float m_bearingError => VarSync.GetFloat(VarName.BuoysBearingError);
+   private float m_detectRange => VarSync.GetFloat(VarName.BuoysDetectRange);
+
+
    void Start()
    {
       m_rombZone = new GameObject("romb_zone");
@@ -48,9 +52,8 @@ public class BuoyGuard : MonoBehaviour
       {
          yield return new WaitForSeconds(1);
 
-
          m_errorBeg = m_errorEnd;
-         m_errorEnd = Random.Range(-bearingError / 10f, bearingError / 10f);
+         m_errorEnd = Random.Range(-m_bearingError / 2f, m_bearingError / 2f);
          m_errorTime = Time.time;
       }
    }
@@ -61,24 +64,23 @@ public class BuoyGuard : MonoBehaviour
       if (m_bouy1 == null || m_bouy2 == null)
          return;
       
-      float range = VarSync.GetFloat(VarName.BuoysDetectRange);
       m_errorCur = Mathf.Lerp(m_errorBeg, m_errorEnd, Time.time - m_errorTime);
 
       Vector3 vc = Quaternion.AngleAxis(m_errorCur, Vector3.up) * (m_torpedo.position - m_bouy1.transform.position).normalized;
-      Vector3 vr = getDir(vc, bearingError / 2);
-      Vector3 vl = getDir(vc, -bearingError / 2);
+      Vector3 vr = getDir(vc, m_bearingError / 2);
+      Vector3 vl = getDir(vc, -m_bearingError / 2);
 
       Vector3 p1 = m_bouy1.transform.position;
-      Vector3 p1r = m_bouy1.transform.position + vr * range + Vector3.up;
-      Vector3 p1l = m_bouy1.transform.position + vl * range + Vector3.up;
+      Vector3 p1r = m_bouy1.transform.position + vr * m_detectRange + Vector3.up;
+      Vector3 p1l = m_bouy1.transform.position + vl * m_detectRange + Vector3.up;
 
       vc = Quaternion.AngleAxis(m_errorCur, Vector3.up) * (m_torpedo.position - m_bouy2.transform.position).normalized;
-      vr = getDir(vc, bearingError / 2);
-      vl = getDir(vc, -bearingError / 2);
+      vr = getDir(vc, m_bearingError / 2);
+      vl = getDir(vc, -m_bearingError / 2);
 
       Vector3 p2 = m_bouy2.transform.position;
-      Vector3 p2r = m_bouy2.transform.position + vr * range + Vector3.up;
-      Vector3 p2l = m_bouy2.transform.position + vl * range + Vector3.up;
+      Vector3 p2r = m_bouy2.transform.position + vr * m_detectRange + Vector3.up;
+      Vector3 p2l = m_bouy2.transform.position + vl * m_detectRange + Vector3.up;
 
       Vector3 c1 = Vector3.zero; 
       bool f1 = getCross(p1, p1l, p2, p2l, out c1);
@@ -130,9 +132,9 @@ public class BuoyGuard : MonoBehaviour
 
       Gizmos.color = Color.green;
       if(m_bouy1 != null)
-         Gizmos.DrawSphere(m_bouy1.GetComponent<Transform>().position, 100);
+         Gizmos.DrawSphere(m_bouy1.GetComponent<Transform>().position, 25);
       if (m_bouy2 != null)
-         Gizmos.DrawSphere(m_bouy2.GetComponent<Transform>().position, 100);
+         Gizmos.DrawSphere(m_bouy2.GetComponent<Transform>().position, 25);
    }
 
    public void AddBuoy(Buoy b)
@@ -148,13 +150,12 @@ public class BuoyGuard : MonoBehaviour
          Debug.LogError("Exceed number of buoys");
    }
 
-   private float bearingError => VarSync.GetFloat(VarName.BuoysBearingError);
 
    private void startWork()
    {
-      m_errorBeg = Random.Range(-bearingError / 2f, bearingError / 2);
+      m_errorBeg = Random.Range(-m_bearingError / 2f, m_bearingError / 2);
       m_errorCur = m_errorBeg;
-      m_errorEnd = Random.Range(-bearingError / 2f, bearingError / 2);
+      m_errorEnd = Random.Range(-m_bearingError / 2f, m_bearingError / 2);
    }
 
    private bool getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22, out Vector3 cross)
@@ -169,7 +170,7 @@ public class BuoyGuard : MonoBehaviour
 
       cross = Vector3.Cross(f1, f2);
 
-      if (Mathf.Abs(cross.y) < 0.01f)
+      if (Mathf.Abs(cross.y) < 0.0001f)
       {
          cross = Vector3.zero;
          return false;
@@ -178,6 +179,11 @@ public class BuoyGuard : MonoBehaviour
       cross.x = cross.x / cross.y;
       cross.z = cross.z / cross.y;
       cross.y = 0;
+
+      float d = (m_torpedo.position - cross).magnitude;
+
+      if (d > VarSync.GetFloat(VarName.BuoysDetectRange))
+         return false;
 
       return true;
    }
