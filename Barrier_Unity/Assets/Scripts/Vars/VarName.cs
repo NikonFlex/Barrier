@@ -31,6 +31,13 @@ public enum VarName
    BuoysBearingError,
    [VarName(DisplayText = "Время готовности буя", Persist = true, HideInInspector = true, Units = "сек", DefaultValue = 3)]
    BuoyReadyTime,
+   [VarName(DisplayText = "Временной сдвиг пуска ракет", Persist = true, HideInInspector = true, Units = "сек", DefaultValue = 3)]
+   RocketPauseDuration,
+   [VarName(DisplayText = "Количество ракет", Persist = true, HideInInspector = true,
+      Vt = VarType.Enum, Variants = new string[] { "1", "2", "3", "4", "5", "6" })]
+   RocketNum,
+   [VarName(DisplayText = "Расстояние между ракетами при ударе", Persist = true, HideInInspector = true, Units = "м", DefaultValue = 100)]
+   RocketDistance,
 
    // runtime vars
    [VarName(Persist = false, DefaultValue = 0f, FormatPrecision = 2)]
