@@ -1,8 +1,8 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SandBoxRocket : MonoBehaviour
+public class Rocket : MonoBehaviour
 {
    private Vector3 _speedVector;
    private bool _isAimed = false;
@@ -15,6 +15,11 @@ public class SandBoxRocket : MonoBehaviour
          StartCoroutine(Fly());
          _isAimed = false;
       }
+   }
+
+   public bool IsExploded()
+   {
+      return gameObject.transform.position.y < 0;
    }
 
    public void AimToTarget(Vector3 target, float speed, float killRadius)
@@ -35,14 +40,12 @@ public class SandBoxRocket : MonoBehaviour
          Vector3 pos = transform.position;
          pos += _speedVector * Time.deltaTime;
          _speedVector.y -= 9.8f * Time.deltaTime;
-         transform.rotation = Quaternion.LookRotation(new Vector3(0, 0, 0));
+         transform.rotation = Quaternion.LookRotation(new Vector3(0, 0, 0)); // куда смотрит снаряд
          if (transform.position.y < 0)
             break_flag = true;
          transform.position = pos;
          GetComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(_killRadius, 30);
          GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, 0);
-         if (gameObject.transform.position.y < 3 && _speedVector.y < 0)
-            Time.timeScale = 0.01f;
          yield return null;
       }
    }

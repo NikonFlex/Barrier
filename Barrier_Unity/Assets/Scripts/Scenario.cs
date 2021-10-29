@@ -224,3 +224,20 @@ class PhaseBouysReady : IScenarioPhase
       return Scenario.Instance.Buoys.All(b => b.State == BuoyState.Working);
    }
 }
+
+class PhaseLaunchRockets : IScenarioPhase
+{
+   public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.MissilesLaunched;
+   public override string Title => "Запуск ракет";
+   public override bool IsFinished => checkFinished();
+
+   public override void Start()
+   {
+      GameObject.FindObjectOfType<RocketLauncher>().LaunchRockets();
+   }
+
+   private bool checkFinished()
+   {
+      return GameObject.FindObjectOfType<RocketLauncher>().IsAllRocketsExploded();
+   }
+}

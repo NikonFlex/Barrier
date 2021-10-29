@@ -402,7 +402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1da351bfc88e0424ea086563eb6aff9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 5
+  _speed: 40.76
 --- !u!1 &931925391
 GameObject:
   m_ObjectHideFlags: 0
@@ -434,8 +434,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _torpedo: {fileID: 807423601}
   _speed: 250
-  _rocketNumber: 5
-  _offestBeetweenRockets: 20.08
+  _rocketNumber: 4
+  _offestBeetweenRockets: 8.33
+  _killRadius: 10.12
 --- !u!4 &931925393
 Transform:
   m_ObjectHideFlags: 0
