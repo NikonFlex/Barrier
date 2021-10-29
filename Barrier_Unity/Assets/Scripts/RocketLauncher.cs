@@ -11,8 +11,7 @@ public class RocketLauncher : MonoBehaviour
    [SerializeField] private float _killRadius;
    [SerializeField] private float _angleSpeed;
 
-   private List<GameObject> _rockets = new List<GameObject>();
-
+   private List<Rocket> _rockets = new List<Rocket>();
    private bool _isStarted = false;
 
    void Start()
@@ -33,19 +32,25 @@ public class RocketLauncher : MonoBehaviour
    {
       for (int i = 0; i < _rockets.Count; i++)
       {
-         if (_rockets[i].GetComponent<Rocket>().IsExploded() == false)
+         if (_rockets[i].IsExploded == false)
             return false;
       }
-      return true;
+      if (_rockets.Count == 0)
+         return false;
+      else
+         return true;
    }
 
    public void LaunchRockets()
    {
       _isStarted = true;
+      _rocketNumber = VarSync.GetInt(VarName.RocketNum) + 1; //count from zero
+      _offestBeetweenRockets = VarSync.GetFloat(VarName.RocketDistance);
    }
 
    private IEnumerator LaunchRocketsCoroutine()
    {
+      yield return new WaitForSeconds(VarSync.GetInt(VarName.RocketPauseDuration));
       var startRotation = transform.rotation;
       float horDelta = Utils.CalculateHorAngleDelta(gameObject.transform, _torpedo.transform.position);
       float vertDelta = Utils.CalculateVertAngle(gameObject.transform.position, _torpedo.transform.position, _speed);
@@ -65,17 +70,20 @@ public class RocketLauncher : MonoBehaviour
       float S = (gameObject.transform.position - _torpedo.transform.position).magnitude;
       float V = _speed;
       float T = S / V;
-      Vector3 target = _torpedo.transform.position + _torpedo.transform.forward * T * _torpedo.GetComponent<Torpedo>().GetSpeed();
+      Vector3 target = _torpedo.transform.position + _torpedo.transform.forward * T * _torpedo.GetComponent<Torpedo>().Speed;
 
       float offset = -1 * _rocketNumber / 2 * _offestBeetweenRockets;
       for (int i = 0; i < _rocketNumber; i++)
       {
          Vector3 cur_target = target - Utils.PerpTo(_torpedo.transform.forward) * offset;
-         GameObject rocket = GameObject.CreatePrimitive(PrimitiveType.Cube);
-         rocket.transform.position = gameObject.transform.position;
-         rocket.name = $"{i}";
-         rocket.AddComponent<Rocket>().AimToTarget(cur_target, _speed, _killRadius);
-         _rockets.Add(rocket);
+
+         GameObject rocketPrefab = Resources.Load("rocket") as GameObject;
+         GameObject packetInstance = Instantiate(rocketPrefab, gameObject.transform.position, Quaternion.Euler(0, 0, 0));
+         packetInstance.name = $"{i}";
+         Rocket rocketComp = packetInstance.GetComponent<Rocket>();
+         rocketComp.AimToTarget(cur_target, _speed, _offestBeetweenRockets / 2);
+         _rockets.Add(rocketComp);
+
          offset += _offestBeetweenRockets;
       }
    }

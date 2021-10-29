@@ -227,17 +227,23 @@ class PhaseBouysReady : IScenarioPhase
 
 class PhaseLaunchRockets : IScenarioPhase
 {
+   RocketLauncher _rocketLauncher;
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.MissilesLaunched;
    public override string Title => "Запуск ракет";
    public override bool IsFinished => checkFinished();
 
    public override void Start()
    {
-      GameObject.FindObjectOfType<RocketLauncher>().LaunchRockets();
+      _rocketLauncher = GameObject.FindObjectOfType<RocketLauncher>();
+      _rocketLauncher.LaunchRockets();
    }
 
    private bool checkFinished()
    {
-      return GameObject.FindObjectOfType<RocketLauncher>().IsAllRocketsExploded();
+      if (_rocketLauncher.IsAllRocketsExploded())
+         return true;
+      else
+         return false;
+      //return _rocketLauncher.IsAllRocketsExploded();
    }
 }
