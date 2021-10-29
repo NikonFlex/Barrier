@@ -128,7 +128,7 @@ public class Scenario : MonoBehaviour
       phases.Add(new PhaseLaunchBouys());
       phases.Add(new PhaseBouysReady());
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByBuoys, "Цель запеленгована буями", 2));
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesLaunched, "Ракеты выпущены", 2));
+      phases.Add(new PhaseLaunchRockets());
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesStrike, "Ракеты достигли цели", 2));
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.ScenarioFinished, "Упражнение окончено", 2));
       
