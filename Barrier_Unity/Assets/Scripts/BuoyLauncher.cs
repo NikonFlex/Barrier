@@ -80,8 +80,8 @@ public class BuoyLauncher : MonoBehaviour
    {
       _busy = true;
       var startRotation = transform.rotation;
-      float horDelta = calculateHorAngleDelta(pos);
-      float vertDelta = calculateVertAngle(pos);
+      float horDelta = Utils.CalculateHorAngleDelta(gameObject.transform, pos);
+      float vertDelta = Utils.CalculateVertAngle(gameObject.transform.position, pos, _launchSpeed);
       var finishRotation = Quaternion.Euler(-vertDelta, startRotation.eulerAngles.y + horDelta, transform.rotation.z);
       float vertRotationPeriod = Mathf.Abs(vertDelta) / _angleSpeed;
       float horRotationPeriod = Mathf.Abs(horDelta) / _angleSpeed;
@@ -111,24 +111,5 @@ public class BuoyLauncher : MonoBehaviour
       _haveTarget = false;
 
       yield return null;
-   }
-
-   private float calculateHorAngleDelta(Vector3 pos)
-   {
-      float a = Vector3.SignedAngle(transform.forward, (pos - transform.position).normalized, Vector3.up);
-      print($"horDelta = {a}");
-      return a;
-   }
-
-   private float calculateVertAngle(Vector3 pos)
-   {
-      float a1, a2;
-      int numSolutions = fts.calc_vert_angle(transform.position, _launchSpeed, pos, 9.8f, out a1, out a2);
-      if (numSolutions > 0)
-      {
-         print($"vertDelta = {a1}");
-         return a1;
-      }
-      return 0;
    }
 }

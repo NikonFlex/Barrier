@@ -50,7 +50,6 @@ static class Utils
 
       int half_width = width / 2;
       List<Vector3> vertex_list = new List<Vector3>();
-      int counter = 1;
       for (int i = 0; i < way_points.Count - 1; i++)
       {
          Vector3 p1 = way_points[i];
@@ -80,7 +79,7 @@ static class Utils
       return mesh;
    }
 
-   static private Vector3 PerpTo(Vector3 dir)
+   static public Vector3 PerpTo(Vector3 dir)
    {
       return Quaternion.AngleAxis(90, Vector3.up) * dir.normalized;
    }
@@ -272,4 +271,21 @@ static class Utils
 
         return spline.ToArray();
     }
+
+   static public float CalculateHorAngleDelta(Transform from, Vector3 to)
+   {
+      float a = Vector3.SignedAngle(from.forward, (to - from.position).normalized, Vector3.up);
+      return a;
+   }
+
+   static public float CalculateVertAngle(Vector3 from, Vector3 to, float launchSpeed)
+   {
+      float a1, a2;
+      int numSolutions = fts.calc_vert_angle(from, launchSpeed, to, 9.8f, out a1, out a2);
+      if (numSolutions > 0)
+      {
+         return a1;
+      }
+      return 0;
+   }
 }
