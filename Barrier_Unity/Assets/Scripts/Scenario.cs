@@ -233,7 +233,7 @@ class PhaseBouysReady : IScenarioPhase
 
 class PhaseLaunchRockets : IScenarioPhase
 {
-   RocketLauncher _rocketLauncher;
+   private RocketLauncher _rocketLauncher;
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.MissilesLaunched;
    public override string Title => "Запуск ракет";
    public override bool IsFinished => checkFinished();
@@ -246,10 +246,6 @@ class PhaseLaunchRockets : IScenarioPhase
 
    private bool checkFinished()
    {
-      if (_rocketLauncher.IsAllRocketsExploded())
-         return true;
-      else
-         return false;
-      //return _rocketLauncher.IsAllRocketsExploded();
+      return _rocketLauncher.IsAllRocketsExploded();
    }
 }

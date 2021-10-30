@@ -21,9 +21,9 @@ public class MSC : MonoBehaviour
 
    }
 
-   private void DrawFastener()
+   private void drawFastener()
    {
-      if (!_isActive)
+      if (!gameObject.activeSelf)
          return;
 
       List<Vector3> pos = new List<Vector3>();
@@ -38,17 +38,16 @@ public class MSC : MonoBehaviour
    public void SetUpSettings(bool isActive, float distToShip)
    {
       gameObject.SetActive(isActive);
-      _isActive = isActive;
       _distToShip = distToShip;
    }
 
    public void SetPosition(Vector3 newShipPos, Vector3 shipForward)
    {
-      if (!_isActive)
+      if (!gameObject.activeSelf)
          return;
 
       newShipPos.y += _offsetFromWater;
       gameObject.transform.position = newShipPos + -shipForward * _distToShip;
-      DrawFastener();
+      drawFastener();
    }
 }

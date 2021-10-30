@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class RocketLauncher : MonoBehaviour
 {
@@ -30,15 +31,11 @@ public class RocketLauncher : MonoBehaviour
 
    public bool IsAllRocketsExploded()
    {
-      for (int i = 0; i < _rockets.Count; i++)
-      {
-         if (_rockets[i].IsExploded == false)
-            return false;
-      }
+      //return false;
       if (_rockets.Count == 0)
          return false;
       else
-         return true;
+         return _rockets.All(x => x.IsExploded);
    }
 
    public void LaunchRockets()
