@@ -105,4 +105,6 @@ public class Torpedo : MonoBehaviour
       return g;
    }
 
+   public float Speed => m_speed;
+
 }

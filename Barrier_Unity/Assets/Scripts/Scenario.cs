@@ -83,6 +83,7 @@ public class Scenario : MonoBehaviour
    public void StartScenario()
    {
       setUpTargetPosition();
+      setUpShipSettings();
       _currentTime = _startTime = Time.time;
       _currentMode = Mode.Running;
       _currentPhaseIndex = 0;
@@ -95,6 +96,11 @@ public class Scenario : MonoBehaviour
       float distance = VarSync.GetFloat(VarName.StartDistanceToTarget);
 
       _torpedo.position = Quaternion.AngleAxis(bearing, Vector3.up) * _ship.forward * distance;
+   }
+
+   private void setUpShipSettings()
+   {
+      _ship.GetComponent<Ship>().SetUpMscSettings(VarSync.GetBool(VarName.MSC_USE), VarSync.GetFloat(VarName.MSC_DISTANCE));
    }
 
    public void PauseScenario()
@@ -128,7 +134,7 @@ public class Scenario : MonoBehaviour
       phases.Add(new PhaseLaunchBouys());
       phases.Add(new PhaseBouysReady());
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByBuoys, "Цель запеленгована буями", 2));
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesLaunched, "Ракеты выпущены", 2));
+      phases.Add(new PhaseLaunchRockets());
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesStrike, "Ракеты достигли цели", 2));
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.ScenarioFinished, "Упражнение окончено", 2));
       
@@ -222,5 +228,24 @@ class PhaseBouysReady : IScenarioPhase
          return false;
 
       return Scenario.Instance.Buoys.All(b => b.State == BuoyState.Working);
+   }
+}
+
+class PhaseLaunchRockets : IScenarioPhase
+{
+   private RocketLauncher _rocketLauncher;
+   public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.MissilesLaunched;
+   public override string Title => "Запуск ракет";
+   public override bool IsFinished => checkFinished();
+
+   public override void Start()
+   {
+      _rocketLauncher = GameObject.FindObjectOfType<RocketLauncher>();
+      _rocketLauncher.LaunchRockets();
+   }
+
+   private bool checkFinished()
+   {
+      return _rocketLauncher.IsAllRocketsExploded();
    }
 }
