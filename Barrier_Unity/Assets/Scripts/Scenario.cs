@@ -83,6 +83,7 @@ public class Scenario : MonoBehaviour
    public void StartScenario()
    {
       setUpTargetPosition();
+      setUpShipSettings();
       _currentTime = _startTime = Time.time;
       _currentMode = Mode.Running;
       _currentPhaseIndex = 0;
@@ -95,6 +96,11 @@ public class Scenario : MonoBehaviour
       float distance = VarSync.GetFloat(VarName.StartDistanceToTarget);
 
       _torpedo.position = Quaternion.AngleAxis(bearing, Vector3.up) * _ship.forward * distance;
+   }
+
+   private void setUpShipSettings()
+   {
+      _ship.GetComponent<Ship>().SetUpMscSettings(VarSync.GetBool(VarName.MSC_USE), VarSync.GetFloat(VarName.MSC_DISTANCE));
    }
 
    public void PauseScenario()

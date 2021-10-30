@@ -6,14 +6,20 @@ public class Ship : MonoBehaviour
 {
    public float m_Speed = 5;
    GameObject m_directionLine;
+
    [SerializeField] GameObject m_arrow;
-   // Start is called before the first frame update
+   [SerializeField] private MSC _msc; 
+
+   public void SetUpMscSettings(bool isActive, float distToShip)
+   {
+      _msc.SetUpSettings(isActive, distToShip);
+   }
+
    void Start()
    {
       m_directionLine = createDirectionLine();
    }
 
-   // Update is called once per frame
    void Update()
    {
       if (!Scenario.Instance.IsRunning)
@@ -22,6 +28,8 @@ public class Ship : MonoBehaviour
       Vector3 pos = transform.position;
       pos += transform.forward * step;
       transform.position = pos;
+      
+      _msc.SetPosition(transform.position, transform.forward);
    }
 
    GameObject createDirectionLine()
