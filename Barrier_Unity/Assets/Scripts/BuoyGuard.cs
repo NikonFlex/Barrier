@@ -17,7 +17,7 @@ public class BuoyGuard : MonoBehaviour
    private GameObject m_rombZone;
    private GameObject m_elipseZone;
    private GameObject m_splineZone;
-   private bool _isTrackedPositiobDrawing = false;
+   private bool _startDrawTrackedPosition = false;
 
    private float m_bearingError => VarSync.GetFloat(VarName.BuoysBearingError);
    private float m_detectRange => VarSync.GetFloat(VarName.BuoysDetectRange);
@@ -63,10 +63,10 @@ public class BuoyGuard : MonoBehaviour
       if (m_bouy1 == null || m_bouy2 == null)
          return;
       
-      if (_isTrackedPositiobDrawing)
+      if (_startDrawTrackedPosition)
       {
          StartCoroutine(drawTrackedTargetPosition());
-         _isTrackedPositiobDrawing = false;
+         _startDrawTrackedPosition = false;
       }
 
       m_errorCur = Mathf.Lerp(m_errorBeg, m_errorEnd, Time.time - m_errorTime);
@@ -137,14 +137,19 @@ public class BuoyGuard : MonoBehaviour
          Vector3 b1Bearing = (m_torpedo.position - m_bouy1.transform.position).normalized;
          Vector3 b1BearingWithError = getDir(b1Bearing, Random.Range(-m_bearingError / 2, m_bearingError / 2));
 
+         //Vector3 p1 = m_bouy1.transform.position;
+         //Vector3 p1r = m_bouy1.transform.position + b1BearingWithError * m_detectRange + Vector3.up;
+
+         //Vector3 b2Bearing = (m_torpedo.transform.position - m_bouy2.transform.position).normalized;
+         //Vector3 b2BearingWithError = getDir(b2Bearing, Random.Range(-m_bearingError / 2, m_bearingError / 2));
+
+         //Vector3 p2 = m_bouy2.transform.position;
+         //Vector3 p2r = m_bouy2.transform.position + b2BearingWithError * m_detectRange + Vector3.up;
+
          Vector3 p1 = m_bouy1.transform.position;
-         Vector3 p1r = m_bouy1.transform.position + b1BearingWithError * m_detectRange + Vector3.up;
-
-         Vector3 b2Bearing = (m_torpedo.transform.position - m_bouy2.transform.position).normalized;
-         Vector3 b2BearingWithError = getDir(b2Bearing, Random.Range(-m_bearingError / 2, m_bearingError / 2));
-
+         Vector3 p1r = calcBearingDeviatedPoint(m_bouy1.transform.position, m_torpedo.transform.position, m_detectRange, Random.Range(-m_bearingError / 2, m_bearingError / 2));
          Vector3 p2 = m_bouy2.transform.position;
-         Vector3 p2r = m_bouy2.transform.position + b2BearingWithError * m_detectRange + Vector3.up;
+         Vector3 p2r = calcBearingDeviatedPoint(m_bouy2.transform.position, m_torpedo.transform.position, m_detectRange, Random.Range(-m_bearingError / 2, m_bearingError / 2));
 
          Vector3 bouysBearingIntersection = Vector3.zero;
          bool f1 = getCross(p1, p1r, p2, p2r, out bouysBearingIntersection);
@@ -156,6 +161,14 @@ public class BuoyGuard : MonoBehaviour
   
          yield return new WaitForSeconds(1f);
       }
+   }
+
+   private Vector3 calcBearingDeviatedPoint(Vector3 posFrom, Vector3 posTo, float bearingRange, float deviation)
+   {
+
+      Vector3 bearing = (posTo - posFrom).normalized;
+      Vector3 BearingWithError = getDir(bearing, deviation);
+      return posFrom + BearingWithError * bearingRange + Vector3.up;
    }
 
    private void OnDrawGizmos()
@@ -189,7 +202,7 @@ public class BuoyGuard : MonoBehaviour
       m_errorBeg = Random.Range(-m_bearingError / 2f, m_bearingError / 2);
       m_errorCur = m_errorBeg;
       m_errorEnd = Random.Range(-m_bearingError / 2f, m_bearingError / 2);
-      _isTrackedPositiobDrawing = true;
+      _startDrawTrackedPosition = true;
    }
 
    private bool getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22, out Vector3 cross)
