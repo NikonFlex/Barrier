@@ -10,15 +10,14 @@ public class BuoyGuard : MonoBehaviour
 
    private Buoy m_bouy1;
    private Buoy m_bouy2;
-   private List<GameObject> ellipse_points;
    private float m_errorBeg;
    private float m_errorEnd;
    private float m_errorCur;
    private float m_errorTime;
-
    private GameObject m_rombZone;
    private GameObject m_elipseZone;
    private GameObject m_splineZone;
+   private bool _isTrackedPositiobDrawing = false;
 
    private float m_bearingError => VarSync.GetFloat(VarName.BuoysBearingError);
    private float m_detectRange => VarSync.GetFloat(VarName.BuoysDetectRange);
@@ -64,6 +63,12 @@ public class BuoyGuard : MonoBehaviour
       if (m_bouy1 == null || m_bouy2 == null)
          return;
       
+      if (_isTrackedPositiobDrawing)
+      {
+         StartCoroutine(drawTrackedTargetPosition());
+         _isTrackedPositiobDrawing = false;
+      }
+
       m_errorCur = Mathf.Lerp(m_errorBeg, m_errorEnd, Time.time - m_errorTime);
 
       Vector3 vc = Quaternion.AngleAxis(m_errorCur, Vector3.up) * (m_torpedo.position - m_bouy1.transform.position).normalized;
@@ -125,6 +130,34 @@ public class BuoyGuard : MonoBehaviour
       m_splineZone.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 1, Mathf.PingPong(Time.time, 0.5f));
    }
 
+   private IEnumerator drawTrackedTargetPosition()
+   {
+      while (true)
+      {
+         Vector3 b1Bearing = (m_torpedo.position - m_bouy1.transform.position).normalized;
+         Vector3 b1BearingWithError = getDir(b1Bearing, Random.Range(-m_bearingError / 2, m_bearingError / 2));
+
+         Vector3 p1 = m_bouy1.transform.position;
+         Vector3 p1r = m_bouy1.transform.position + b1BearingWithError * m_detectRange + Vector3.up;
+
+         Vector3 b2Bearing = (m_torpedo.transform.position - m_bouy2.transform.position).normalized;
+         Vector3 b2BearingWithError = getDir(b2Bearing, Random.Range(-m_bearingError / 2, m_bearingError / 2));
+
+         Vector3 p2 = m_bouy2.transform.position;
+         Vector3 p2r = m_bouy2.transform.position + b2BearingWithError * m_detectRange + Vector3.up;
+
+         Vector3 bouysBearingIntersection = Vector3.zero;
+         bool f1 = getCross(p1, p1r, p2, p2r, out bouysBearingIntersection);
+
+         GameObject TrackedPoint = new GameObject("Track Point " + string.Format("{0:0.00}", Scenario.Instance.ScenarioTime));
+         TrackedPoint.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(10, 30);
+         TrackedPoint.AddComponent<MeshRenderer>().material.color = new Color(1, 0, 0, 0.5f);
+         TrackedPoint.transform.position = new Vector3(bouysBearingIntersection.x, 10, bouysBearingIntersection.z);
+  
+         yield return new WaitForSeconds(1f);
+      }
+   }
+
    private void OnDrawGizmos()
    {
       Gizmos.color = Color.red;
@@ -156,6 +189,7 @@ public class BuoyGuard : MonoBehaviour
       m_errorBeg = Random.Range(-m_bearingError / 2f, m_bearingError / 2);
       m_errorCur = m_errorBeg;
       m_errorEnd = Random.Range(-m_bearingError / 2f, m_bearingError / 2);
+      _isTrackedPositiobDrawing = true;
    }
 
    private bool getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22, out Vector3 cross)

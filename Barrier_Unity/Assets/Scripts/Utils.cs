@@ -231,8 +231,8 @@ static class Utils
         for (int i = 1; i < spl.Count - 1; i += 1)
         {
             tris.Add(0);
-            tris.Add(i);
             tris.Add(i + 1);
+            tris.Add(i);
         }
         tris.Add(0);
         tris.Add(spl.Count - 2);
