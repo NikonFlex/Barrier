@@ -77,7 +77,8 @@ public class Packet : MonoBehaviour
 
    private IEnumerator SplashDown()
    {
-      print($"packet '{gameObject.name}' on parashut on height {transform.position.y}");
+      ScenarioLog.Instance.AddMessage($"packet '{gameObject.name}' on parashut on height {transform.position.y}");
+      //print($"packet '{gameObject.name}' on parashut on height {transform.position.y}");
       _isOnParashut = true;
       _prevPos = transform.position;
       while (transform.position.y > 0)
@@ -109,7 +110,8 @@ public class Packet : MonoBehaviour
 
          yield return null;
       }
-      print($"bouy '{gameObject.name}' on water");
+      ScenarioLog.Instance.AddMessage($"bouy '{gameObject.name}' on water");
+      //print($"bouy '{gameObject.name}' on water");
 
       _state = PacketState.OnWater;
       gameObject.AddComponent<Buoy>();

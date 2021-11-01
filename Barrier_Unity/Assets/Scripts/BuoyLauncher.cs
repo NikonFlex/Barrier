@@ -20,7 +20,8 @@ public class BuoyLauncher : MonoBehaviour
       if (_busy)
          return false;
       _busy = true;
-      print("Shoot buoy start");
+      ScenarioLog.Instance.AddMessage("Shoot buoy start");
+      //print("Shoot buoy start");
       _haveTarget = true;
       StartCoroutine(shoot(targetPos));
       return true;
@@ -70,7 +71,7 @@ public class BuoyLauncher : MonoBehaviour
    {
       while (_busy)
          yield return null;
-      print("next shoot");
+      ScenarioLog.Instance.AddMessage("next shoot");
       FindObjectOfType<CameraController>().FollowObject(transform);
       ShootToTarget(p);
       yield return null;

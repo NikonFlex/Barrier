@@ -3,52 +3,52 @@
 !VarNamePersist
 Data: 
   IDictionary.Entries: 
-    BuoysBearingError: 
-      DefaultValue: !System.Single 10
-      DisplayText: Погрешность пеленга буя
-    RocketDistance: 
-      DefaultValue: 100
-      DisplayText: Расстояние между ракетами при ударе
-    StartDistanceToTarget: 
-      DefaultValue: !System.Single 7000
-      DisplayText: Расстояние до цели
+    MSC_USE: 
+      DefaultValue: True
+      DisplayText: Использовать МСЦ
     Weather: 
       DefaultValue: null
       DisplayText: Погода
+    BouysDistanceBetween: 
+      DefaultValue: !System.Single 1000
+      DisplayText: Расстояние между буями
     BuoyReadyTime: 
       DefaultValue: !System.Single 3
       DisplayText: Время готовности буя
     BuoysDetectRange: 
       DefaultValue: !System.Single 5000
       DisplayText: Дальность обнаружения буями
-    RocketPauseDuration: 
-      DefaultValue: 3
-      DisplayText: Временной сдвиг пуска ракет
-    MSC_USE: 
-      DefaultValue: True
-      DisplayText: Использовать МСЦ
-    BuoysShootRange: 
-      DefaultValue: !System.Single 5000
-      DisplayText: Дальность полета буев
-    NumBuoys: 
-      DefaultValue: null
-      DisplayText: Количество буев
     BuoysSettingPostionError: 
       DefaultValue: !System.Single 500
       DisplayText: Погрешность постановки буя
+    RocketPauseDuration: 
+      DefaultValue: 3
+      DisplayText: Временной сдвиг пуска ракет
+    RocketDistance: 
+      DefaultValue: 100
+      DisplayText: Расстояние между ракетами при ударе
+    NumBuoys: 
+      DefaultValue: null
+      DisplayText: Количество буев
     RocketNum: 
       DefaultValue: null
       DisplayText: Количество ракет
+    MSC_DISTANCE: 
+      DefaultValue: !System.Single 800
+      DisplayText: Дистанция МСЦ
+    StartDistanceToTarget: 
+      DefaultValue: !System.Single 7000
+      DisplayText: Расстояние до цели
+    BuoysShootRange: 
+      DefaultValue: !System.Single 5000
+      DisplayText: Дальность полета буев
+    BuoysBearingError: 
+      DefaultValue: !System.Single 10
+      DisplayText: Погрешность пеленга буя
     BuoysOpenConeHeight: 
       DefaultValue: !System.Single 200
       DisplayText: Высота открытия парашюта
     StartBearingToTarget: 
       DefaultValue: !System.Single 180
       DisplayText: Пеленг на цель
-    MSC_DISTANCE: 
-      DefaultValue: !System.Single 800
-      DisplayText: Дистанция МСЦ
-    BouysDistanceBetween: 
-      DefaultValue: !System.Single 1000
-      DisplayText: Расстояние между буями
 ...
