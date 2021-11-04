@@ -15,6 +15,7 @@ public class Toolbar : MonoBehaviour
       VIEW_TOP,
       VIEW_ISO,
       SECTORS,
+      LOG,
       EXIT
    };
 
