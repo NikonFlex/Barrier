@@ -39,6 +39,8 @@ public enum VarName
    RocketNum,
    [VarName(DisplayText = "Расстояние между ракетами при ударе", Persist = true, HideInInspector = true, Units = "м", DefaultValue = 100)]
    RocketDistance,
+   [VarName(DisplayText = "Множитель погрешности обнаружения буя при шторме", Persist = true, DefaultValue = 2f)]
+   BuoysBearingMultplier,
 
    // runtime vars
    [VarName(Persist = false, DefaultValue = 0f, FormatPrecision = 2f)]
