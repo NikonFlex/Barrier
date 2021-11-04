@@ -174,7 +174,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   V:
-    Name: 
+    Name: ScenarioPhaseName
 --- !u!114 &13319754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1571,7 +1571,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   V:
-    Name: 
+    Name: TargetBearing
 --- !u!114 &400465879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3136,8 +3136,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 3f532e8b48f69b2429b4e4ed9eacd141, type: 2}
-  m_sharedMaterial: {fileID: 2140032, guid: 3f532e8b48f69b2429b4e4ed9eacd141, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5930,7 +5930,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   V:
-    Name: 
+    Name: CurrentTime
 --- !u!114 &1587088808
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6109,7 +6109,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   V:
-    Name: 
+    Name: TargetDistance
 --- !u!114 &1640597564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6581,7 +6581,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1994967113}
   m_LocalRotation: {x: 0.5, y: 0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0, y: 1, z: -0}
   m_LocalScale: {x: 1, y: 2.82, z: 1}
   m_Children: []
   m_Father: {fileID: 1723057348}

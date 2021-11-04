@@ -20,7 +20,7 @@ public class BuoyGuard : MonoBehaviour
    private bool _startDrawTrackedPosition = false;
 
    private float m_detectRange => VarSync.GetFloat(VarName.BuoysDetectRange);
-   private float m_bearingError()
+   private float getBearingError()
    {
       if (VarSync.GetInt(VarName.Weather) == 0)
          return VarSync.GetFloat(VarName.BuoysBearingError);
@@ -58,7 +58,7 @@ public class BuoyGuard : MonoBehaviour
          yield return new WaitForSeconds(1);
 
          m_errorBeg = m_errorEnd;
-         m_errorEnd = Random.Range(-m_bearingError() / 2f, m_bearingError() / 2f);
+         m_errorEnd = Random.Range(-getBearingError() / 2f, getBearingError() / 2f);
          m_errorTime = Time.time;
       }
    }
@@ -78,16 +78,16 @@ public class BuoyGuard : MonoBehaviour
       m_errorCur = Mathf.Lerp(m_errorBeg, m_errorEnd, Time.time - m_errorTime);
 
       Vector3 vc = Quaternion.AngleAxis(m_errorCur, Vector3.up) * (m_torpedo.position - m_bouy1.transform.position).normalized;
-      Vector3 vr = getDir(vc, m_bearingError() / 2);
-      Vector3 vl = getDir(vc, -m_bearingError() / 2);
+      Vector3 vr = getDir(vc, getBearingError() / 2);
+      Vector3 vl = getDir(vc, -getBearingError() / 2);
 
       Vector3 p1 = m_bouy1.transform.position;
       Vector3 p1r = m_bouy1.transform.position + vr * m_detectRange + Vector3.up;
       Vector3 p1l = m_bouy1.transform.position + vl * m_detectRange + Vector3.up;
 
       vc = Quaternion.AngleAxis(m_errorCur, Vector3.up) * (m_torpedo.position - m_bouy2.transform.position).normalized;
-      vr = getDir(vc, m_bearingError() / 2);
-      vl = getDir(vc, -m_bearingError() / 2);
+      vr = getDir(vc, getBearingError() / 2);
+      vl = getDir(vc, -getBearingError() / 2);
 
       Vector3 p2 = m_bouy2.transform.position;
       Vector3 p2r = m_bouy2.transform.position + vr * m_detectRange + Vector3.up;
@@ -141,12 +141,12 @@ public class BuoyGuard : MonoBehaviour
       while (true)
       {
          Vector3 b1Bearing = (m_torpedo.position - m_bouy1.transform.position).normalized;
-         Vector3 b1BearingWithError = getDir(b1Bearing, Random.Range(-m_bearingError() / 2, m_bearingError() / 2));
+         Vector3 b1BearingWithError = getDir(b1Bearing, Random.Range(-getBearingError() / 2, getBearingError() / 2));
 
          Vector3 p1 = m_bouy1.transform.position;
-         Vector3 p1r = calcBearingDeviatedPoint(m_bouy1.transform.position, m_torpedo.transform.position, m_detectRange, Random.Range(-m_bearingError() / 2, m_bearingError() / 2));
+         Vector3 p1r = calcBearingDeviatedPoint(m_bouy1.transform.position, m_torpedo.transform.position, m_detectRange, Random.Range(-getBearingError() / 2, getBearingError() / 2));
          Vector3 p2 = m_bouy2.transform.position;
-         Vector3 p2r = calcBearingDeviatedPoint(m_bouy2.transform.position, m_torpedo.transform.position, m_detectRange, Random.Range(-m_bearingError() / 2, m_bearingError() / 2));
+         Vector3 p2r = calcBearingDeviatedPoint(m_bouy2.transform.position, m_torpedo.transform.position, m_detectRange, Random.Range(-getBearingError() / 2, getBearingError() / 2));
 
          Vector3 bouysBearingIntersection = Vector3.zero;
          bool f1 = getCross(p1, p1r, p2, p2r, out bouysBearingIntersection);
@@ -168,17 +168,17 @@ public class BuoyGuard : MonoBehaviour
       return posFrom + BearingWithError * bearingRange + Vector3.up;
    }
 
-   private void OnDrawGizmos()
-   {
-      Gizmos.color = Color.red;
-      Gizmos.DrawSphere(m_torpedo.position, 100);
+   //private void OnDrawGizmos()
+   //{
+   //   Gizmos.color = Color.red;
+   //   Gizmos.DrawSphere(m_torpedo.position, 100);
 
-      Gizmos.color = Color.green;
-      if(m_bouy1 != null)
-         Gizmos.DrawSphere(m_bouy1.GetComponent<Transform>().position, 25);
-      if (m_bouy2 != null)
-         Gizmos.DrawSphere(m_bouy2.GetComponent<Transform>().position, 25);
-   }
+   //   Gizmos.color = Color.green;
+   //   if(m_bouy1 != null)
+   //      Gizmos.DrawSphere(m_bouy1.GetComponent<Transform>().position, 25);
+   //   if (m_bouy2 != null)
+   //      Gizmos.DrawSphere(m_bouy2.GetComponent<Transform>().position, 25);
+   //}
 
    public void AddBuoy(Buoy b)
    {
@@ -196,9 +196,9 @@ public class BuoyGuard : MonoBehaviour
 
    private void startWork()
    {
-      m_errorBeg = Random.Range(-m_bearingError() / 2f, m_bearingError() / 2);
+      m_errorBeg = Random.Range(-getBearingError() / 2f, getBearingError() / 2);
       m_errorCur = m_errorBeg;
-      m_errorEnd = Random.Range(-m_bearingError() / 2f, m_bearingError() / 2);
+      m_errorEnd = Random.Range(-getBearingError() / 2f, getBearingError() / 2);
       _startDrawTrackedPosition = true;
    }
 
