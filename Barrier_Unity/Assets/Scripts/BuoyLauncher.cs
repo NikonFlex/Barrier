@@ -72,7 +72,7 @@ public class BuoyLauncher : MonoBehaviour
       while (_busy)
          yield return null;
       ScenarioLog.Instance.AddMessage("next shoot");
-      FindObjectOfType<CameraController>().FollowObject(transform);
+      //FindObjectOfType<CameraController>().FollowObject(transform);
       ShootToTarget(p);
       yield return null;
    }
@@ -105,7 +105,7 @@ public class BuoyLauncher : MonoBehaviour
       packet.Launch(_launchSpeed, transform.forward);
       Scenario.Instance.OnPacketLaunch(packet);
 
-      FindObjectOfType<CameraController>().FollowObject(packetInstance.transform);
+      //FindObjectOfType<CameraController>().FollowObject(packetInstance.transform);
 
 
       _busy = false;

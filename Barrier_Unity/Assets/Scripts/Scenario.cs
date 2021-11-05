@@ -27,13 +27,20 @@ public abstract class IScenarioPhase
 
 public class ScnenarioPhaseStub : IScenarioPhase
 {
-   public ScnenarioPhaseStub(ScenarioPhaseState state, string title, float duration)
+   public ScnenarioPhaseStub(ScenarioPhaseState state, string title, float duration, Transform followObject = null)
    {
       _scenarioState = state;
       _title = title;
       _duration = duration;
+      _followObject = followObject;
    }
-   public override void Start() => _startTime = Scenario.Instance.ScenarioTime;
+   public override void Start()
+   {
+      _startTime = Scenario.Instance.ScenarioTime;
+      if (_followObject != null)
+         GameObject.FindObjectOfType<CameraController>().FollowObject(_followObject);
+
+   }
    public override ScenarioPhaseState ScenarioState => _scenarioState;
    public override string Title => _title;
    public override bool IsFinished => Scenario.Instance.ScenarioTime > _startTime + _duration;
@@ -42,6 +49,7 @@ public class ScnenarioPhaseStub : IScenarioPhase
    private readonly float _duration;
    private float _startTime;
    private ScenarioPhaseState _scenarioState;
+   private Transform _followObject;
 }
 
 public class TargetInfo
@@ -129,11 +137,12 @@ public class Scenario : MonoBehaviour
    {
       // add stub phases
       var phases = new List<IScenarioPhase>();
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 0.1f));
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByAntenna, "Цель обнаружена МСЦ", 0.5f));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 2f, _ship));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByAntenna, "Цель обнаружена МСЦ", 1f));
       phases.Add(new PhaseLaunchBouys());
-      phases.Add(new PhaseBouysReady());
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByBuoys, "Цель запеленгована буями", 2));
+      phases.Add(new PhaseBouysPreparingReady());
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.BuoysStartScan, "Начало сканирования буями", 2f));
+      phases.Add(new PhaseBouysTargetDetected());
       phases.Add(new PhaseLaunchRockets());
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesStrike, "Ракеты достигли цели", 2));
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.ScenarioFinished, "Упражнение окончено", 2));
@@ -145,7 +154,7 @@ public class Scenario : MonoBehaviour
    {
       VarSync.Set(VarName.CurrentTime, _currentTime);
       VarSync.Set(VarName.ScenarioPhaseName, currentPhase.Title, true);
-
+      
       if (_currentMode != Mode.Running)
          return;
 
@@ -162,10 +171,13 @@ public class Scenario : MonoBehaviour
       if (nextIndex >= _phases.Length)
       {
          _currentMode = Mode.Finished;
+         ScenarioLog.Instance.AddMessage("Сценарий закончен");
          return;
       }
       _currentPhaseIndex = nextIndex;
       currentPhase.Start();
+      ScenarioLog.Instance.AddMessage(currentPhase.Title);
+
    }
 
    private TargetInfo calcTargetInfo()
@@ -212,7 +224,7 @@ class PhaseLaunchBouys : IScenarioPhase
 }
 
 
-class PhaseBouysReady : IScenarioPhase
+class PhaseBouysPreparingReady : IScenarioPhase
 {
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysOnPlace;
    public override string Title => "Буи готовятся";
@@ -228,6 +240,26 @@ class PhaseBouysReady : IScenarioPhase
          return false;
 
       return Scenario.Instance.Buoys.All(b => b.State == BuoyState.Working);
+   }
+}
+
+class PhaseBouysTargetDetected : IScenarioPhase
+{
+   public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.TargetDetectedByBuoys;
+   public override string Title => "Цель запеленгована буями";
+   public override bool IsFinished => checkFinished();
+
+   private BuoyGuard _bg;
+
+   public override void Start()
+   {
+      _bg = GameObject.FindObjectOfType<BuoyGuard>();
+      GameObject.FindObjectOfType<CameraController>().FollowObject(_bg.DetectZone, 2000);
+   }
+
+   private bool checkFinished()
+   {
+      return _bg.ScanningError < 0.1f;
    }
 }
 

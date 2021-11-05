@@ -18,8 +18,14 @@ public class BuoyGuard : MonoBehaviour
    private GameObject m_elipseZone;
    private GameObject m_splineZone;
    private bool _startDrawTrackedPosition = false;
+   private float _startScanTime = -1;
 
    private float m_detectRange => VarSync.GetFloat(VarName.BuoysDetectRange);
+   public Transform DetectZone => m_splineZone.transform;
+   public float _scanningError = 1f;
+
+   public float ScanningError => _scanningError;
+
    private float getBearingError()
    {
       if (VarSync.GetInt(VarName.Weather) == 0)
@@ -28,9 +34,9 @@ public class BuoyGuard : MonoBehaviour
          return VarSync.GetFloat(VarName.BuoysBearingError) * VarSync.GetFloat(VarName.BuoysBearingMultplier);
    }
 
-
    void Start()
    {
+
       m_rombZone = new GameObject("romb_zone");
       m_rombZone.AddComponent<MeshFilter>().mesh = Utils.CreateRombusMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
       m_rombZone.AddComponent<MeshRenderer>().material = m_material;
@@ -42,7 +48,6 @@ public class BuoyGuard : MonoBehaviour
       m_splineZone = new GameObject("spline_zone");
       m_splineZone.AddComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
       m_splineZone.AddComponent<MeshRenderer>().material = m_material;
-
       //m_rombZone.transform.localPosition = new Vector3(0, 0.25f, 0);
 
 
@@ -68,7 +73,13 @@ public class BuoyGuard : MonoBehaviour
    {
       if (m_bouy1 == null || m_bouy2 == null)
          return;
-      
+      if (_startScanTime < 0)
+         _startScanTime = Scenario.Instance.ScenarioTime;
+      else 
+      {
+         _scanningError = Mathf.Clamp01(1 - (Scenario.Instance.ScenarioTime - _startScanTime) / 5);
+      }
+
       if (_startDrawTrackedPosition)
       {
          StartCoroutine(drawTrackedTargetPosition());

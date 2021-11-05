@@ -432,6 +432,7 @@ GameObject:
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
   - component: {fileID: 963194230}
+  - component: {fileID: 963194231}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -539,6 +540,24 @@ MonoBehaviour:
   Speed: 2
   RotationPeriod: 5
   SmoothTime: 1
+  _camera: {fileID: 963194231}
+  _duration: 5
+--- !u!114 &963194231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7a6877a8c5cfb945841caad1c622b0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _height: 50
+  _offset: 50
+  _smoothTime: 2
+  _minDistance: 10
 --- !u!1 &1018384502
 GameObject:
   m_ObjectHideFlags: 0
@@ -1049,6 +1068,7 @@ GameObject:
   - component: {fileID: 1765234120}
   - component: {fileID: 1765234119}
   - component: {fileID: 1765234118}
+  - component: {fileID: 1765234121}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -1133,6 +1153,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1765234116}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1765234121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1765234116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1832d19cb67cbd147a0688307f0313db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _speed: 1
 --- !u!1 &1991903940
 GameObject:
   m_ObjectHideFlags: 0

@@ -3,55 +3,55 @@
 !VarNamePersist
 Data: 
   IDictionary.Entries: 
-    RocketNum: 
+    BuoysOpenConeHeight: 
+      DefaultValue: !System.Single 200
+      DisplayText: Высота открытия парашюта
+    NumBuoys: 
       DefaultValue: null
-      DisplayText: Количество ракет
+      DisplayText: Количество буев
     Weather: 
       DefaultValue: null
       DisplayText: Погода
     BouysDistanceBetween: 
       DefaultValue: !System.Single 1000
       DisplayText: Расстояние между буями
-    BuoysDetectRange: 
-      DefaultValue: !System.Single 5000
-      DisplayText: Дальность обнаружения буями
-    BuoysBearingMultplier: 
-      DefaultValue: !System.Single 2
-      DisplayText: Множитель погрешности обнаружения буя при шторме
-    BuoysBearingError: 
-      DefaultValue: !System.Single 10
-      DisplayText: Погрешность пеленга буя
     StartDistanceToTarget: 
       DefaultValue: !System.Single 7000
       DisplayText: Расстояние до цели
     MSC_USE: 
       DefaultValue: True
       DisplayText: Использовать МСЦ
-    BuoyReadyTime: 
-      DefaultValue: !System.Single 3
-      DisplayText: Время готовности буя
-    StartBearingToTarget: 
-      DefaultValue: !System.Single 180
-      DisplayText: Пеленг на цель
     BuoysSettingPostionError: 
       DefaultValue: !System.Single 500
       DisplayText: Погрешность постановки буя
-    MSC_DISTANCE: 
-      DefaultValue: !System.Single 800
-      DisplayText: Дистанция МСЦ
-    NumBuoys: 
-      DefaultValue: null
-      DisplayText: Количество буев
     BuoysShootRange: 
       DefaultValue: !System.Single 5000
       DisplayText: Дальность полета буев
-    RocketDistance: 
-      DefaultValue: 100
-      DisplayText: Расстояние между ракетами при ударе
+    BuoysBearingMultplier: 
+      DefaultValue: !System.Single 2
+      DisplayText: Множитель погрешности обнаружения буя при шторме
+    BuoysDetectRange: 
+      DefaultValue: !System.Single 5000
+      DisplayText: Дальность обнаружения буями
     RocketPauseDuration: 
       DefaultValue: 3
       DisplayText: Временной сдвиг пуска ракет
-    BuoysOpenConeHeight: 
-      DefaultValue: !System.Single 200
-      DisplayText: Высота открытия парашюта
+    StartBearingToTarget: 
+      DefaultValue: !System.Single 180
+      DisplayText: Пеленг на цель
+    RocketDistance: 
+      DefaultValue: 100
+      DisplayText: Расстояние между ракетами при ударе
+    RocketNum: 
+      DefaultValue: null
+      DisplayText: Количество ракет
+    MSC_DISTANCE: 
+      DefaultValue: !System.Single 800
+      DisplayText: Дистанция МСЦ
+    BuoysBearingError: 
+      DefaultValue: !System.Single 10
+      DisplayText: Погрешность пеленга буя
+    BuoyReadyTime: 
+      DefaultValue: !System.Single 3
+      DisplayText: Время готовности буя
 ...

@@ -15,6 +15,8 @@ public class SmoothTravel : MonoBehaviour
    public float SmoothTime = 1F;
    private int _currentIndex = 0;
    private bool _isMoving = false;
+   [SerializeField] FolowCamera _camera;
+   [SerializeField] float _duration = 5;
    void Start()
    {
 
@@ -24,7 +26,20 @@ public class SmoothTravel : MonoBehaviour
    void Update()
    {
       if (!_isMoving)
-         StartCoroutine(move());
+         StartCoroutine(followWheel());
+   }
+
+   IEnumerator followWheel()
+   {
+      _isMoving = true;
+      while (true)
+      {
+         Transform cur = _targets[(_currentIndex) % _targets.Length].transform;
+         _camera.StartFollow(cur);
+         _currentIndex++;
+         yield return new WaitForSeconds(_duration);
+      }
+
    }
 
    IEnumerator move()

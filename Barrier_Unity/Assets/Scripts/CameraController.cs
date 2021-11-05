@@ -17,9 +17,11 @@ public class CameraController : MonoBehaviour
       _followCamera.gameObject.SetActive(false);
    }
 
-   public void FollowObject(Transform t)
+   public void FollowObject(Transform t, float distance = -1)
    {
-      _followCamera.GetComponent<MouseOrbit>().target = t;
+      print($"Follow object {t.gameObject.name}");
+      //_followCamera.GetComponent<MouseOrbit>().target = t;
+      _followCamera.GetComponent<FolowCamera>().StartFollow(t, distance);
       ChangeView(ViewType.FollowObject);
    }
 

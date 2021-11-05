@@ -5549,7 +5549,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1497797551
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5653,6 +5653,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_torpedo: {fileID: 1723057348}
   m_material: {fileID: 2100000, guid: 3363be8f1b297ed42b2b7f3ae8d633ab, type: 2}
+  _scanningError: 1
 --- !u!4 &1537873268
 Transform:
   m_ObjectHideFlags: 0
@@ -7300,6 +7301,7 @@ GameObject:
   - component: {fileID: 2131364502}
   - component: {fileID: 2131364500}
   - component: {fileID: 2131364501}
+  - component: {fileID: 2131364503}
   m_Layer: 0
   m_Name: FollowCamera
   m_TagString: MainCamera
@@ -7357,7 +7359,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2131364499}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ac6ae668c796c4c48b8615f5ffb50c09, type: 3}
   m_Name: 
@@ -7384,6 +7386,22 @@ Transform:
   m_Father: {fileID: 1035623155}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 8.467, y: -51.285004, z: 4.8950005}
+--- !u!114 &2131364503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2131364499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7a6877a8c5cfb945841caad1c622b0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _height: 100
+  _offset: 100
+  _smoothTime: 2
+  _minDistance: 50
 --- !u!1 &2135443176
 GameObject:
   m_ObjectHideFlags: 0
