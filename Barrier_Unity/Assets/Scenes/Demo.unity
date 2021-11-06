@@ -3305,7 +3305,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &979977665
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -5632,6 +5632,7 @@ GameObject:
   - component: {fileID: 1537873268}
   - component: {fileID: 1537873267}
   - component: {fileID: 1537873269}
+  - component: {fileID: 1537873270}
   m_Layer: 0
   m_Name: buoyGuard
   m_TagString: Untagged
@@ -5678,6 +5679,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 281a245a742aaf74da7c665c5e9d387e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1537873270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537873266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76fadb397a72e6a4b8e99c166a1a20b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1570377727
