@@ -7,7 +7,8 @@ public enum ViewType
    Top,
    Iso,
    FollowObject,
-   Free
+   Free,
+   Torpedo
 };
 
 public class Main : MonoBehaviour
@@ -17,6 +18,7 @@ public class Main : MonoBehaviour
    [SerializeField] GameObject _targetInfoPanel;
    [SerializeField] GameObject _mapPanel;
    [SerializeField] GameObject _settingsPanel;
+ 
    Toolbar[] m_toolbars;
    private CameraController m_cameraController;
    // Start is called before the first frame update
