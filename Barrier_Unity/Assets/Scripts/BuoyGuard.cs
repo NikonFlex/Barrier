@@ -151,12 +151,12 @@ public class BuoyGuard : MonoBehaviour
          m_elipseZone.transform.eulerAngles = new Vector3(0, 180 - Vector3.SignedAngle((c1 - c3).normalized, Vector3.forward, Vector3.up), 0);
       }
       m_elipseZone.transform.position = new Vector3((c2.x + c4.x) / 2f, 10, (c2.z + c4.z) / 2f);
-      m_elipseZone.GetComponent<MeshRenderer>().material.color = new Color(0, 1, 0, Mathf.PingPong(Time.time, 0.5f));
+      m_elipseZone.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 1, Mathf.PingPong(Time.time, 0.5f));
 
       //draw spline
       m_splineZone.GetComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(vertices[0], vertices[1], vertices[2], vertices[3]);
       m_splineZone.transform.position = new Vector3(c1.x, 10, c1.z);
-      m_splineZone.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 1, Mathf.PingPong(Time.time, 0.5f));
+      m_splineZone.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
    }
 
    private IEnumerator drawTrackedTargetPosition()
@@ -181,7 +181,7 @@ public class BuoyGuard : MonoBehaviour
                trackedPosition = m_torpedo.position;
          _realTrackedPositions.Add(trackedPosition);
 
-         _torpedoMathModel.AddTrackPoint(trackedPosition);
+         _torpedoMathModel.AddTrackPoint(trackedPosition, Scenario.Instance.ScenarioTime);
 
          //draw tracked points
          GameObject trackedPointMesh = new GameObject("Track Point " + string.Format("{0:0.00}", Scenario.Instance.ScenarioTime));
@@ -291,7 +291,7 @@ public class BuoyGuard : MonoBehaviour
 
    private List<Vector3> calculateAccumalatedTorpedoWayPoints()
    {
-      Vector3 firstPos = _torpedoMathModel.CalcNextPos();
+      Vector3 firstPos = _torpedoMathModel.CalcPrognozePos(5f);
 
       List<Vector3> points = new List<Vector3>();
       for (int i = 0; i < _accumalatedTorpedoWayLength; i += 20)
