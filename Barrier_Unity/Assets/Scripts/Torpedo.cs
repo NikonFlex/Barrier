@@ -97,7 +97,6 @@ public class Torpedo : MonoBehaviour
    private GameObject createWay()
    {
       var g = new GameObject("TorpedoTail");
-      //g.layer = 6;
       g.AddComponent<MeshFilter>().mesh = Utils.CreateOfssetedLinedMesh(_wayPoints, 50);
       var meshReneder = g.AddComponent<MeshRenderer>();
       meshReneder.material = m_arrow.GetComponent<MeshRenderer>().material;

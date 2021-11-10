@@ -47,7 +47,7 @@ public class Rocket : MonoBehaviour
          pos += _speedVector * Time.deltaTime;
          _speedVector.y -= 9.8f * Time.deltaTime;
          transform.rotation = Quaternion.LookRotation(_speedVector); // куда смотрит снаряд
-         if (transform.position.y < 0)
+         if (transform.position.y < 1)
             _state = RocketState.Explode;
          transform.position = pos;
          yield return null;

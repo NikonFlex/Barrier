@@ -65,6 +65,7 @@ public class Scenario : MonoBehaviour
    [SerializeField] Transform _torpedo;
    private List<Packet> _buoyPackets = new List<Packet>();
    private List<Buoy> _buoys = new List<Buoy>();
+   [SerializeField] private CameraController m_cameraController;
 
    public enum Mode
    {
@@ -148,6 +149,8 @@ public class Scenario : MonoBehaviour
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.ScenarioFinished, "Упражнение окончено", 2));
       
       _phases = phases.ToArray();
+
+      
    }
    // Update is called once per frame
    void Update()
@@ -266,6 +269,8 @@ class PhaseBouysTargetDetected : IScenarioPhase
 class PhaseLaunchRockets : IScenarioPhase
 {
    private RocketLauncher _rocketLauncher;
+   private CameraController m_cameraController;
+
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.MissilesLaunched;
    public override string Title => "Запуск ракет";
    public override bool IsFinished => checkFinished();
@@ -274,6 +279,9 @@ class PhaseLaunchRockets : IScenarioPhase
    {
       _rocketLauncher = GameObject.FindObjectOfType<RocketLauncher>();
       _rocketLauncher.LaunchRockets();
+
+      m_cameraController = GameObject.FindObjectOfType<CameraController>();
+      m_cameraController.ChangeView(ViewType.Torpedo);
    }
 
    private bool checkFinished()
