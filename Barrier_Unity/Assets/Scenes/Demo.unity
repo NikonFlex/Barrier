@@ -3271,8 +3271,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.00085735, y: 0.0014191}
-  m_SizeDelta: {x: 700.51, y: 626.38}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 650, y: 520}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &971280292
 MonoBehaviour:
@@ -4174,6 +4174,7 @@ MonoBehaviour:
   _ship: {fileID: 543450653066634939}
   _torpedo: {fileID: 1723057348}
   m_cameraController: {fileID: 0}
+  _log: {fileID: 971280292}
 --- !u!1 &1175411987
 GameObject:
   m_ObjectHideFlags: 0
@@ -5649,7 +5650,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1497797551
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5667,8 +5668,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 609.89655, y: -147.2854}
-  m_SizeDelta: {x: -1219.493, y: -294.5709}
+  m_AnchoredPosition: {x: 625, y: -199.99997}
+  m_SizeDelta: {x: -1250, y: -400.00006}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1497797552
 MonoBehaviour:
@@ -5683,7 +5684,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.11764706, b: 0.014480043, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.4}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
