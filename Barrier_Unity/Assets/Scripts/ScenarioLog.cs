@@ -4,13 +4,8 @@ using UnityEngine;
 
 public class ScenarioLog : MonoBehaviour
 {
-   private static ScenarioLog _instance;
    private string _log;
    private TMPro.TMP_Text _last_message;
-
-   public static ScenarioLog Instance => _instance;
-
-   private void Awake() => _instance = this;
 
    private void Start()
    {

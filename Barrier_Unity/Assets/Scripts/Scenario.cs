@@ -63,9 +63,12 @@ public class Scenario : MonoBehaviour
 {
    [SerializeField] Transform _ship;
    [SerializeField] Transform _torpedo;
+   [SerializeField] private CameraController m_cameraController;
+   [SerializeField] private ScenarioLog _log;
+
    private List<Packet> _buoyPackets = new List<Packet>();
    private List<Buoy> _buoys = new List<Buoy>();
-   [SerializeField] private CameraController m_cameraController;
+
 
    public enum Mode
    {
@@ -131,6 +134,10 @@ public class Scenario : MonoBehaviour
       _currentMode = Mode.Stoped;
    }
 
+   public void AddMessage(string message)
+   {
+      _log.AddMessage(message);
+   }
 
    void Awake() => _instance = this;
 
@@ -174,12 +181,12 @@ public class Scenario : MonoBehaviour
       if (nextIndex >= _phases.Length)
       {
          _currentMode = Mode.Finished;
-         ScenarioLog.Instance.AddMessage("Сценарий закончен");
+         AddMessage("Сценарий закончен");
          return;
       }
       _currentPhaseIndex = nextIndex;
       currentPhase.Start();
-      ScenarioLog.Instance.AddMessage(currentPhase.Title);
+      AddMessage(currentPhase.Title);
 
    }
 
