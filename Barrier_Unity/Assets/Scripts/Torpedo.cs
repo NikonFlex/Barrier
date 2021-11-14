@@ -16,6 +16,7 @@ public class Torpedo : MonoBehaviour
    
    [SerializeField] int _distBeetweenWaysPoints = 30;
 
+   public bool IsAlive = true;
    GameObject m_circleObject;
    GameObject m_arrowedLineObject;
    GameObject m_torpedoWay;

@@ -56,13 +56,13 @@ public class TargetInfo
 {
    public float Bearing = 0;
    public float Distance = -1;
-   public Vector3 TargetPos;
+   public Torpedo Target;
 }
 
 public class Scenario : MonoBehaviour
 {
    [SerializeField] Transform _ship;
-   [SerializeField] Transform _torpedo;
+   [SerializeField] Torpedo _torpedo;
    [SerializeField] private CameraController m_cameraController;
    [SerializeField] private ScenarioLog _log;
 
@@ -107,7 +107,7 @@ public class Scenario : MonoBehaviour
       float bearing = VarSync.GetFloat(VarName.StartBearingToTarget);
       float distance = VarSync.GetFloat(VarName.StartDistanceToTarget);
 
-      _torpedo.position = Quaternion.AngleAxis(bearing, Vector3.up) * _ship.forward * distance;
+      _torpedo.transform.position = Quaternion.AngleAxis(bearing, Vector3.up) * _ship.forward * distance;
    }
 
    private void setUpShipSettings()
@@ -194,10 +194,10 @@ public class Scenario : MonoBehaviour
    {
       return new TargetInfo()
       {
-         Distance = (_ship.position - _torpedo.position).magnitude,
+         Distance = (_ship.position - _torpedo.transform.position).magnitude,
          // TODO: use ship direction and 
-         TargetPos = _torpedo.position,
-         Bearing = Vector3.SignedAngle(_ship.forward, (_torpedo.position - transform.position).normalized, Vector3.up)
+         Target = _torpedo,
+         Bearing = Vector3.SignedAngle(_ship.forward, (_torpedo.transform.position - transform.position).normalized, Vector3.up)
       };
    }
 

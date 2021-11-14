@@ -31,11 +31,7 @@ public class RocketLauncher : MonoBehaviour
 
    public bool IsAllRocketsExploded()
    {
-      //return false;
-      if (_rockets.Count == 0)
-         return false;
-      else
-         return _rockets.All(x => x.IsExploded);
+      return _rockets.All(x => x.IsExploded);
    }
 
    public void LaunchRockets()

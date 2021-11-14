@@ -2061,8 +2061,8 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
+  near clip plane: 10
+  far clip plane: 5000
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -3286,6 +3286,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe1d9f09c8739a41b049bc25539d886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _last_message: {fileID: 971280293}
 --- !u!114 &971280293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3402,7 +3403,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!64 &979977665
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -4172,7 +4173,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _ship: {fileID: 543450653066634939}
-  _torpedo: {fileID: 1723057348}
+  _torpedo: {fileID: 1723057347}
   m_cameraController: {fileID: 0}
   _log: {fileID: 971280292}
 --- !u!1 &1175411987
@@ -6429,6 +6430,7 @@ MonoBehaviour:
   m_arrow: {fileID: 1391170010}
   m_targetShip: {fileID: 919132148589263873}
   _distBeetweenWaysPoints: 30
+  IsAlive: 1
 --- !u!4 &1723057348
 Transform:
   m_ObjectHideFlags: 0

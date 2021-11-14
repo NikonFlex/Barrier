@@ -22,7 +22,7 @@ public class Rocket : MonoBehaviour
       if (_isAimed == true)
       {
          _isAimed = false;
-         StartCoroutine(Coorutine());
+         StartCoroutine(fly());
       }
    }
 
@@ -39,19 +39,18 @@ public class Rocket : MonoBehaviour
       _state = RocketState.Fly;
    }
 
-   private IEnumerator Coorutine()
+   private IEnumerator fly()
    {
-      while (_state == RocketState.Fly)
+      while (transform.position.y > 1)
       {
          Vector3 pos = transform.position;
          pos += _speedVector * Time.deltaTime;
          _speedVector.y -= 9.8f * Time.deltaTime;
          transform.rotation = Quaternion.LookRotation(_speedVector); // куда смотрит снаряд
-         if (transform.position.y < 1)
-            _state = RocketState.Explode;
          transform.position = pos;
          yield return null;
       }
+      _state = RocketState.Explode;
 
       float cur_radius = 0;
       float adding_radius = _killRadius / 60f * 1.25f;
@@ -62,6 +61,11 @@ public class Rocket : MonoBehaviour
          GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, 0.5f);
          yield return null;
       }
+      var delta = transform.position - Scenario.Instance.TargetInfo.Target.transform.position;
+      delta.y = 0;
+      if (delta.magnitude <= _killRadius)
+         Scenario.Instance.TargetInfo.Target.IsAlive = false;
+
       _state = RocketState.Exploded;
    }
 }

@@ -82,6 +82,19 @@ public class BuoyGuard : MonoBehaviour
    {
       if (m_bouy1 == null || m_bouy2 == null)
          return;
+
+      var target = Scenario.Instance.TargetInfo;
+      if (target == null || !Scenario.Instance.TargetInfo.Target.IsAlive)
+      {
+         m_rombZone.SetActive(false);
+         m_elipseZone.SetActive(false);
+         m_splineZone.SetActive(false);
+         return;
+      }
+      m_rombZone.SetActive(true);
+      m_elipseZone.SetActive(true);
+      m_splineZone.SetActive(true);
+
       if (_startScanTime < 0)
          _startScanTime = Scenario.Instance.ScenarioTime;
       else 
@@ -161,7 +174,7 @@ public class BuoyGuard : MonoBehaviour
 
    private IEnumerator drawTrackedTargetPosition()
    {
-      while (true)
+      while (Scenario.Instance.TargetInfo != null && Scenario.Instance.TargetInfo.Target.IsAlive)
       {
          //calculate real tracked point
          Vector3 b1Bearing = (m_torpedo.position - m_bouy1.transform.position).normalized;
@@ -176,9 +189,9 @@ public class BuoyGuard : MonoBehaviour
          bool f1 = getCross(p1, p1r, p2, p2r, out bouysBearingIntersection);
          Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 10, bouysBearingIntersection.z);
 
-         if (_realTrackedPositions.Count != 0)
-            if (trackedPosition.magnitude > _realTrackedPositions[_realTrackedPositions.Count - 1].magnitude)
-               trackedPosition = m_torpedo.position;
+//          if (_realTrackedPositions.Count != 0)
+//             if (trackedPosition.magnitude > _realTrackedPositions[_realTrackedPositions.Count - 1].magnitude)
+//                trackedPosition = m_torpedo.position;
          _realTrackedPositions.Add(trackedPosition);
 
          _torpedoMathModel.AddTrackPoint(trackedPosition, Scenario.Instance.ScenarioTime);
@@ -188,12 +201,14 @@ public class BuoyGuard : MonoBehaviour
          trackedPointMesh.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(10, 30);
          trackedPointMesh.AddComponent<MeshRenderer>().material.color = new Color(1, 0, 0, 0.5f);
          trackedPointMesh.transform.position = trackedPosition;
+         Destroy(trackedPointMesh, 6.0f);
 
          //draw tracked points after kalman filter
          GameObject kalmanTrackedPointMesh = new GameObject("Kalman Track Point " + string.Format("{0:0.00}", Scenario.Instance.ScenarioTime));
          kalmanTrackedPointMesh.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(10, 30);
          kalmanTrackedPointMesh.AddComponent<MeshRenderer>().material.color = new Color(0, 1, 0, 0.5f);
          kalmanTrackedPointMesh.transform.position = _torpedoMathModel.CalcPos();
+         Destroy(kalmanTrackedPointMesh, 6.0f);
 
          //draw accumalated way
          _accumalatedTorpedoWay.GetComponent<MeshFilter>().mesh = Utils.CreateOfssetedLinedMesh(calculateAccumalatedTorpedoWayPoints(), 50);
