@@ -12,24 +12,22 @@ public class BuoyGuard : MonoBehaviour
 
    private Buoy m_bouy1;
    private Buoy m_bouy2;
+
    private float[] m_errorBeg = new float[2];
    private float[] m_errorEnd = new float[2];
-
    private float m_errorTime;
+
    private GameObject m_rombZone;
    private GameObject m_elipseZone;
    private GameObject m_splineZone;
+
    private bool _startDrawTrackedPosition = false;
    private float _startScanTime = -1;
 
-   private List<Vector3> _realTrackedPositions = new List<Vector3>();
-
-   private GameObject _calculatedTorpedoWay;
-   private GameObject _kalmanTorpedoWay;
    private GameObject _accumalatedTorpedoWay;
    [SerializeField] private float _accumalatedTorpedoWayLength = 10000;
 
-   private TorpedoMathModel _torpedoMathModel = new TorpedoMathModel();
+   [SerializeField] private TorpedoDetectionModel _torpedoDetectionModel;
 
    private float m_detectRange => VarSync.GetFloat(VarName.BuoysDetectRange);
    public Transform DetectZone => m_splineZone.transform;
@@ -217,24 +215,22 @@ public class BuoyGuard : MonoBehaviour
          realPointMesh.transform.position = realPosition;
          Destroy(realPointMesh, 12.0f);
 
-         Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 5, bouysBearingIntersection.z);
+         Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 0, bouysBearingIntersection.z);
 
-         _realTrackedPositions.Add(trackedPosition);
-
-         _torpedoMathModel.AddTrackPoint(trackedPosition, Scenario.Instance.ScenarioTime);
+         _torpedoDetectionModel.AddTrackPoint(trackedPosition);
 
          //draw tracked points
          GameObject trackedPointMesh = new GameObject("Track Point " + string.Format("{0:0.00}", Scenario.Instance.ScenarioTime));
          trackedPointMesh.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(5, 30);
          trackedPointMesh.AddComponent<MeshRenderer>().material.color = new Color(1, 0, 0, 0.5f);
-         trackedPointMesh.transform.position = trackedPosition;
+         trackedPointMesh.transform.position = trackedPosition + Vector3.up * 5;
          Destroy(trackedPointMesh, 12.0f);
 
          //draw tracked points after kalman filter
          GameObject kalmanTrackedPointMesh = new GameObject("Kalman Track Point " + string.Format("{0:0.00}", Scenario.Instance.ScenarioTime));
          kalmanTrackedPointMesh.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(5, 30);
          kalmanTrackedPointMesh.AddComponent<MeshRenderer>().material.color = new Color(0, 1, 0, 0.5f);
-         kalmanTrackedPointMesh.transform.position = _torpedoMathModel.CalcPos();
+         kalmanTrackedPointMesh.transform.position = _torpedoDetectionModel.CalcPos() + Vector3.up * 5; 
          Destroy(kalmanTrackedPointMesh, 12.0f);
 
          //draw accumalated way
@@ -254,8 +250,7 @@ public class BuoyGuard : MonoBehaviour
 
    private void OnDrawGizmos()
    {
-      Gizmos.color = new Color(1, 0, 0, 0.5f);
-      Gizmos.DrawSphere(m_torpedo.position, 25);
+      Gizmos.color = new Color(1, 0, 0, 0.25f);
 
       if (m_bouy1 != null)
       {
@@ -359,11 +354,11 @@ public class BuoyGuard : MonoBehaviour
 
    private List<Vector3> calculateAccumalatedTorpedoWayPoints()
    {
-      Vector3 firstPos = _torpedoMathModel.CalcPrognozePos(5f);
+      Vector3 firstPos = _torpedoDetectionModel.CalcPrognosisPos(5f) + Vector3.up * 5f;
 
       List<Vector3> points = new List<Vector3>();
       for (int i = 0; i < _accumalatedTorpedoWayLength; i += 20)
-         points.Add(firstPos + _torpedoMathModel.CalcCourse() * i);
+         points.Add(firstPos + _torpedoDetectionModel.CalcCourse() * i);
 
       return points;
    }

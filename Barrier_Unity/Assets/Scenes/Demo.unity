@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5733,6 +5733,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1537873268}
   - component: {fileID: 1537873267}
+  - component: {fileID: 1537873270}
   - component: {fileID: 1537873269}
   m_Layer: 0
   m_Name: buoyGuard
@@ -5755,7 +5756,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_torpedo: {fileID: 1723057348}
   m_material: {fileID: 2100000, guid: 3363be8f1b297ed42b2b7f3ae8d633ab, type: 2}
-  _accumalatedTorpedoWayLength: 10000
+  _accumalatedTorpedoWayLength: 5000
+  _torpedoDetectionModel: {fileID: 1537873270}
   _scanningError: 1
 --- !u!4 &1537873268
 Transform:
@@ -5783,6 +5785,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 281a245a742aaf74da7c665c5e9d387e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1537873270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1537873266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76fadb397a72e6a4b8e99c166a1a20b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _kalmanK: 0.5
 --- !u!1 &1570377727
 GameObject:
   m_ObjectHideFlags: 0
@@ -9773,7 +9788,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -20.79}
+  m_AnchoredPosition: {x: 0, y: -20.789978}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &7439107341488403910

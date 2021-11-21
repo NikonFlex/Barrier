@@ -28,7 +28,7 @@ public enum VarName
    BuoysOpenConeHeight,
    [VarName(DisplayText = "Погрешность постановки буя", Persist = true, Units = "м", DefaultValue = 500f)]
    BuoysSettingPostionError,
-   [VarName(DisplayText = "Погрешность пеленга буя", Persist = true, Units = "град", DefaultValue = 10f)]
+   [VarName(DisplayText = "Погрешность пеленга буя", Persist = true, Units = "град", DefaultValue = 5f)]
    BuoysBearingError,
    [VarName(DisplayText = "Время готовности буя", Persist = true, Units = "сек", DefaultValue = 3f)]
    BuoyReadyTime,
