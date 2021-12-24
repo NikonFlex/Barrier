@@ -60,9 +60,9 @@ public class Main : MonoBehaviour
    }
    void updatePanels()
    {
-      _scenarioPanel.SetActive(Scenario.Instance.IsAlive);
-      _targetInfoPanel.SetActive(Scenario.Instance.IsAlive);
-      _mapPanel.SetActive(Scenario.Instance.IsAlive);
+      if (_scenarioPanel) _scenarioPanel.SetActive(Scenario.Instance.IsAlive);
+      if (_targetInfoPanel) _targetInfoPanel.SetActive(Scenario.Instance.IsAlive);
+      if (_mapPanel) _mapPanel.SetActive(Scenario.Instance.IsAlive);
       if (Scenario.Instance.IsAlive && _settingsPanel.activeInHierarchy)
          _settingsPanel.SetActive(false);
    }

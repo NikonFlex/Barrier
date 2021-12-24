@@ -14,8 +14,8 @@ public class VarLinkUI : MonoBehaviour
    
    //private UIType _uiType = UIType.Undefined;
    private Toggle _toggle;
-   private InputField _input;
-   private Dropdown _dropdown;
+   private TMP_InputField _input;
+   private TMP_Dropdown _dropdown;
    private TMP_Text _tmpText;
    private Text     _text;
    public VarNameSelector V;
@@ -30,14 +30,14 @@ public class VarLinkUI : MonoBehaviour
          _toggle.onValueChanged.AddListener((value) => onToggleValueChanged(_toggle, value));
       }
 
-      _input = GetComponentInChildren<InputField>();
+      _input = GetComponentInChildren<TMP_InputField>();
       if (_input != null)
       {
          //_uiType = UIType.Numeric;
          _input.onValueChanged.AddListener((value) => onInputValueChanged(_input, value));
       }
 
-      _dropdown = GetComponentInChildren<Dropdown>();
+      _dropdown = GetComponentInChildren<TMP_Dropdown>();
       if (_dropdown != null)
       {
          //_uiType = UIType.Dropdown;
@@ -56,12 +56,12 @@ public class VarLinkUI : MonoBehaviour
       VarSync.Set(_v, value);
    }
 
-   private void onInputValueChanged(InputField _input, string value)
+   private void onInputValueChanged(TMP_InputField _input, string value)
    {
       VarSync.Set(_v, float.Parse(value));
    }
 
-   private void onDropdownValueChanged(Dropdown _dropdown, int value)
+   private void onDropdownValueChanged(TMP_Dropdown _dropdown, int value)
    {
       VarSync.Set(_v, value);
    }

@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using TMPro;
 
 public class ToolbarButton : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class ToolbarButton : MonoBehaviour
    public string TooltipText;
 
    private Text m_tooltip;
-   Text ButtonText;
+   TextMeshProUGUI ButtonText;
    Image ButtonImg;
 
    [SerializeField] bool m_bEnabled = true;
@@ -42,15 +43,17 @@ public class ToolbarButton : MonoBehaviour
       }
    }
 
-   Color pressedColor = new Color(1.0f, 0.75f, 0.015f);
-   Color hoverColor = new Color(1.0f, 0.85f, 0.5f);
-   Color disabledColor = Color.gray;
-   Color normalColor = Color.white;
+    Color pressedColor = Color.white;// new Color(1.0f, 0.75f, 0.015f);
+    Color hoverColor = Color.white;//new Color(1.0f, 0.85f, 0.5f);
+    Color disabledColor = Color.gray;
+    Color normalColor = Color.white;
 
    void Start()
    {
-      ButtonText = transform.Find("Text").GetComponent<Text>();
-      ButtonImg = transform.Find("Image").GetComponent<Image>();
+      Transform t = transform.Find("Text");
+      if (t!=null) ButtonText = t.GetComponent<TextMeshProUGUI>();
+      t = transform.Find("Image");
+      if (t != null) ButtonImg = t.GetComponent<Image>();
 
       EventTrigger trigger = gameObject.AddComponent<EventTrigger>();
       addEventTrigger(trigger, hover, EventTriggerType.PointerEnter);
@@ -95,7 +98,7 @@ public class ToolbarButton : MonoBehaviour
       if (ButtonText != null) ButtonText.color = pressedColor;
       if (ButtonImg != null) ButtonImg.color = pressedColor;
 
-      GetComponent<Image>().sprite = GetComponent<Button>().spriteState.pressedSprite;
+      //GetComponent<Image>().sprite = GetComponent<Button>().spriteState.pressedSprite;
    }
 
    void updateButton()
@@ -116,7 +119,7 @@ public class ToolbarButton : MonoBehaviour
       if (ButtonImg != null) ButtonImg.color = clr;
 
       GetComponent<Button>().interactable = m_bEnabled;
-      GetComponent<Image>().sprite = m_bPressed ? GetComponent<Button>().spriteState.pressedSprite : GetComponent<Button>().spriteState.highlightedSprite;
+      //GetComponent<Image>().sprite = m_bPressed ? GetComponent<Button>().spriteState.pressedSprite : GetComponent<Button>().spriteState.highlightedSprite;
    }
 
 }

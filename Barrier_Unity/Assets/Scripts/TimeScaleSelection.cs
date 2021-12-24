@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class TimeScaleSelection : MonoBehaviour
 {
    void Start()
    {
-      var dd = GetComponent<Dropdown>();
+      var dd = GetComponent<TMP_Dropdown>();
       Time.timeScale = float.Parse(dd.options[dd.value].text);
       dd.onValueChanged.AddListener(delegate
       {
@@ -13,6 +14,6 @@ public class TimeScaleSelection : MonoBehaviour
       });
    }
 
-   void dropdownValueChanged(Dropdown change) => 
+   void dropdownValueChanged(TMP_Dropdown change) => 
       Time.timeScale = float.Parse(change.options[change.value].text);
 }

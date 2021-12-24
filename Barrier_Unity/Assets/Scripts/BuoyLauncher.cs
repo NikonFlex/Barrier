@@ -99,7 +99,8 @@ public class BuoyLauncher : MonoBehaviour
 
       GameObject packetPrefab = Resources.Load("packet") as GameObject;
       var packetInstance = Instantiate(packetPrefab, _packetPos.position, _packetPos.rotation);
-      packetInstance.name = $"bouy {_buoysCounter++}";
+      Debug.Log(string.Format("{0:0.00}", Scenario.Instance.ScenarioTime) + "Instantiated");
+      packetInstance.name = $"buoy {_buoysCounter++}";
       Packet packet = packetInstance.GetComponent<Packet>();
       packet.Target = pos;
       packet.Launch(_launchSpeed, transform.forward);

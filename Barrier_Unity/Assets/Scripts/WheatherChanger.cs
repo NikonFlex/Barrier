@@ -10,15 +10,16 @@ enum Wheather
 
 public class WheatherChanger : MonoBehaviour
 {
-   [SerializeField] private GameObject _goodWheatherTexture;
-   [SerializeField] private GameObject _badWheatherTexture;
-
    private Wheather _prevWheather;
    private Wheather _curWheather;
+
+    private Crest.ShapeFFT _shapeFFT;
 
    void Start()
    {
       _prevWheather = Wheather.Good;
+      _shapeFFT = GetComponent<Crest.ShapeFFT>();
+
    }
 
    private void Update()
@@ -28,7 +29,7 @@ public class WheatherChanger : MonoBehaviour
          _curWheather = Wheather.Good;
          if (_curWheather != _prevWheather)
          {
-            gameObject.GetComponent<MeshRenderer>().material = _goodWheatherTexture.GetComponent<MeshRenderer>().material;
+            _shapeFFT.enabled = false;
             _prevWheather = _curWheather;
          }
       }
@@ -37,7 +38,7 @@ public class WheatherChanger : MonoBehaviour
          _curWheather = Wheather.Bad;
          if (_curWheather != _prevWheather)
          {
-            gameObject.GetComponent<MeshRenderer>().material = _badWheatherTexture.GetComponent<MeshRenderer>().material;
+            _shapeFFT.enabled = true;
             _prevWheather = _curWheather;
          }
       }
