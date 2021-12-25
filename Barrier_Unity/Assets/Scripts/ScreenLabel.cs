@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 [RequireComponent(typeof(RectTransform))]
 
@@ -9,8 +10,10 @@ public class ScreenLabel : MonoBehaviour
 {
     //public Transform target2;
     public Transform target;
-    public Camera cam;
+    private Camera cam;
     public Vector3 offset;
+    public string LabelText;
+    public TextMeshProUGUI tMP;
     Rect canvasRect;
     //public bool oriented;
     
@@ -20,8 +23,10 @@ public class ScreenLabel : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        cam = Camera.main;
         myRect = transform.GetComponent<RectTransform>();
         canvasRect = FindObjectOfType<Canvas>().pixelRect;
+        if (tMP!=null) tMP.text = LabelText;
     }
 
     private void Update()
