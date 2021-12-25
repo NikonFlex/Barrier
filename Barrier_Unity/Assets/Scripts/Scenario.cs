@@ -8,6 +8,7 @@ public enum ScenarioPhaseState
 {
    Idle, // цель не обнаружена.
    TargetDetectedByAntenna,// - цель обнаружена антенной
+   StartAiming,// - начало нацеливания
    BuoysLaunched,// - Буи выпущены
    BuoysOnPlace,  // - Буи приводнились
    BuoysStartScan, // - Начало сканирования буями
@@ -23,6 +24,7 @@ public abstract class IScenarioPhase
    public abstract string Title { get; }
    public abstract void Start();
    public abstract bool IsFinished { get; }
+   public abstract void Update();
 }
 
 public class ScnenarioPhaseStub : IScenarioPhase
@@ -41,6 +43,9 @@ public class ScnenarioPhaseStub : IScenarioPhase
          GameObject.FindObjectOfType<CameraController>().FollowObject(_followObject);
 
    }
+
+   public override void Update() {}
+
    public override ScenarioPhaseState ScenarioState => _scenarioState;
    public override string Title => _title;
    public override bool IsFinished => Scenario.Instance.ScenarioTime > _startTime + _duration;
@@ -89,7 +94,13 @@ public class Scenario : MonoBehaviour
    public Packet[] BuoyPackets => _buoyPackets.ToArray();
    public Buoy[] Buoys => _buoys.ToArray();
 
-   public void OnPacketLaunch(Packet p) => _buoyPackets.Add(p);
+   public void OnPacketLaunch(Packet p)
+   {
+      _buoyPackets.Add(p);
+      var camera = GameObject.Find("vcam_Launch").GetComponent<Cinemachine.CinemachineVirtualCamera>();
+      var lookAtGroup = camera.LookAt.GetComponent<Cinemachine.CinemachineTargetGroup>();
+      lookAtGroup.AddMember(p.transform, 1, 1);
+   }
    public void OnBouyHatched(Buoy b) => _buoys.Add(b);
 
    public void StartScenario()
@@ -146,7 +157,7 @@ public class Scenario : MonoBehaviour
       // add stub phases
       var phases = new List<IScenarioPhase>();
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 2f, _ship));
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.TargetDetectedByAntenna, "Цель обнаружена МСЦ", 1f));
+      phases.Add(new PhaseTargetDetected());
       phases.Add(new PhaseLaunchBouys());
       phases.Add(new PhaseBouysPreparingReady());
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.BuoysStartScan, "Начало сканирования буями", 2f));
@@ -173,6 +184,8 @@ public class Scenario : MonoBehaviour
       VarSync.Set(VarName.TargetDistance, trg != null ? trg.Distance : 0f);
 
       _currentTime += Time.deltaTime;
+
+      currentPhase.Update();
 
       if (!currentPhase.IsFinished)
          return;
@@ -214,15 +227,52 @@ public class Scenario : MonoBehaviour
    private static Scenario _instance;
 }
 
+class PhaseTargetDetected : IScenarioPhase
+{
+   public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.TargetDetectedByAntenna;
+   public override string Title => "Цель обнаружена МСЦ";
+   public override bool IsFinished => Scenario.Instance.ScenarioTime > _startTime + _duration;
+   private float _startTime;
+   private float _duration = 2f;
+
+   public override void Start()
+   {
+      _startTime = Scenario.Instance.ScenarioTime;
+      var camera = GameObject.Find("vCam_ShipGroup").GetComponent<Cinemachine.CinemachineVirtualCamera>();
+      camera.MoveToTopOfPrioritySubqueue();
+      var lookAtGroup = camera.LookAt.GetComponent<Cinemachine.CinemachineTargetGroup>();
+      var torpedo = Scenario.Instance.TargetInfo.Target.GetComponent<Transform>();
+      int idx = lookAtGroup.FindMember(torpedo);
+      lookAtGroup.m_Targets[idx].weight = 1;
+   }
+   public override void Update() { }
+}
+
 class PhaseLaunchBouys : IScenarioPhase
 {
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysLaunched;
    public override string Title => "Буи выстрелили";
    public override bool IsFinished => checkFinished();
+   public float _delay = 2;
+   private float _startTime;
+   private Cinemachine.CinemachineVirtualCamera _camera = null;
 
    public override void Start()
    {
+      _startTime = Scenario.Instance.ScenarioTime;
       GameObject.FindObjectOfType<BuoyLauncher>().LaunchBuouys();
+   }
+   public override void Update() 
+   {
+      if (_startTime + _delay >= Scenario.Instance.ScenarioTime)
+      {
+         if (!_camera)
+         {
+            _camera = GameObject.Find("vcam_Launch").GetComponent<Cinemachine.CinemachineVirtualCamera>();
+            _camera.MoveToTopOfPrioritySubqueue();
+         }
+
+      }
    }
 
    private bool checkFinished()
@@ -240,9 +290,8 @@ class PhaseBouysPreparingReady : IScenarioPhase
    public override string Title => "Буи готовятся";
    public override bool IsFinished => checkFinished();
 
-   public override void Start()
-   {
-   }
+   public override void Start(){}
+   public override void Update(){}
 
    private bool checkFinished()
    {
@@ -266,6 +315,8 @@ class PhaseBouysTargetDetected : IScenarioPhase
       _bg = GameObject.FindObjectOfType<BuoyGuard>();
       GameObject.FindObjectOfType<CameraController>().FollowObject(_bg.DetectZone, 2000);
    }
+   public override void Update() {}
+
 
    private bool checkFinished()
    {
@@ -290,6 +341,8 @@ class PhaseLaunchRockets : IScenarioPhase
       m_cameraController = GameObject.FindObjectOfType<CameraController>();
       m_cameraController.ChangeView(ViewType.Torpedo);
    }
+   public override void Update() { }
+
 
    private bool checkFinished()
    {
