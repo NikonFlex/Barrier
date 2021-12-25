@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Cinemachine;
 
 public enum ScenarioPhaseState
 {
@@ -97,8 +98,8 @@ public class Scenario : MonoBehaviour
    public void OnPacketLaunch(Packet p)
    {
       _buoyPackets.Add(p);
-      var camera = GameObject.Find("vcam_Launch").GetComponent<Cinemachine.CinemachineVirtualCamera>();
-      var lookAtGroup = camera.LookAt.GetComponent<Cinemachine.CinemachineTargetGroup>();
+      var camera = GameObject.Find("vcam_Launch").GetComponent<CinemachineVirtualCamera>();
+      var lookAtGroup = camera.LookAt.GetComponent<CinemachineTargetGroup>();
       lookAtGroup.AddMember(p.transform, 1, 1);
    }
    public void OnBouyHatched(Buoy b) => _buoys.Add(b);
@@ -156,7 +157,7 @@ public class Scenario : MonoBehaviour
    {
       // add stub phases
       var phases = new List<IScenarioPhase>();
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 2f, _ship));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 1f, _ship));
       phases.Add(new PhaseTargetDetected());
       phases.Add(new PhaseLaunchBouys());
       phases.Add(new PhaseBouysPreparingReady());
@@ -168,7 +169,7 @@ public class Scenario : MonoBehaviour
       
       _phases = phases.ToArray();
 
-      
+      VirtualCameraHelper.Activate("vCam_ShipGroup");
    }
    // Update is called once per frame
    void Update()
@@ -238,10 +239,9 @@ class PhaseTargetDetected : IScenarioPhase
    public override void Start()
    {
       _startTime = Scenario.Instance.ScenarioTime;
-      var camera = GameObject.Find("vCam_ShipGroup").GetComponent<Cinemachine.CinemachineVirtualCamera>();
-      camera.MoveToTopOfPrioritySubqueue();
-      var lookAtGroup = camera.LookAt.GetComponent<Cinemachine.CinemachineTargetGroup>();
-      var torpedo = Scenario.Instance.TargetInfo.Target.GetComponent<Transform>();
+      var camera = VirtualCameraHelper.Activate("vCam_ShipGroup");
+      var lookAtGroup = camera.LookAt.GetComponent<CinemachineTargetGroup>();
+      var torpedo = Scenario.Instance.TargetInfo.Target.transform;
       int idx = lookAtGroup.FindMember(torpedo);
       lookAtGroup.m_Targets[idx].weight = 1;
    }
@@ -255,7 +255,7 @@ class PhaseLaunchBouys : IScenarioPhase
    public override bool IsFinished => checkFinished();
    public float _delay = 2;
    private float _startTime;
-   private Cinemachine.CinemachineVirtualCamera _camera = null;
+   private CinemachineVirtualCamera _camera = null;
 
    public override void Start()
    {
@@ -267,10 +267,7 @@ class PhaseLaunchBouys : IScenarioPhase
       if (_startTime + _delay >= Scenario.Instance.ScenarioTime)
       {
          if (!_camera)
-         {
-            _camera = GameObject.Find("vcam_Launch").GetComponent<Cinemachine.CinemachineVirtualCamera>();
-            _camera.MoveToTopOfPrioritySubqueue();
-         }
+            _camera = VirtualCameraHelper.Activate("vcam_Launch");
 
       }
    }
@@ -348,4 +345,41 @@ class PhaseLaunchRockets : IScenarioPhase
    {
       return _rocketLauncher.IsAllRocketsExploded();
    }
+}
+
+static class VirtualCameraHelper
+{
+   public static void Activate(CinemachineVirtualCamera cam)
+   {
+      Debug.Log($"Activate camera {cam.name}");
+      // up priority of cam and down priority of siblings
+      for (int i = 0; i < cam.transform.parent.childCount; ++i)
+      {
+         if (cam.transform.parent.GetChild(i) == cam.transform)
+            cam.m_Priority = 11;
+         else 
+         {
+            var camSibl = cam.transform.parent.GetChild(i).GetComponent<CinemachineVirtualCamera>();
+            if (camSibl != null && camSibl.m_Priority > 10)
+            {
+               Debug.Log($"deactivate camera {camSibl.name}");
+               camSibl.m_Priority = 10;
+            }
+
+         }
+      }
+      cam.MoveToTopOfPrioritySubqueue();
+   }
+
+   public static CinemachineVirtualCamera Activate(string camName)
+   {
+      var g = GameObject.Find(camName);
+      if (g == null)
+         return null;
+      var cam = g.GetComponent<CinemachineVirtualCamera>();
+      if (cam != null)
+         Activate(cam);
+      return cam;
+   }
+
 }
