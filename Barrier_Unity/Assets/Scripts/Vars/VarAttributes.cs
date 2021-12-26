@@ -164,6 +164,7 @@ public static class AttributeHelper
    {
       try
       {
+         Debug.Log($"Serialize settings  to {path}");
          System.Yaml.Serialization.YamlSerializer yaml = new System.Yaml.Serialization.YamlSerializer();
          yaml.SerializeToFile(path, m_Persist);
          return true;
@@ -180,6 +181,8 @@ public static class AttributeHelper
    {
       try
       {
+         Debug.Log($"Deserialize settings from {path}");
+
          System.Yaml.Serialization.YamlSerializer yaml = new System.Yaml.Serialization.YamlSerializer();
 
          VarNamePersist persist = yaml.DeserializeFromFile(path)[0] as VarNamePersist;

@@ -71,11 +71,12 @@ public class RocketLauncher : MonoBehaviour
          Vector3 cur_target = target - Utils.PerpTo(_torpedo.transform.forward) * offset;
 
          GameObject rocketPrefab = Resources.Load("rocket") as GameObject;
-         GameObject packetInstance = Instantiate(rocketPrefab, gameObject.transform.position, Quaternion.Euler(0, 0, 0));
-         packetInstance.name = $"{i}";
-         Rocket rocketComp = packetInstance.GetComponent<Rocket>();
+         GameObject rocketInstance = Instantiate(rocketPrefab, gameObject.transform.position, Quaternion.Euler(0, 0, 0));
+         rocketInstance.name = $"rocket_{i}";
+         Rocket rocketComp = rocketInstance.GetComponent<Rocket>();
          rocketComp.AimToTarget(cur_target, _speed, _offestBeetweenRockets / 2);
          _rockets.Add(rocketComp);
+         Scenario.Instance.OnRocketLaunched(rocketComp);
 
          offset += _offestBeetweenRockets;
       }

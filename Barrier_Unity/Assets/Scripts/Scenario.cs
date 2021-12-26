@@ -75,7 +75,6 @@ public class Scenario : MonoBehaviour
    private List<Packet> _buoyPackets = new List<Packet>();
    private List<Buoy> _buoys = new List<Buoy>();
 
-
    public enum Mode
    {
       Stoped,
@@ -94,14 +93,20 @@ public class Scenario : MonoBehaviour
    public TargetInfo TargetInfo => isRunning ? calcTargetInfo() : null;
    public Packet[] BuoyPackets => _buoyPackets.ToArray();
    public Buoy[] Buoys => _buoys.ToArray();
+   public Transform Ship => _ship;
 
-   public void OnPacketLaunch(Packet p)
+   public void OnPacketLaunched(Packet p)
    {
       _buoyPackets.Add(p);
-      LabelHelper.AddLabel(p.gameObject, $"Буй {_buoyPackets.Count}" );
+      LabelHelper.AddLabel(p.gameObject, $"Буй {_buoyPackets.Count}");
       VirtualCameraHelper.AddMemberToTargetGroup("vcam_Launch", p.transform);
    }
    public void OnBouyHatched(Buoy b) => _buoys.Add(b);
+
+   public void OnRocketLaunched(Rocket r)
+   {
+      VirtualCameraHelper.AddMemberToTargetGroup("vcam_TorpedoZone", r.transform);
+   }
 
    public void StartScenario()
    {
@@ -150,10 +155,16 @@ public class Scenario : MonoBehaviour
       _log.AddMessage(message);
    }
 
+   public void OnApplySetings()
+   {
+      AttributeHelper.SerialzeToYaml("settings.yaml");
+   }
+
    void Awake() => _instance = this;
 
    void Start()
    {
+      AttributeHelper.DeserializeFromYaml("settings.yaml");
       // add stub phases
       var phases = new List<IScenarioPhase>();
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 1f, _ship));
@@ -247,25 +258,38 @@ class PhaseTargetDetected : IScenarioPhase
 class PhaseLaunchBouys : IScenarioPhase
 {
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysLaunched;
-   public override string Title => "Буи выстрелили";
+   public override string Title => "Запуск буев";
    public override bool IsFinished => checkFinished();
-   public float _delay = 2;
+   public float _delay1 = 2;
+   public float _delay2 = 2;
    private float _startTime;
-   private CinemachineVirtualCamera _camera = null;
+   private float _allBouysLaunchedTime = 0;
+   private CinemachineVirtualCamera _launchCamera = null;
+   private CinemachineVirtualCamera _bouyCamera = null;
+   BuoyLauncher _launcher;
 
    public override void Start()
    {
       _startTime = Scenario.Instance.ScenarioTime;
-      GameObject.FindObjectOfType<BuoyLauncher>().LaunchBuouys();
+      _launcher = GameObject.FindObjectOfType<BuoyLauncher>();
+      _launcher.LaunchBuouys();
    }
    public override void Update() 
    {
-      if (_startTime + _delay >= Scenario.Instance.ScenarioTime)
-      {
-         if (!_camera)
-            _camera = VirtualCameraHelper.Activate("vcam_Launch");
+      if (_startTime + _delay1 >= Scenario.Instance.ScenarioTime && _launchCamera == null)
+         _launchCamera = VirtualCameraHelper.Activate("vcam_Launch");
 
+      if (_allBouysLaunchedTime == 0)
+      {
+         if (Scenario.Instance.BuoyPackets.Length == _launcher.NumBuoys)
+            _allBouysLaunchedTime = Scenario.Instance.ScenarioTime;
       }
+      else if (_allBouysLaunchedTime + _delay2 >= Scenario.Instance.ScenarioTime && _bouyCamera == null)
+      {
+         _bouyCamera = VirtualCameraHelper.Activate("vcam_Buoy");
+         _bouyCamera.Follow = _bouyCamera.LookAt = Scenario.Instance.BuoyPackets.First().transform;
+      }
+
    }
 
    private bool checkFinished()
@@ -306,7 +330,10 @@ class PhaseBouysTargetDetected : IScenarioPhase
    public override void Start()
    {
       _bg = GameObject.FindObjectOfType<BuoyGuard>();
-      GameObject.FindObjectOfType<CameraController>().FollowObject(_bg.DetectZone, 2000);
+      var cam = VirtualCameraHelper.Activate("vcam_TorpedoZone");
+      var zone = _bg.RealZone;
+      float radius = Math.Max((zone[0] - zone[2]).magnitude, (zone[1] - zone[3]).magnitude);
+      VirtualCameraHelper.AddMemberToTargetGroup(cam, _bg.DetectZone, 1, radius);
    }
    public override void Update() {}
 
@@ -330,9 +357,8 @@ class PhaseLaunchRockets : IScenarioPhase
    {
       _rocketLauncher = GameObject.FindObjectOfType<RocketLauncher>();
       _rocketLauncher.LaunchRockets();
+      VirtualCameraHelper.AddMemberToTargetGroup("vcam_TorpedoZone", Scenario.Instance.Ship);
 
-      m_cameraController = GameObject.FindObjectOfType<CameraController>();
-      m_cameraController.ChangeView(ViewType.Torpedo);
    }
    public override void Update() { }
 
@@ -423,7 +449,6 @@ static class VirtualCameraHelper
 
 static class LabelHelper
 {
-
    public static ScreenLabel AddLabel(GameObject o, string text)
    {
       GameObject labelPrefab = Resources.Load("ObjectLabel") as GameObject;

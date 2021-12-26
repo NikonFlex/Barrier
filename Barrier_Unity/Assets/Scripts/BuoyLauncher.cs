@@ -12,6 +12,7 @@ public class BuoyLauncher : MonoBehaviour
    private bool _haveTarget = false;
    private bool _busy = false;
    private int _buoysCounter = 0;
+   public readonly int NumBuoys = 2;
 
    public bool ShootToTarget(Vector3 targetPos)
    {
@@ -37,23 +38,22 @@ public class BuoyLauncher : MonoBehaviour
    {
       FindObjectOfType<CameraController>().FollowObject(transform);
       var trg = Scenario.Instance.TargetInfo;
-      if (trg != null)
-      {
-         float d = VarSync.GetFloat(VarName.BouysDistanceBetween);
-         float distance = trg.Distance - d * Mathf.Sqrt(3) / 2f;
-         Mathf.Clamp(distance, 0, VarSync.GetFloat(VarName.BuoysShootRange));
-         Vector3 dirToTarget = (trg.Target.transform.position - transform.position).normalized;
-         Vector3 left = Vector3.Cross(dirToTarget, Vector3.up).normalized;
-         Vector3 openConeHeightPos = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
-         Vector3 p1 = left * d / 2 + dirToTarget * distance + openConeHeightPos;
-         Vector3 p2 = -left * d / 2 + dirToTarget * distance + openConeHeightPos;
-         var o1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-         o1.transform.position = p1;
-         var o2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-         o2.transform.position = p2;
-         ShootToTarget(p1);
-         StartCoroutine(nextShoot(p2));
-      }
+      if (trg == null)
+         return;
+      float d = VarSync.GetFloat(VarName.BouysDistanceBetween);
+      float distance = trg.Distance - d * Mathf.Sqrt(3) / 2f;
+      Mathf.Clamp(distance, 0, VarSync.GetFloat(VarName.BuoysShootRange));
+      Vector3 dirToTarget = (trg.Target.transform.position - transform.position).normalized;
+      Vector3 left = Vector3.Cross(dirToTarget, Vector3.up).normalized;
+      Vector3 openConeHeightPos = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
+      Vector3 p1 = left * d / 2 + dirToTarget * distance + openConeHeightPos;
+      Vector3 p2 = -left * d / 2 + dirToTarget * distance + openConeHeightPos;
+      var o1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+      o1.transform.position = p1;
+      var o2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+      o2.transform.position = p2;
+      ShootToTarget(p1);
+      StartCoroutine(nextShoot(p2));
    }
 
    void Update()
@@ -104,7 +104,7 @@ public class BuoyLauncher : MonoBehaviour
       Packet packet = packetInstance.GetComponent<Packet>();
       packet.Target = pos;
       packet.Launch(_launchSpeed, transform.forward);
-      Scenario.Instance.OnPacketLaunch(packet);
+      Scenario.Instance.OnPacketLaunched(packet);
 
       //FindObjectOfType<CameraController>().FollowObject(packetInstance.transform);
 

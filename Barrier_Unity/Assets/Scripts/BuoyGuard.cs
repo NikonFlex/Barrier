@@ -35,6 +35,8 @@ public class BuoyGuard : MonoBehaviour
    public float _scanningError = 1f;
    public float ScanningError => _scanningError;
 
+   public Vector3[] RealZone { get; private set; }
+
    private float getBearingError()
    {
       if (VarSync.GetInt(VarName.Weather) == 0)
@@ -138,6 +140,8 @@ public class BuoyGuard : MonoBehaviour
       bool f3 = getCross(p1, p1r, p2, p2r, out c3);
       Vector3 c4 = Vector3.zero;
       bool f4 = getCross(p1, p1l, p2, p2r, out c4);
+
+      RealZone = new Vector3[] { c1, c2, c3, c4 };
 
       if (!(f1 && f2 && f3 && f4))
       {
