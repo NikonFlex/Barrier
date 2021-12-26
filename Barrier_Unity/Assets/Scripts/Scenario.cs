@@ -98,9 +98,8 @@ public class Scenario : MonoBehaviour
    public void OnPacketLaunch(Packet p)
    {
       _buoyPackets.Add(p);
-      var camera = GameObject.Find("vcam_Launch").GetComponent<CinemachineVirtualCamera>();
-      var lookAtGroup = camera.LookAt.GetComponent<CinemachineTargetGroup>();
-      lookAtGroup.AddMember(p.transform, 1, 1);
+      LabelHelper.AddLabel(p.gameObject, $"Буй {_buoyPackets.Count}" );
+      VirtualCameraHelper.AddMemberToTargetGroup("vcam_Launch", p.transform);
    }
    public void OnBouyHatched(Buoy b) => _buoys.Add(b);
 
@@ -240,10 +239,7 @@ class PhaseTargetDetected : IScenarioPhase
    {
       _startTime = Scenario.Instance.ScenarioTime;
       var camera = VirtualCameraHelper.Activate("vCam_ShipGroup");
-      var lookAtGroup = camera.LookAt.GetComponent<CinemachineTargetGroup>();
-      var torpedo = Scenario.Instance.TargetInfo.Target.transform;
-      int idx = lookAtGroup.FindMember(torpedo);
-      lookAtGroup.m_Targets[idx].weight = 1;
+      VirtualCameraHelper.AddMemberToTargetGroup(camera, Scenario.Instance.TargetInfo.Target.transform);
    }
    public override void Update() { }
 }
@@ -362,7 +358,7 @@ static class VirtualCameraHelper
             var camSibl = cam.transform.parent.GetChild(i).GetComponent<CinemachineVirtualCamera>();
             if (camSibl != null && camSibl.m_Priority > 10)
             {
-               Debug.Log($"deactivate camera {camSibl.name}");
+               Debug.Log($"Deactivate camera {camSibl.name}");
                camSibl.m_Priority = 10;
             }
 
@@ -381,5 +377,64 @@ static class VirtualCameraHelper
          Activate(cam);
       return cam;
    }
+
+
+   public static CinemachineVirtualCamera Find(string name)
+   {
+      var o = GameObject.Find(name);
+      return o != null ? o.GetComponent<CinemachineVirtualCamera>() : null;
+   }
+
+   public static bool AddMemberToTargetGroup(CinemachineVirtualCamera cam, Transform t, float w = 1, float r = 1)
+   {
+      if (cam.LookAt == null)
+      {
+         Debug.LogError($"Null lookat  of camera {cam.name}");
+         return false;
+      }
+         
+      var lookAtGroup = cam.LookAt.GetComponent<CinemachineTargetGroup>();
+      if (lookAtGroup == null)
+      {
+         Debug.LogError($"Can't get  CinemachineTargetGroup from lookat in camera {cam.name}");
+         return false;
+      }
+
+      Debug.Log($"Add {t.name} to target group of camera {cam.name}");
+
+      int index = lookAtGroup.FindMember(t);
+      if (index != -1)
+      {
+         lookAtGroup.m_Targets[index].weight = w;
+         lookAtGroup.m_Targets[index].radius = r;
+      }
+      else
+         lookAtGroup.AddMember(t, w, r);
+
+      return true;
+   }
+
+   public static bool AddMemberToTargetGroup(string name, Transform t, float w = 1, float r = 1)
+   {
+      var cam = Find(name);
+      return cam != null ? AddMemberToTargetGroup(cam, t, w, r) : false;
+   }
+}
+
+static class LabelHelper
+{
+
+   public static ScreenLabel AddLabel(GameObject o, string text)
+   {
+      GameObject labelPrefab = Resources.Load("ObjectLabel") as GameObject;
+      var label = GameObject.Instantiate(labelPrefab, markersGroup).GetComponent<ScreenLabel>();
+      label.name = o.name + "_label";
+      label.target = o.transform;
+      label.LabelText = text;
+      Debug.Log($"Add label '{label.name}' to object '{o.name}'");
+      return label;
+   }
+
+   private static Transform markersGroup => GameObject.Find("ObjectMarkers").transform;
 
 }
