@@ -98,7 +98,7 @@ public class Scenario : MonoBehaviour
    public void OnPacketLaunched(Packet p)
    {
       _buoyPackets.Add(p);
-      LabelHelper.AddLabel(p.gameObject, $"Буй {_buoyPackets.Count}");
+      LabelHelper.AddLabel(p.gameObject, $"РГАБ {_buoyPackets.Count}");
       VirtualCameraHelper.AddMemberToTargetGroup("vcam_Launch", p.transform);
    }
    public void OnBouyHatched(Buoy b) => _buoys.Add(b);
