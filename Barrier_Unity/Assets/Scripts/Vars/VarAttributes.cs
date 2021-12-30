@@ -8,7 +8,7 @@ using UnityEngine;
 public class VarNamePersistAttribute
 {
    public string DisplayText;
-   public object DefaultValue;
+   public object Value;
 }
 
 public class VarNamePersist
@@ -59,7 +59,7 @@ public static class AttributeHelper
          VarNamePersistAttribute vp = new VarNamePersistAttribute
          {
             DisplayText = va.DisplayText,
-            DefaultValue = va.DefaultValue
+            Value = va.DefaultValue
          };
          m_Persist.Data.Add(varName, vp);
       }
@@ -109,19 +109,10 @@ public static class AttributeHelper
       return vp.DisplayText;
    }
 
-   public static object GetDefValue(this VarName varName)
+   public static object GetDefaultValue(VarName varName)
    {
-      VarNamePersistAttribute vp;
-      if (!m_Persist.Data.TryGetValue(varName, out vp))
-      {
-         VarNameAttribute va = getAttributes(varName);
-         if (va == null)
-            return null;
-
-         return va.DefaultValue;
-      }
-
-      return vp.DefaultValue;
+      VarNameAttribute va = getAttributes(varName);
+      return va == null ? 0f : va.DefaultValue;
    }
 
    public static float GetPrecision(this VarName varName)
@@ -164,6 +155,12 @@ public static class AttributeHelper
    {
       try
       {
+         foreach(var kv in m_Persist.Data)
+         {
+            object v = kv.Key.GetObject();
+            kv.Value.Value = v;
+         }
+         
          Debug.Log($"Serialize settings  to {path}");
          System.Yaml.Serialization.YamlSerializer yaml = new System.Yaml.Serialization.YamlSerializer();
          yaml.SerializeToFile(path, m_Persist);
@@ -193,6 +190,7 @@ public static class AttributeHelper
             if (m_Persist.Data.TryGetValue(item.Key, out vp))
             {
                m_Persist.Data[item.Key] = item.Value;
+               item.Key.Set(item.Value.Value);
             }
          }
 

@@ -53,17 +53,17 @@ public class VarLinkUI : MonoBehaviour
 
    private void onToggleValueChanged(Toggle _toggle, bool value)
    {
-      VarSync.Set(_v, value);
+      _v.Set(value);
    }
 
    private void onInputValueChanged(TMP_InputField _input, string value)
    {
-      VarSync.Set(_v, float.Parse(value));
+      _v.Set(float.Parse(value));
    }
 
    private void onDropdownValueChanged(TMP_Dropdown _dropdown, int value)
    {
-      VarSync.Set(_v, value);
+      _v.Set(value);
    }
 
    private void updateUI()

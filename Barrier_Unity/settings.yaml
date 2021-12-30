@@ -3,55 +3,55 @@
 !VarNamePersist
 Data: 
   IDictionary.Entries: 
-    MSC_USE: 
-      DefaultValue: True
-      DisplayText: Использовать МСЦ
-    StartDistanceToTarget: 
-      DefaultValue: !System.Single 7000
-      DisplayText: Расстояние до цели
-    BuoysSettingPostionError: 
-      DefaultValue: !System.Single 500
-      DisplayText: Погрешность постановки буя
-    StartBearingToTarget: 
-      DefaultValue: !System.Single 180
-      DisplayText: Пеленг на цель
-    RocketPauseDuration: 
-      DefaultValue: 3
-      DisplayText: Временной сдвиг пуска ракет
-    Weather: 
-      DefaultValue: null
-      DisplayText: Погода
-    BuoyReadyTime: 
-      DefaultValue: !System.Single 3
-      DisplayText: Время готовности буя
-    BuoysBearingError: 
-      DefaultValue: !System.Single 5
-      DisplayText: Погрешность пеленга буя
-    RocketDistance: 
-      DefaultValue: 100
-      DisplayText: Расстояние между ракетами при ударе
-    NumBuoys: 
-      DefaultValue: null
-      DisplayText: Количество буев
-    BuoysDetectRange: 
-      DefaultValue: !System.Single 5000
-      DisplayText: Дальность обнаружения буями
-    BuoysShootRange: 
-      DefaultValue: !System.Single 5000
-      DisplayText: Дальность полета буев
     BuoysOpenConeHeight: 
-      DefaultValue: !System.Single 200
+      Value: !System.Single 200
       DisplayText: Высота открытия парашюта
     BuoysBearingMultplier: 
-      DefaultValue: !System.Single 2
+      Value: !System.Single 2
       DisplayText: Множитель погрешности обнаружения буя при шторме
-    MSC_DISTANCE: 
-      DefaultValue: !System.Single 800
-      DisplayText: Дистанция МСЦ
+    NumBuoys: 
+      Value: !System.Single 0
+      DisplayText: Количество буев
     RocketNum: 
-      DefaultValue: null
+      Value: !System.Single 0
       DisplayText: Количество ракет
+    BuoysBearingError: 
+      Value: !System.Single 5
+      DisplayText: Погрешность пеленга буя
     BouysDistanceBetween: 
-      DefaultValue: !System.Single 1000
+      Value: !System.Single 1000
       DisplayText: Расстояние между буями
+    MSC_DISTANCE: 
+      Value: !System.Single 800
+      DisplayText: Дистанция МСЦ
+    RocketPauseDuration: 
+      Value: !System.Single 3
+      DisplayText: Временной сдвиг пуска ракет
+    BuoyReadyTime: 
+      Value: !System.Single 3
+      DisplayText: Время готовности буя
+    BuoysDetectRange: 
+      Value: !System.Single 5000
+      DisplayText: Дальность обнаружения буями
+    BuoysShootRange: 
+      Value: !System.Single 5000
+      DisplayText: Дальность полета буев
+    RocketDistance: 
+      Value: !System.Single 100
+      DisplayText: Расстояние между ракетами при ударе
+    StartBearingToTarget: 
+      Value: !System.Single 180
+      DisplayText: Пеленг на цель
+    MSC_USE: 
+      Value: True
+      DisplayText: Использовать МСЦ
+    Weather: 
+      Value: !System.Single 1
+      DisplayText: Погода
+    StartDistanceToTarget: 
+      Value: !System.Single 7000
+      DisplayText: Расстояние до цели
+    BuoysSettingPostionError: 
+      Value: !System.Single 500
+      DisplayText: Погрешность постановки буя
 ...

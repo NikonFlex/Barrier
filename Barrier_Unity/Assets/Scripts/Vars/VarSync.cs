@@ -4,9 +4,7 @@ using System;
 
 public static class VarSync
 {
-   static private VarData[] _vars = new VarData[(int)VarName.VARSYNC_LAST];
-
-   static public VarData[] vars { get { return _vars; } }
+   private static VarData[] _vars = new VarData[(int)VarName.VARSYNC_LAST];
 
    static VarSync()
    {
@@ -40,11 +38,11 @@ public static class VarSync
          _vars[(int)i].type = VarData.Type.Undefined;
          _vars[(int)i].value = null;
 
-         object defVal = i.GetDefValue();
+         object val = i.GetDefaultValue();
 
-         if (defVal != null)
+         if (val != null)
          {
-            _vars[(int)i] = new VarData(defVal);
+            _vars[(int)i] = new VarData(val);
             fireUpdate(i, _vars[(int)i]);
          }
       }
@@ -57,32 +55,35 @@ public static class VarSync
       return (o != null && o is T) ? (T)o : def;
    }
 
-   static public float GetFloat(VarName v)
+   static object GetDefaultValue(this VarName v)
+   {
+      return AttributeHelper.GetDefaultValue(v);
+   }
+
+   static public float GetFloat(this VarName v)
    {
       object o = GetObject(v);
-      if (o == null)
-         o = v.GetDefValue();
       if (o != null && (o is float || o is int))
          return (float)o;
       return 0f;
    }
 
-   static public bool GetBool(VarName v)
+   static public bool GetBool(this VarName v)
    {
       return Get(v, false);
    }
 
-   static public int GetInt(VarName v)
+   static public int GetInt(this VarName v)
    {
       return (int)Get(v, 0f);
    }
 
-   static public string GetString(VarName v)
+   static public string GetString(this VarName v)
    {
       return Get(v, "");
    }
 
-   static public Vector2 Get(VarName v, Vector2 def)
+   static public Vector2 Get(this VarName v, Vector2 def)
    {
       float[] arr = Get(v, new float[0]);
       if (arr == null || arr.Length < 2)
@@ -90,7 +91,7 @@ public static class VarSync
       return new Vector2(arr[0], arr[1]);
    }
 
-   static public Vector3 Get(VarName v, Vector3 def)
+   static public Vector3 Get(this VarName v, Vector3 def)
    {
       float[] arr = Get(v, new float[0]);
       if (arr == null || arr.Length < 3)
@@ -98,7 +99,7 @@ public static class VarSync
       return new Vector3(arr[0], arr[1], arr[2]);
    }
 
-   static public object GetObject(VarName v)
+   static public object GetObject(this VarName v)
    {
       return _vars[(int)v].ToObject();
    }
@@ -130,38 +131,43 @@ public static class VarSync
       return false;
    }
 
-   static public void Set(VarName v, bool value, bool forceUpdate = false)
+   static public void Set(this VarName v, object value)
+   {
+      _vars[(int)v] = new VarData(value);
+   }
+
+   static public void Set(this VarName v, bool value, bool forceUpdate = false)
    {
       if (forceUpdate || Get(v, false) != value)
          updateVariableInternal(v, new VarData(value));
    }
 
-   static public void Set(VarName v, string value, bool forceUpdate = false)
+   static public void Set(this VarName v, string value, bool forceUpdate = false)
    {
       if (forceUpdate || Get(v, "") != value)
          updateVariableInternal(v, new VarData(value));
    }
 
-   static public void Set(VarName v, float value, bool forceUpdate = false)
+   static public void Set(this VarName v, float value, bool forceUpdate = false)
    {
       if (forceUpdate || isChanged(v, value))
          updateVariableInternal(v, new VarData(value));
    }
 
-   static public void Set(VarName v, float[] value, bool forceUpdate = false)
+   static public void Set(this VarName v, float[] value, bool forceUpdate = false)
    {
       if (forceUpdate || isChanged(v, value))
          updateVariableInternal(v, new VarData(value));
    }
 
-   static public void Set(VarName v, Vector2 value, bool forceUpdate = false)
+   static public void Set(this VarName v, Vector2 value, bool forceUpdate = false)
    {
       float[] arr = new float[2] { value.x, value.y };
       if (forceUpdate || isChanged(v, arr))
          updateVariableInternal(v, new VarData(value));
    }
 
-   static public void Set(VarName v, Vector3 value, bool forceUpdate = false)
+   static public void Set(this VarName v, Vector3 value, bool forceUpdate = false)
    {
       float[] arr = new float[3] { value.x, value.y, value.z };
       if (forceUpdate || isChanged(v, arr))

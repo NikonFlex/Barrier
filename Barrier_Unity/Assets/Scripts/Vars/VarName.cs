@@ -13,10 +13,10 @@ public enum VarName
    [VarName(DisplayText = "Дистанция МСЦ", Persist = true, DefaultValue = 800f)]
    MSC_DISTANCE,
    [VarName(DisplayText = "Погода", Persist = true, 
-      Vt = VarType.Enum, Variants = new string[] { "Штиль", "Шторм" })]
+      Vt = VarType.Enum, Variants = new string[] { "Штиль", "Шторм" }, DefaultValue = 0)]
    Weather,
    [VarName(DisplayText = "Количество буев", Persist = true,
-      Vt = VarType.Enum, Variants = new string[] { "1", "2", "3", "4", "5", "6" })]
+      Vt = VarType.Enum, Variants = new string[] { "1", "2", "3", "4", "5", "6" }, DefaultValue = 0)]
    NumBuoys,
    [VarName(DisplayText = "Дальность обнаружения буями", Persist = true, Units = "м", DefaultValue = 5000f)]
    BuoysDetectRange,
@@ -32,12 +32,12 @@ public enum VarName
    BuoysBearingError,
    [VarName(DisplayText = "Время готовности буя", Persist = true, Units = "сек", DefaultValue = 3f)]
    BuoyReadyTime,
-   [VarName(DisplayText = "Временной сдвиг пуска ракет", Persist = true, HideInInspector = true, Units = "сек", DefaultValue = 3)]
+   [VarName(DisplayText = "Временной сдвиг пуска ракет", Persist = true, HideInInspector = true, Units = "сек", DefaultValue = 3f)]
    RocketPauseDuration,
    [VarName(DisplayText = "Количество ракет", Persist = true, HideInInspector = true,
-      Vt = VarType.Enum, Variants = new string[] { "1", "2", "3", "4", "5", "6" })]
+      Vt = VarType.Enum, Variants = new string[] { "1", "2", "3", "4", "5", "6" }, DefaultValue = 0)]
    RocketNum,
-   [VarName(DisplayText = "Расстояние между ракетами при ударе", Persist = true, HideInInspector = true, Units = "м", DefaultValue = 100)]
+   [VarName(DisplayText = "Расстояние между ракетами при ударе", Persist = true, HideInInspector = true, Units = "м", DefaultValue = 100f)]
    RocketDistance,
    [VarName(DisplayText = "Множитель погрешности обнаружения буя при шторме", Persist = true, DefaultValue = 2f)]
    BuoysBearingMultplier,
