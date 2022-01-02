@@ -22,7 +22,7 @@ public class Ship : MonoBehaviour
 
    void Update()
    {
-      if (!Scenario.Instance.IsRunning)
+      if (!Scenario.IsRunning)
          return;
       float step = m_Speed * Time.deltaTime;
       Vector3 pos = transform.position;

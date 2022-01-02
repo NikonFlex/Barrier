@@ -89,7 +89,7 @@ public class Scenario : MonoBehaviour
    public float ScenarioTime => _currentTime - _startTime;
    public IScenarioPhase CurrentPhase => currentPhase;
    public bool IsAlive => isAlive;
-   public bool IsRunning => isRunning;
+   public static bool IsRunning => Instance.isRunning;
    public TargetInfo TargetInfo => isRunning ? calcTargetInfo() : null;
    public Packet[] BuoyPackets => _buoyPackets.ToArray();
    public Buoy[] Buoys => _buoys.ToArray();
@@ -209,9 +209,8 @@ public class Scenario : MonoBehaviour
          return;
       }
       _currentPhaseIndex = nextIndex;
+      AddMessage($"Старт фазы: '{currentPhase.Title}'");
       currentPhase.Start();
-      AddMessage(currentPhase.Title);
-
    }
 
    private TargetInfo calcTargetInfo()
@@ -244,7 +243,7 @@ class PhaseTargetDetected : IScenarioPhase
    public override string Title => "Цель обнаружена МСЦ";
    public override bool IsFinished => Scenario.Instance.ScenarioTime > _startTime + _duration;
    private float _startTime;
-   private float _duration = 2f;
+   private float _duration = 1f;
 
    public override void Start()
    {
@@ -261,7 +260,8 @@ class PhaseLaunchBouys : IScenarioPhase
    public override string Title => "Запуск буев";
    public override bool IsFinished => checkFinished();
    public float _delay1 = 2;
-   public float _delay2 = 2;
+   public float _delay2 = 1;
+   public float _buoyCameraHeight = 15;
    private float _startTime;
    private float _allBouysLaunchedTime = 0;
    private CinemachineVirtualCamera _launchCamera = null;
@@ -284,10 +284,15 @@ class PhaseLaunchBouys : IScenarioPhase
          if (Scenario.Instance.BuoyPackets.Length == _launcher.NumBuoys)
             _allBouysLaunchedTime = Scenario.Instance.ScenarioTime;
       }
-      else if (_allBouysLaunchedTime + _delay2 >= Scenario.Instance.ScenarioTime && _bouyCamera == null)
+      else
       {
-         _bouyCamera = VirtualCameraHelper.Activate("vcam_Buoy");
-         _bouyCamera.Follow = _bouyCamera.LookAt = Scenario.Instance.BuoyPackets.First().transform;
+         if (_allBouysLaunchedTime + _delay2 < Scenario.Instance.ScenarioTime
+               && _bouyCamera == null
+               && _buoyCameraHeight > Scenario.Instance.BuoyPackets.First().transform.position.y)
+         {
+            _bouyCamera = VirtualCameraHelper.Activate("vcam_Buoy");
+            _bouyCamera.Follow = _bouyCamera.LookAt = Scenario.Instance.BuoyPackets.First().transform;
+         }
       }
 
    }

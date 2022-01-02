@@ -7,39 +7,30 @@ public class BuoyLauncher : MonoBehaviour
    [SerializeField] private float _launchSpeed; // m/s
    [SerializeField] private float _angleSpeed; // grad/s
    [SerializeField] Transform _packetPos;
-   private Quaternion _startRotation;
-   private Quaternion _finishRotation;
-   private bool _haveTarget = false;
-   private bool _busy = false;
+   private bool _inProgress = false;
+   private Vector3[] _buoysTargets;
    private int _buoysCounter = 0;
    public readonly int NumBuoys = 2;
 
-   public bool ShootToTarget(Vector3 targetPos)
+   public bool LaunchBuouys()
    {
-      if (_haveTarget)
+      if (_inProgress)
+      {
+         Debug.LogWarning("Launch buoys already in progress");
          return false;
-      if (_busy)
-         return false;
-      _busy = true;
-      Scenario.Instance.AddMessage("Shoot buoy start");
-      //print("Shoot buoy start");
-      _haveTarget = true;
-      StartCoroutine(shoot(targetPos));
-      return true;
-   }
+      }
+         
 
-
-   void Start()
-   {
-      _startRotation = transform.rotation;
-   }
-
-   public void LaunchBuouys()
-   {
-      FindObjectOfType<CameraController>().FollowObject(transform);
       var trg = Scenario.Instance.TargetInfo;
       if (trg == null)
-         return;
+      {
+         Debug.LogWarning("Can't launch buoys without target");
+         return false;
+      }
+
+      _inProgress = true;
+      var buoysTargets = new List<Vector3>();
+
       float d = VarSync.GetFloat(VarName.BouysDistanceBetween);
       float distance = trg.Distance - d * Mathf.Sqrt(3) / 2f;
       Mathf.Clamp(distance, 0, VarSync.GetFloat(VarName.BuoysShootRange));
@@ -48,38 +39,34 @@ public class BuoyLauncher : MonoBehaviour
       Vector3 openConeHeightPos = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
       Vector3 p1 = left * d / 2 + dirToTarget * distance + openConeHeightPos;
       Vector3 p2 = -left * d / 2 + dirToTarget * distance + openConeHeightPos;
-      var o1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-      o1.transform.position = p1;
-      var o2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-      o2.transform.position = p2;
-      ShootToTarget(p1);
-      StartCoroutine(nextShoot(p2));
+      buoysTargets.Add(p1);
+      buoysTargets.Add(p2);
+      _buoysTargets = buoysTargets.ToArray();
+      //       var o1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+      //       o1.transform.position = p1;
+      //       var o2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+      //       o2.transform.position = p2;
+      StartCoroutine(launchCoroutine());
+      return true;
    }
 
-   void Update()
+   private IEnumerator launchCoroutine()
    {
-      if (_busy)
-         return;
-
-      if (Input.GetKeyDown("space"))
+      for (_buoysCounter = 0; _buoysCounter < _buoysTargets.Length; ++_buoysCounter)
       {
-         LaunchBuouys();
-      }
-   }
-
-   private IEnumerator nextShoot(Vector3 p)
-   {
-      while (_busy)
+         Vector3 pos = _buoysTargets[_buoysCounter];
+         yield return StartCoroutine(aimToTarget(pos));
+         Scenario.Instance.AddMessage($"Запуск буя {_buoysCounter}");
+         emitBuoy(pos, $"buoy {_buoysCounter}");
          yield return null;
-      Scenario.Instance.AddMessage("next shoot");
-      //FindObjectOfType<CameraController>().FollowObject(transform);
-      ShootToTarget(p);
+      }
+      _inProgress = false;
       yield return null;
    }
 
-   private IEnumerator shoot(Vector3 pos)
+   private IEnumerator aimToTarget(Vector3 pos)
    {
-      _busy = true;
+      Scenario.Instance.AddMessage($"Прицеливание буя {_buoysCounter}");
       var startRotation = transform.rotation;
       float horDelta = Utils.CalculateHorAngleDelta(gameObject.transform, pos);
       float vertDelta = Utils.CalculateVertAngle(gameObject.transform.position, pos, _launchSpeed);
@@ -91,27 +78,37 @@ public class BuoyLauncher : MonoBehaviour
       float rotationTime = 0;
       while (rotationTime < rotationPeriod)
       {
+         if (!Scenario.IsRunning)
+         {
+            yield return null;
+            continue;
+         }
          rotationTime += Time.deltaTime;
          transform.rotation = Quaternion.Slerp(startRotation, finishRotation, rotationTime / rotationPeriod);
          yield return null;
       }
-
-
-      GameObject packetPrefab = Resources.Load("packet") as GameObject;
-      var packetInstance = Instantiate(packetPrefab, _packetPos.position, _packetPos.rotation);
-      Debug.Log(string.Format("{0:0.00}", Scenario.Instance.ScenarioTime) + "Instantiated");
-      packetInstance.name = $"buoy {_buoysCounter++}";
-      Packet packet = packetInstance.GetComponent<Packet>();
-      packet.Target = pos;
-      packet.Launch(_launchSpeed, transform.forward);
-      Scenario.Instance.OnPacketLaunched(packet);
-
-      //FindObjectOfType<CameraController>().FollowObject(packetInstance.transform);
-
-
-      _busy = false;
-      _haveTarget = false;
-
       yield return null;
    }
+
+   private void emitBuoy(Vector3 targetPos, string name)
+   {
+      Packet packet = Instantiate(Resources.Load<Packet>("packet"), _packetPos.position, _packetPos.rotation);
+      packet.name = name;
+      packet.Target = targetPos;
+      packet.Launch(_launchSpeed, transform.forward);
+      Scenario.Instance.OnPacketLaunched(packet);
+   }
+
+
+   void Update()
+   {
+      if (_inProgress)
+         return;
+
+      if (Input.GetKeyDown("space"))
+      {
+         LaunchBuouys();
+      }
+   }
+
 }

@@ -50,8 +50,6 @@ public class Packet : MonoBehaviour
    {
       _speedVector = dir * V0;
       _state = PacketState.Fly;
-      Time.timeScale = 0.5f;
-
    }
 
    private IEnumerator Fly()
@@ -59,6 +57,11 @@ public class Packet : MonoBehaviour
       bool break_flag = false;
       while (!break_flag)
       {
+         if (!Scenario.IsRunning)
+         {
+            yield return null;
+            continue;
+         }
          Vector3 pos = transform.position;
          pos += _speedVector * Time.deltaTime;
          _speedVector.y -= g * Time.deltaTime;
@@ -77,12 +80,18 @@ public class Packet : MonoBehaviour
 
    private IEnumerator SplashDown()
    {
-      Scenario.Instance.AddMessage($"packet '{gameObject.name}' on parashut on height {transform.position.y}");
+      Scenario.Instance.AddMessage($"Раскрытие парашюта у '{gameObject.name}' на   высоте {transform.position.y}");
       //print($"packet '{gameObject.name}' on parashut on height {transform.position.y}");
       _isOnParashut = true;
       _prevPos = transform.position;
       while (transform.position.y > 0)
       {
+         if (!Scenario.IsRunning)
+         {
+            yield return null;
+            continue;
+         }
+
          float PvMax = K * _speedVector.magnitude * _speedVector.magnitude; // максимальное сопротивление парашюта
          float PvMin = PvMax / 10; // минимальное сопротивление парашюта
          float speedMax = 250;
@@ -110,8 +119,7 @@ public class Packet : MonoBehaviour
 
          yield return null;
       }
-      Scenario.Instance.AddMessage($"bouy '{gameObject.name}' on water");
-      //print($"bouy '{gameObject.name}' on water");
+      Scenario.Instance.AddMessage($"Буй '{gameObject.name}' приводнился");
 
       _state = PacketState.OnWater;
       gameObject.AddComponent<Buoy>();

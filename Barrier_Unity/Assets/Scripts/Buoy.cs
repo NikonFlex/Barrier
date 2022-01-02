@@ -28,10 +28,12 @@ public class Buoy : MonoBehaviour
    IEnumerator preparingToWork()
    {
       _state = BuoyState.PreparingToWork;
-      yield return new WaitForSeconds(VarSync.GetFloat(VarName.BuoyReadyTime));
+      float startTime = Scenario.Instance.ScenarioTime;
+      Scenario.Instance.AddMessage($"Буй '{gameObject.name}' готовится");
+      while (Scenario.Instance.ScenarioTime - startTime < VarSync.GetFloat(VarName.BuoyReadyTime))
+         yield return null;
       _state = BuoyState.Working;
-      Scenario.Instance.AddMessage($"bouy '{gameObject.name}' start work");
-      //print($"bouy '{gameObject.name}' start work");
+      Scenario.Instance.AddMessage($"Буй '{gameObject.name}' начал сканирование");
       FindObjectOfType<BuoyGuard>().AddBuoy(this);
       yield return null;
    }

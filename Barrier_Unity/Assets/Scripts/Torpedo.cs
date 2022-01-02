@@ -39,7 +39,7 @@ public class Torpedo : MonoBehaviour
    void Update()
    {
 
-      if (!Scenario.Instance.IsRunning)
+      if (!Scenario.IsRunning)
          return;
 
 
