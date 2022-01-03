@@ -459,8 +459,7 @@ static class LabelHelper
 {
    public static ScreenLabel AddLabel(GameObject o, string text)
    {
-      GameObject labelPrefab = Resources.Load("ObjectLabel") as GameObject;
-      var label = GameObject.Instantiate(labelPrefab, markersGroup).GetComponent<ScreenLabel>();
+      var label = GameObject.Instantiate(Resources.Load<ScreenLabel>("ObjectLabel"), markersGroup);
       label.name = o.name + "_label";
       label.target = o.transform;
       label.LabelText = text;

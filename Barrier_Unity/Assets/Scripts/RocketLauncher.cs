@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -43,7 +43,10 @@ public class RocketLauncher : MonoBehaviour
 
    private IEnumerator LaunchRocketsCoroutine()
    {
-      yield return new WaitForSeconds(VarSync.GetInt(VarName.RocketPauseDuration));
+      float startTime = Scenario.Instance.ScenarioTime;
+      while (Scenario.Instance.ScenarioTime - startTime < VarSync.GetInt(VarName.RocketPauseDuration))
+         yield return null;
+
       var startRotation = transform.rotation;
       float horDelta = Utils.CalculateHorAngleDelta(gameObject.transform, _torpedo.transform.position);
       float vertDelta = Utils.CalculateVertAngle(gameObject.transform.position, _torpedo.transform.position, _speed);
@@ -55,8 +58,11 @@ public class RocketLauncher : MonoBehaviour
       float rotationTime = 0;
       while (rotationTime < rotationPeriod)
       {
-         rotationTime += Time.deltaTime;
-         transform.rotation = Quaternion.Slerp(startRotation, finishRotation, rotationTime / rotationPeriod);
+         if (Scenario.IsRunning)
+         {
+            rotationTime += Time.deltaTime;
+            transform.rotation = Quaternion.Slerp(startRotation, finishRotation, rotationTime / rotationPeriod);
+         }
          yield return null;
       }
 
@@ -70,13 +76,11 @@ public class RocketLauncher : MonoBehaviour
       {
          Vector3 cur_target = target - Utils.PerpTo(_torpedo.transform.forward) * offset;
 
-         GameObject rocketPrefab = Resources.Load("rocket") as GameObject;
-         GameObject rocketInstance = Instantiate(rocketPrefab, gameObject.transform.position, Quaternion.Euler(0, 0, 0));
-         rocketInstance.name = $"rocket_{i}";
-         Rocket rocketComp = rocketInstance.GetComponent<Rocket>();
-         rocketComp.AimToTarget(cur_target, _speed, _offestBeetweenRockets / 2);
-         _rockets.Add(rocketComp);
-         Scenario.Instance.OnRocketLaunched(rocketComp);
+         Rocket rocket = Instantiate(Resources.Load<Rocket>("rocket"), gameObject.transform.position, Quaternion.Euler(0, 0, 0));
+         rocket.name = $"rocket_{i}";
+         rocket.AimToTarget(cur_target, _speed, _offestBeetweenRockets / 2);
+         _rockets.Add(rocket);
+         Scenario.Instance.OnRocketLaunched(rocket);
 
          offset += _offestBeetweenRockets;
       }

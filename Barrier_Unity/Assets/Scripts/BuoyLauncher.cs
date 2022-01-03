@@ -78,13 +78,11 @@ public class BuoyLauncher : MonoBehaviour
       float rotationTime = 0;
       while (rotationTime < rotationPeriod)
       {
-         if (!Scenario.IsRunning)
+         if (Scenario.IsRunning)
          {
-            yield return null;
-            continue;
+            rotationTime += Time.deltaTime;
+            transform.rotation = Quaternion.Slerp(startRotation, finishRotation, rotationTime / rotationPeriod);
          }
-         rotationTime += Time.deltaTime;
-         transform.rotation = Quaternion.Slerp(startRotation, finishRotation, rotationTime / rotationPeriod);
          yield return null;
       }
       yield return null;

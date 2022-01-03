@@ -43,11 +43,14 @@ public class Rocket : MonoBehaviour
    {
       while (transform.position.y > 1)
       {
-         Vector3 pos = transform.position;
-         pos += _speedVector * Time.deltaTime;
-         _speedVector.y -= 9.8f * Time.deltaTime;
-         transform.rotation = Quaternion.LookRotation(_speedVector); // куда смотрит снаряд
-         transform.position = pos;
+         if (Scenario.IsRunning)
+         {
+            Vector3 pos = transform.position;
+            pos += _speedVector * Time.deltaTime;
+            _speedVector.y -= 9.8f * Time.deltaTime;
+            transform.rotation = Quaternion.LookRotation(_speedVector); // куда смотрит снаряд
+            transform.position = pos;
+         }
          yield return null;
       }
       _state = RocketState.Explode;

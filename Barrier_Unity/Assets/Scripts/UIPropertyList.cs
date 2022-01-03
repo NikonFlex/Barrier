@@ -9,9 +9,9 @@ public class UIPropertyList : MonoBehaviour
    [SerializeField] PropCategory Category;
    void Start()
    {
-      GameObject numericPrefab = Resources.Load("TemplateNumericProperty") as GameObject;
-      GameObject togglePrefab = Resources.Load("TemplateToggleProperty") as GameObject;
-      GameObject dropdownPrefab = Resources.Load("TemplateDropdownProperty") as GameObject;
+      GameObject numericPrefab = Resources.Load<GameObject>("TemplateNumericProperty");
+      GameObject togglePrefab = Resources.Load<GameObject>("TemplateToggleProperty");
+      GameObject dropdownPrefab = Resources.Load<GameObject>("TemplateDropdownProperty");
       foreach (UIProperty prop in ScenarioProperties.GetProps())
       {
          GameObject instance = null;
