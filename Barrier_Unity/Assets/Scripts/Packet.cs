@@ -15,7 +15,7 @@ public class Packet : MonoBehaviour
    private const float g = 9.8f;
    private Vector3 _speedVector;
    private PacketState _state = PacketState.None;
-   public Vector3 Target;
+   private Vector3 _target;
    [SerializeField] private float K = 0.001f;
    Vector3 _prevPos;
    bool _isOnParashut = false;
@@ -30,33 +30,40 @@ public class Packet : MonoBehaviour
 
    void Update()
    {
-      if (Target == null)
-         return;
+      //if (Target == null)
+      //   return;
 
-      switch (_state)
-      {
-         case PacketState.Fly:
-            StartCoroutine(Fly());
-            break;
+      //switch (_state)
+      //{
+      //   //case PacketState.Fly:
+      //   //   StartCoroutine(Fly());
+      //   //   break;
 
-         case PacketState.SplashDown:
-            if (!_isOnParashut)
-               StartCoroutine(SplashDown());
-            break;
-      }
+      //   case PacketState.SplashDown:
+      //      if (!_isOnParashut)
+      //         StartCoroutine(SplashDown());
+      //      break;
+      //}
    }
 
-   public void Launch(float V0, Vector3 dir)
+   public void Launch(float V0, Vector3 dir, Vector3 targetPos)
    {
       _speedVector = dir * V0;
       _state = PacketState.Fly;
+      _target = targetPos;
+      StartCoroutine(Fly());
    }
 
    private IEnumerator Fly()
    {
       bool break_flag = false;
+
+      float startTime = Time.time;
+      Vector3 startPos = transform.position;
+
       while (!break_flag)
       {
+         Time.timeScale = 1;
          if (!Scenario.IsRunning)
          {
             yield return null;
@@ -66,16 +73,17 @@ public class Packet : MonoBehaviour
          pos += _speedVector * Time.deltaTime;
          _speedVector.y -= g * Time.deltaTime;
          transform.rotation = Quaternion.LookRotation(_speedVector.normalized);
-         //print($"d = {(transform.position - _startPos).magnitude},  dt = {(transform.position - Target).magnitude} ");
-         //          if ((pos - Target).magnitude > (transform.position - Target).magnitude)
-         //             break_flag = true;
-         if ((transform.position - Target).magnitude < 100 || 
+
+         if ((transform.position - _target).magnitude < 100 || 
             (_speedVector.y < 0 && pos.y < VarSync.GetFloat(VarName.BuoysOpenConeHeight)))
             break_flag = true;
+         //Debug.Log($"packet {(pos - transform.position).magnitude / Time.deltaTime} {Time.deltaTime}");
          transform.position = pos;
          yield return null;
       }
+      Debug.Log($"packet {Time.time - startTime} {(startPos - transform.position).magnitude}");
       _state = PacketState.SplashDown;
+      yield return StartCoroutine(SplashDown());
    }
 
    private IEnumerator SplashDown()

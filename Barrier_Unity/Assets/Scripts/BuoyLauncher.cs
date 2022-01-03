@@ -92,8 +92,7 @@ public class BuoyLauncher : MonoBehaviour
    {
       Packet packet = Instantiate(Resources.Load<Packet>("packet"), _packetPos.position, _packetPos.rotation);
       packet.name = name;
-      packet.Target = targetPos;
-      packet.Launch(_launchSpeed, transform.forward);
+      packet.Launch(_launchSpeed, transform.forward, targetPos);
       Scenario.Instance.OnPacketLaunched(packet);
    }
 
