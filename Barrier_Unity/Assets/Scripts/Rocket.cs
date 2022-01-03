@@ -26,7 +26,7 @@ public class Rocket : MonoBehaviour
       }
    }
 
-   public bool IsExploded => gameObject.transform.position.y < 0;
+   public bool IsExploded => _state == RocketState.Exploded;
 
    public void AimToTarget(Vector3 target, float speed, float killRadius)
    {
@@ -53,6 +53,7 @@ public class Rocket : MonoBehaviour
          }
          yield return null;
       }
+
       _state = RocketState.Explode;
 
       float cur_radius = 0;
