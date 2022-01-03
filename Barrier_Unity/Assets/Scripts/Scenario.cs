@@ -173,11 +173,6 @@ public class Scenario : MonoBehaviour
       _log.AddMessage(message);
    }
 
-   public void OnApplySetings()
-   {
-      AttributeHelper.SerialzeToYaml("settings.yaml");
-   }
-
    void Awake() => _instance = this;
 
    void Start()
