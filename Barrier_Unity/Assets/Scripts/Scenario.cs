@@ -73,6 +73,7 @@ public class Scenario : MonoBehaviour
    [SerializeField] private ScenarioLog _log;
 
    private List<Packet> _buoyPackets = new List<Packet>();
+   private List<Rocket> _rockets = new List<Rocket>();
    private List<Buoy> _buoys = new List<Buoy>();
 
    public enum Mode
@@ -105,7 +106,9 @@ public class Scenario : MonoBehaviour
 
    public void OnRocketLaunched(Rocket r)
    {
+      _rockets.Add(r);
       VirtualCameraHelper.AddMemberToTargetGroup("vcam_TorpedoZone", r.transform);
+      LabelHelper.AddLabel(r.gameObject, $"РАКЕТА {_rockets.Count}");
    }
 
    public void StartScenario()
