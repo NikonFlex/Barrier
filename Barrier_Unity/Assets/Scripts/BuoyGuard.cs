@@ -7,8 +7,8 @@ using UnityEngine;
 
 public class BuoyGuard : MonoBehaviour
 {
-   public Transform m_torpedo;
-   public Material m_material;
+   [SerializeField] private Transform m_torpedo;
+   [SerializeField] private Material m_material;
 
    private Buoy m_bouy1;
    private Buoy m_bouy2;
@@ -29,9 +29,11 @@ public class BuoyGuard : MonoBehaviour
 
    [SerializeField] private TorpedoDetectionModel _torpedoDetectionModel;
 
+   private bool drawDebugLines = true;
+
    private float m_detectRange => VarSync.GetFloat(VarName.BuoysDetectRange);
    public Transform DetectZone => m_splineZone.transform;
-   
+
    public float _scanningError = 1f;
    public float ScanningError => _scanningError;
 
@@ -51,22 +53,10 @@ public class BuoyGuard : MonoBehaviour
    void Start()
    {
       UnityEngine.Random.InitState(DateTime.UtcNow.GetHashCode());
-
-      m_rombZone = new GameObject("romb_zone");
-      m_rombZone.AddComponent<MeshFilter>().mesh = Utils.CreateRombusMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
-      m_rombZone.AddComponent<MeshRenderer>().material = m_material;
-
-      m_elipseZone = new GameObject("elipse_zone");
-      m_elipseZone.AddComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
-      m_elipseZone.AddComponent<MeshRenderer>().material = m_material;
-
-      m_splineZone = new GameObject("spline_zone");
-      m_splineZone.AddComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
-      m_splineZone.AddComponent<MeshRenderer>().material = m_material;
       m_errorTime = Time.time;
-
       StartCoroutine(timerCoroutine());
 
+      createZoneObject();
       _accumalatedTorpedoWay = createAccumalatedTorpedoWay();
    }
 
@@ -84,24 +74,20 @@ public class BuoyGuard : MonoBehaviour
       }
    }
 
-   // Update is called once per frame
    void Update()
    {
+      if (!(m_bouy1 == null || m_bouy2 == null))
+         activateZone();
+      else
+         return;
+
       var target = Scenario.Instance.TargetInfo;
-      if (target == null || !Scenario.Instance.TargetInfo.Target.IsAlive)
+      if (target == null || !Scenario.Instance.TargetInfo.Target.IsActive)
       {
-         m_rombZone.SetActive(false);
-         m_elipseZone.SetActive(false);
-         m_splineZone.SetActive(false);
+         deactivateZone();
+         drawDebugLines = false;
          return;
       }
-
-      if (m_bouy1 == null || m_bouy2 == null)
-         return;
-
-      m_rombZone.SetActive(true);
-      m_elipseZone.SetActive(true);
-      m_splineZone.SetActive(true);
 
       if (_startScanTime < 0)
          _startScanTime = Scenario.Instance.ScenarioTime;
@@ -116,7 +102,52 @@ public class BuoyGuard : MonoBehaviour
          _startDrawTrackedPosition = false;
       }
 
-      Vector3 vc = Quaternion.AngleAxis(b1Error, Vector3.up) * (m_torpedo.position - m_bouy1.transform.position).normalized;
+      Vector3[] zonePoints = updateZonePoints();
+      if (zonePoints.Length == 0)
+         return;
+
+      RealZone = zonePoints;
+      Vector3 c1 = RealZone[0];
+      Vector3 c2 = RealZone[1];
+      Vector3 c3 = RealZone[2];
+      Vector3 c4 = RealZone[3];
+
+      Vector3[] vertices = { c1 - c1, c2 - c1, c3 - c1, c4 - c1 };
+      updateZoneMesh(c1, c2, c3, c4, vertices);
+   }
+
+   private void createZoneObject()
+   {
+      m_rombZone = new GameObject("romb_zone");
+      m_rombZone.AddComponent<MeshFilter>().mesh = Utils.CreateRombusMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
+      m_rombZone.AddComponent<MeshRenderer>().material = m_material;
+
+      m_elipseZone = new GameObject("elipse_zone");
+      m_elipseZone.AddComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
+      m_elipseZone.AddComponent<MeshRenderer>().material = m_material;
+
+      m_splineZone = new GameObject("spline_zone");
+      m_splineZone.AddComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
+      m_splineZone.AddComponent<MeshRenderer>().material = m_material;
+   }
+
+   private void activateZone()
+   {
+      m_rombZone.SetActive(true);
+      m_elipseZone.SetActive(true);
+      m_splineZone.SetActive(true);
+   }
+
+   private void deactivateZone()
+   {
+      m_rombZone.SetActive(false);
+      m_elipseZone.SetActive(false);
+      m_splineZone.SetActive(false);
+   }
+
+   private Vector3[] updateZonePoints()
+   {
+      Vector3 vc = Quaternion.AngleAxis(b1Error, Vector3.up) * (m_torpedo.transform.position - m_bouy1.transform.position).normalized;
       Vector3 vr = getDir(vc, getBearingError() / 2);
       Vector3 vl = getDir(vc, -getBearingError() / 2);
 
@@ -124,7 +155,7 @@ public class BuoyGuard : MonoBehaviour
       Vector3 p1r = m_bouy1.transform.position + vr * m_detectRange + Vector3.up;
       Vector3 p1l = m_bouy1.transform.position + vl * m_detectRange + Vector3.up;
 
-      vc = Quaternion.AngleAxis(b2Error, Vector3.up) * (m_torpedo.position - m_bouy2.transform.position).normalized;
+      vc = Quaternion.AngleAxis(b2Error, Vector3.up) * (m_torpedo.transform.position - m_bouy2.transform.position).normalized;
       vr = getDir(vc, getBearingError() / 2);
       vl = getDir(vc, -getBearingError() / 2);
 
@@ -141,18 +172,14 @@ public class BuoyGuard : MonoBehaviour
       Vector3 c4 = Vector3.zero;
       bool f4 = getCross(p1, p1l, p2, p2r, out c4);
 
-      RealZone = new Vector3[] { c1, c2, c3, c4 };
-
       if (!(f1 && f2 && f3 && f4))
-      {
-         m_rombZone.GetComponent<MeshFilter>().mesh = Utils.CreateRombusMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
-         m_elipseZone.GetComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
-         m_splineZone.GetComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
-         return;
-      }
+         return new Vector3[0];
+      else
+         return new Vector3[] { c1, c2, c3, c4 };
+   }
 
-      Vector3[] vertices = { c1 - c1, c2 - c1, c3 - c1, c4 - c1 };
-
+   private void updateZoneMesh(Vector3 c1, Vector3 c2, Vector3 c3, Vector3 c4, Vector3[] vertices)
+   {
       //draw rombus
       m_rombZone.GetComponent<MeshFilter>().mesh = Utils.CreateRombusMesh(vertices[0], vertices[1], vertices[2], vertices[3]);
       m_rombZone.transform.position = new Vector3(c1.x, 10, c1.z);
@@ -182,11 +209,11 @@ public class BuoyGuard : MonoBehaviour
 
    private IEnumerator drawTrackedTargetPosition()
    {
-      while (Scenario.Instance.TargetInfo != null && Scenario.Instance.TargetInfo.Target.IsAlive)
+      while (Scenario.Instance.TargetInfo != null && Scenario.Instance.TargetInfo.Target.IsActive)
       {
          //calculate real tracked point
-         Vector3 b1Bearing = (m_torpedo.position - m_bouy1.transform.position).normalized;
-         Vector3 b2Bearing = (m_torpedo.position - m_bouy2.transform.position).normalized;
+         Vector3 b1Bearing = (m_torpedo.transform.position - m_bouy1.transform.position).normalized;
+         Vector3 b2Bearing = (m_torpedo.transform.position - m_bouy2.transform.position).normalized;
 
          Vector3 b1BearingWithError = getDir(b1Bearing, b1Error);
          Vector3 b2BearingWithError = getDir(b2Bearing, b2Error);
@@ -244,21 +271,16 @@ public class BuoyGuard : MonoBehaviour
       }
    }
 
-   //private Vector3 calcBearingDeviatedPoint(Vector3 posFrom, Vector3 posTo, float bearingRange, float deviation)
-   //{
-
-   //   Vector3 bearing = (posTo - posFrom).normalized;
-   //   Vector3 BearingWithError = getDir(bearing, deviation);
-   //   return posFrom + BearingWithError * bearingRange + Vector3.up;
-   //}
-
    private void OnDrawGizmos()
    {
+      if (!drawDebugLines)
+         return;
+
       Gizmos.color = new Color(1, 0, 0, 0.25f);
 
       if (m_bouy1 != null)
       {
-         Vector3 bearing = (m_torpedo.position - m_bouy1.transform.position).normalized;
+         Vector3 bearing = (m_torpedo.transform.position - m_bouy1.transform.position).normalized;
          Vector3 bCenter = getDir(bearing, b1Error);
          Vector3 bLeft = getDir(bearing, b1Error - getBearingError()/2f);
          Vector3 bRight = getDir(bearing, b1Error + getBearingError() / 2f);
@@ -273,7 +295,7 @@ public class BuoyGuard : MonoBehaviour
 
       if (m_bouy2 != null)
       {
-         Vector3 bearing = (m_torpedo.position - m_bouy2.transform.position).normalized;
+         Vector3 bearing = (m_torpedo.transform.position - m_bouy2.transform.position).normalized;
          Vector3 bCenter = getDir(bearing, b2Error);
          Vector3 bLeft = getDir(bearing, b2Error - getBearingError() / 2f);
          Vector3 bRight = getDir(bearing, b2Error + getBearingError() / 2f);
@@ -333,7 +355,7 @@ public class BuoyGuard : MonoBehaviour
       cross.z = cross.z / cross.y;
       cross.y = 0;
 
-      float d = (m_torpedo.position - cross).magnitude;
+      float d = (m_torpedo.transform.position - cross).magnitude;
 
       if (d > VarSync.GetFloat(VarName.BuoysDetectRange))
          return false;
