@@ -212,9 +212,9 @@ public class Scenario : MonoBehaviour
       currentPhase.Update();
 
       //взрыв корабля
-      if (Scenario.Instance.TargetInfo.Distance <= 15)
+      if (Scenario.Instance.TargetInfo.Distance <= 15 && _ship.transform.GetComponent<Ship>().IsAlive)
       {
-         StartCoroutine(explodeShip());
+         StartCoroutine(_ship.transform.GetComponent<Ship>().Explode());
          Scenario.Instance.AddMessage("Корабль уничтожен");
          Scenario.Instance.TargetInfo.Target.Kill();
       }
@@ -232,19 +232,6 @@ public class Scenario : MonoBehaviour
       _currentPhaseIndex = nextIndex;
       AddMessage($"Старт фазы: '{currentPhase.Title}'");
       currentPhase.Start();
-   }
-
-   private IEnumerator explodeShip()
-   {
-      GameObject explosion = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-      explosion.name = "explosion";
-      explosion.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, 0.5f);
-      explosion.transform.position = Scenario.Instance.Ship.position;
-      while (explosion.transform.localScale.magnitude < new Vector3(200, 200, 200).magnitude)
-      {
-         explosion.transform.localScale += new Vector3(2, 2, 2);
-         yield return null;
-      }
    }
 
    private TargetInfo calcTargetInfo()
@@ -392,6 +379,10 @@ class PhaseLaunchRockets : IScenarioPhase
       {
          _rocketsMissed = true;
          Scenario.Instance.AddMessage("Ракеты не попали");
+      }
+      else if (_rocketLauncher.IsAllRocketsExploded && !Scenario.Instance.TargetInfo.Target.IsActive)
+      {
+         Scenario.Instance.AddMessage("Ракеты попали");
       }
    }
 

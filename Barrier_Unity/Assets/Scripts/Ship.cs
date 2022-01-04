@@ -5,14 +5,33 @@ using UnityEngine;
 public class Ship : MonoBehaviour
 {
    public float m_Speed = 5;
-   GameObject m_directionLine;
 
-   [SerializeField] GameObject m_arrow;
-   [SerializeField] private MSC _msc; 
+   private GameObject m_directionLine;
+   private bool _isAlive = true;
+
+   [SerializeField] private GameObject m_arrow;
+   [SerializeField] private MSC _msc;
+
+   public bool IsAlive => _isAlive;
 
    public void SetUpMscSettings(bool isActive, float distToShip)
    {
       _msc.SetUpSettings(isActive, distToShip);
+   }
+
+   public IEnumerator Explode()
+   {
+      _isAlive = false;
+
+      GameObject explosion = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+      explosion.name = "explosion";
+      explosion.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, 0.5f);
+      explosion.transform.position = gameObject.transform.position;
+      while (explosion.transform.localScale.magnitude < new Vector3(200, 200, 200).magnitude)
+      {
+         explosion.transform.localScale += new Vector3(2, 2, 2);
+         yield return null;
+      }
    }
 
    void Start()
