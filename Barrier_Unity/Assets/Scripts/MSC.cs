@@ -7,18 +7,12 @@ public class MSC : MonoBehaviour
    [SerializeField] private GameObject _fastener;
 
    private float _distToShip;
-   private bool _isActive;
    private float _offsetFromWater = 0.25f; //can't see under water
    private LineRenderer _lineRenderer;
 
    void Start()
    {
       _lineRenderer = gameObject.GetComponent<LineRenderer>();
-   }
-
-   void Update()
-   {
-
    }
 
    private void drawFastener()
@@ -39,6 +33,7 @@ public class MSC : MonoBehaviour
    {
       gameObject.SetActive(isActive);
       _distToShip = distToShip;
+      LabelHelper.ShowLabel(gameObject);
    }
 
    public void SetPosition(Vector3 newShipPos, Vector3 shipForward)

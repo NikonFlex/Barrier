@@ -13,20 +13,10 @@ enum RocketState
 public class Rocket : MonoBehaviour
 {
    private Vector3 _speedVector;
-   private bool _isAimed = false;
    private float _killRadius;
-   private RocketState _state;
+   private bool _isExploded = false;
 
-   private void Update()
-   {
-      if (_isAimed == true)
-      {
-         _isAimed = false;
-         StartCoroutine(fly());
-      }
-   }
-
-   public bool IsExploded => _state == RocketState.Exploded;
+   public bool IsExploded => _isExploded;
 
    public void AimToTarget(Vector3 target, float speed, float killRadius)
    {
@@ -35,27 +25,36 @@ public class Rocket : MonoBehaviour
       float vertAngle = Utils.CalculateVertAngle(transform.position, target, speed);
       gameObject.transform.rotation = Quaternion.Euler(-vertAngle, horAngle, transform.rotation.z);
       _speedVector = gameObject.transform.forward * speed;
-      _isAimed = true;
-      _state = RocketState.Fly;
+      StartCoroutine(fly());
    }
 
    private IEnumerator fly()
    {
       while (transform.position.y > 1)
       {
-         if (Scenario.IsRunning)
+         if (!Scenario.IsRunning)
          {
-            Vector3 pos = transform.position;
-            pos += _speedVector * Time.deltaTime;
-            _speedVector.y -= 9.8f * Time.deltaTime;
-            transform.rotation = Quaternion.LookRotation(_speedVector); // куда смотрит снаряд
-            transform.position = pos;
+            yield return null;
+            continue;
          }
+
+         Vector3 pos = transform.position;
+         pos += _speedVector * Time.deltaTime;
+         _speedVector.y -= 9.8f * Time.deltaTime;
+         transform.rotation = Quaternion.LookRotation(_speedVector.normalized);
+         transform.position = pos;
+         
          yield return null;
       }
 
-      _state = RocketState.Explode;
+      yield return StartCoroutine(explode());
+   }
 
+   private IEnumerator explode()
+   {
+      LabelHelper.DestroyLabel(gameObject);
+      transform.forward = Vector3.zero;
+      transform.position = new Vector3(transform.position.x, 2, transform.position.z);
       float cur_radius = 0;
       float adding_radius = _killRadius / 60f * 1.25f;
       while (cur_radius < _killRadius)
@@ -68,8 +67,12 @@ public class Rocket : MonoBehaviour
       var delta = transform.position - Scenario.Instance.TargetInfo.Target.transform.position;
       delta.y = 0;
       if (delta.magnitude <= _killRadius)
-         Scenario.Instance.TargetInfo.Target.IsAlive = false;
+      {
+         Scenario.Instance.TargetInfo.Target.Kill();
+         Scenario.Instance.AddMessage("Торпеда взорванна");
+      }
 
-      _state = RocketState.Exploded;
+      gameObject.transform.GetChild(0).gameObject.SetActive(false);
+      _isExploded = true;
    }
 }

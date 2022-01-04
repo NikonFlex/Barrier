@@ -1225,7 +1225,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 110076544}
-  m_LocalRotation: {x: 0.0771628, y: 0.89041376, z: -0.16466765, w: 0.41724536}
+  m_LocalRotation: {x: 0.077162795, y: 0.8904138, z: -0.16466765, w: 0.4172454}
   m_LocalPosition: {x: -1020, y: 461, z: 761}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1263,7 +1263,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2.7615385, y: 1}
+    m_SensorSize: {x: 2.157122, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -1690,7 +1690,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 203728279}
-  m_LocalRotation: {x: 0.25521192, y: 0.7281443, z: -0.34970507, w: 0.53139365}
+  m_LocalRotation: {x: 0.25521183, y: 0.7281443, z: -0.34970507, w: 0.53139365}
   m_LocalPosition: {x: -4068, y: 3175, z: -2098}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1728,7 +1728,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2.7615385, y: 1}
+    m_SensorSize: {x: 2.157122, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -6187,7 +6187,7 @@ PrefabInstance:
         type: 3}
       propertyPath: target
       value: 
-      objectReference: {fileID: 220841804}
+      objectReference: {fileID: 543450653066634939}
     - target: {fileID: 6309656781295862193, guid: e5f66848b0dc4ac459a9c9a323cc4758,
         type: 3}
       propertyPath: LabelText
@@ -6197,6 +6197,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ShipLabel
+      objectReference: {fileID: 0}
+    - target: {fileID: 6309656781295862195, guid: e5f66848b0dc4ac459a9c9a323cc4758,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e5f66848b0dc4ac459a9c9a323cc4758, type: 3}
@@ -6387,9 +6392,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26f609f7b5335654696f805a84f4c189, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  screenBoundOffset: 0.95
   viewRect: {fileID: 842330301}
   _targ: {fileID: 220841804}
+  screenBoundOffset: 0.95
 --- !u!222 &842330306
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7905,7 +7910,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1082155327}
-  m_LocalRotation: {x: 0.0771628, y: 0.89041376, z: -0.16466765, w: 0.41724536}
+  m_LocalRotation: {x: 0.077162795, y: 0.8904138, z: -0.16466765, w: 0.4172454}
   m_LocalPosition: {x: -39.48706, y: 18.681885, z: -28.169434}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -8429,9 +8434,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86f51df1cf2d5d64181171ee0e0ed340, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ship: {fileID: 543450653066634939}
+  _ship: {fileID: 919132148589263873}
   _torpedo: {fileID: 1723057347}
-  m_cameraController: {fileID: 1035623154}
+  _cameraController: {fileID: 0}
   _log: {fileID: 971280292}
 --- !u!1 &1175411987
 GameObject:
@@ -9920,9 +9925,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _torpedo: {fileID: 1723057346}
   _speed: 250
-  _rocketNumber: 5
-  _offestBeetweenRockets: 15
-  _killRadius: 10
   _angleSpeed: 10
 --- !u!65 &1371733815
 BoxCollider:
@@ -11760,7 +11762,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2.7615385, y: 1}
+    m_SensorSize: {x: 2.157122, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -12114,7 +12116,6 @@ MonoBehaviour:
   m_arrow: {fileID: 1391170010}
   m_targetShip: {fileID: 919132148589263873}
   _distBeetweenWaysPoints: 30
-  IsAlive: 1
 --- !u!4 &1723057348
 Transform:
   m_ObjectHideFlags: 0
@@ -13708,7 +13709,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2066991197}
-  m_LocalRotation: {x: -0, y: 0.17364816, z: -0, w: 0.9848078}
+  m_LocalRotation: {x: -0, y: 0.17364818, z: -0, w: 0.9848078}
   m_LocalPosition: {x: -39.56911, y: -18.012878, z: -6.6158285}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -13746,7 +13747,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 2.7615385, y: 1}
+    m_SensorSize: {x: 2.157122, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -16124,6 +16125,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: MSCLabel
+      objectReference: {fileID: 0}
+    - target: {fileID: 6309656781295862195, guid: e5f66848b0dc4ac459a9c9a323cc4758,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e5f66848b0dc4ac459a9c9a323cc4758, type: 3}

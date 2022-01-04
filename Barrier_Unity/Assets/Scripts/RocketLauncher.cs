@@ -7,18 +7,12 @@ public class RocketLauncher : MonoBehaviour
 {
    [SerializeField] private GameObject _torpedo;
    [SerializeField] private float _speed;
-   [SerializeField] private int _rocketNumber;
-   [SerializeField] private float _offestBeetweenRockets;
-   [SerializeField] private float _killRadius;
    [SerializeField] private float _angleSpeed;
 
+   private int _rocketNumber;
+   private float _offestBeetweenRockets;
    private List<Rocket> _rockets = new List<Rocket>();
    private bool _isStarted = false;
-
-   void Start()
-   {
-        
-   }
 
    void Update()
    {
@@ -29,10 +23,7 @@ public class RocketLauncher : MonoBehaviour
       }
    }
 
-   public bool IsAllRocketsExploded()
-   {
-      return _rockets.Count == _rocketNumber && _rockets.All(x => x.IsExploded);
-   }
+   public bool IsAllRocketsExploded => (_rockets.Count == _rocketNumber && _rockets.All(x => x.IsExploded));
 
    public void LaunchRockets()
    {
