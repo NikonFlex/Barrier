@@ -16,7 +16,7 @@ public class Torpedo : MonoBehaviour
    
    [SerializeField] int _distBeetweenWaysPoints = 30;
 
-   public bool IsAlive = true;
+   private bool _isAlive = true;
    GameObject m_circleObject;
    GameObject m_arrowedLineObject;
    GameObject m_torpedoWay;
@@ -24,10 +24,17 @@ public class Torpedo : MonoBehaviour
    Vector3 _lastPos;
    List<Vector3> _wayPoints;
 
-   // Start is called before the first frame update
+   public bool IsActive => _isAlive;
+
+   public void Kill()
+   {
+      gameObject.SetActive(false);
+      _isAlive = false;
+      //Destroy(gameObject, 1f);
+   }
+
    void Start()
    {
-      //m_circleObject = createCircle();
       m_arrowedLineObject = createForwardArrowedLine();
       _lastPos = gameObject.transform.position;
       _wayPoints = new List<Vector3>();
@@ -35,7 +42,6 @@ public class Torpedo : MonoBehaviour
       m_torpedoWay = createWay();
    }
 
-   // Update is called once per frame
    void Update()
    {
 
@@ -50,16 +56,8 @@ public class Torpedo : MonoBehaviour
       var relativePos = targetAdvancePos - transform.position;
       var targetRotation = Quaternion.LookRotation(relativePos);
       transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 0.5f);
-//      transform.Rotate(Time.deltaTime, Time.deltaTime, Time.deltaTime);
-      //transform.LookAt(targetAdvancePos);
-      //gameObject.transform.LookAt(m_targetShip.transform);
       pos += transform.forward*step;
       transform.position = pos;
-
-      //m_circleObject.GetComponent<MeshRenderer>().material.color = 
-      //   new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
-      //float scaleFactor = Mathf.PingPong(Time.time * 0.5f, 0.7f) + 0.3f;
-      //m_circleObject.transform.localScale = new Vector3(scaleFactor, 1, scaleFactor);
 
       if ((_wayPoints.Last() - gameObject.transform.position).magnitude > _distBeetweenWaysPoints)
       {
@@ -69,7 +67,7 @@ public class Torpedo : MonoBehaviour
       }
    }
 
-   GameObject createCircle()
+   private GameObject createCircle()
    {
       var g = new GameObject("Circle");
       g.layer = 6;
@@ -82,7 +80,7 @@ public class Torpedo : MonoBehaviour
       return g;
    }
 
-   GameObject createForwardArrowedLine()
+   private GameObject createForwardArrowedLine()
    {
       var g = new GameObject("ArrowLine");
       g.layer = 6;

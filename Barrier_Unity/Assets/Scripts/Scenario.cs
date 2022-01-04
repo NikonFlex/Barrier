@@ -67,14 +67,27 @@ public class TargetInfo
 
 public class Scenario : MonoBehaviour
 {
-   [SerializeField] Transform _ship;
+   [SerializeField] GameObject _ship;
    [SerializeField] Torpedo _torpedo;
-   [SerializeField] private CameraController m_cameraController;
+   [SerializeField] private CameraController _cameraController;
    [SerializeField] private ScenarioLog _log;
 
    private List<Packet> _buoyPackets = new List<Packet>();
    private List<Rocket> _rockets = new List<Rocket>();
    private List<Buoy> _buoys = new List<Buoy>();
+
+   private IScenarioPhase[] _phases;
+   private Mode _currentMode = Mode.Stoped;
+   private float _startTime;
+   private float _currentTime;
+   private int _currentPhaseIndex;
+
+   private static Scenario _instance;
+
+   private IScenarioPhase currentPhase => _phases[(int)_currentPhaseIndex];
+   private bool isRunning => _currentMode == Mode.Running;
+   private bool isAlive => _currentMode != Mode.Stoped && _currentMode != Mode.Finished;
+
 
    public enum Mode
    {
@@ -94,7 +107,7 @@ public class Scenario : MonoBehaviour
    public TargetInfo TargetInfo => isRunning ? calcTargetInfo() : null;
    public Packet[] BuoyPackets => _buoyPackets.ToArray();
    public Buoy[] Buoys => _buoys.ToArray();
-   public Transform Ship => _ship;
+   public Transform Ship => _ship.transform;
 
    public void OnPacketLaunched(Packet p)
    {
@@ -113,6 +126,7 @@ public class Scenario : MonoBehaviour
 
    public void StartScenario()
    {
+      OffScreenIndicator.ShowIndecators();
       setUpTargetPosition();
       setUpShipSettings();
       _currentTime = _startTime = Time.time;
@@ -126,12 +140,13 @@ public class Scenario : MonoBehaviour
       float bearing = VarSync.GetFloat(VarName.StartBearingToTarget);
       float distance = VarSync.GetFloat(VarName.StartDistanceToTarget);
 
-      _torpedo.transform.position = Quaternion.AngleAxis(bearing, Vector3.up) * _ship.forward * distance;
+      _torpedo.transform.position = Quaternion.AngleAxis(bearing, Vector3.up) * _ship.transform.forward * distance;
    }
 
    private void setUpShipSettings()
    {
-      _ship.GetComponent<Ship>().SetUpMscSettings(VarSync.GetBool(VarName.MSC_USE), VarSync.GetFloat(VarName.MSC_DISTANCE));
+      _ship.transform.GetComponent<Ship>().SetUpMscSettings(VarSync.GetBool(VarName.MSC_USE), VarSync.GetFloat(VarName.MSC_DISTANCE));
+      LabelHelper.ShowLabel(_ship);
    }
 
    public void PauseScenario()
@@ -165,14 +180,14 @@ public class Scenario : MonoBehaviour
       AttributeHelper.DeserializeFromYaml("settings.yaml");
       // add stub phases
       var phases = new List<IScenarioPhase>();
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 1f, _ship));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 1f, _ship.transform));
       phases.Add(new PhaseTargetDetected());
       phases.Add(new PhaseLaunchBouys());
       phases.Add(new PhaseBouysPreparingReady());
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.BuoysStartScan, "Начало сканирования буями", 2f));
       phases.Add(new PhaseBouysTargetDetected());
       phases.Add(new PhaseLaunchRockets());
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesStrike, "Ракеты достигли цели", 2));
+      //phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesStrike, "Ракеты достигли цели", 2)); НЕ НУЖНА
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.ScenarioFinished, "Упражнение окончено", 2));
       
       _phases = phases.ToArray();
@@ -196,6 +211,14 @@ public class Scenario : MonoBehaviour
 
       currentPhase.Update();
 
+      //взрыв корабля
+      if (Scenario.Instance.TargetInfo.Distance <= 15)
+      {
+         StartCoroutine(explodeShip());
+         Scenario.Instance.AddMessage("Корабль уничтожен");
+         Scenario.Instance.TargetInfo.Target.Kill();
+      }
+
       if (!currentPhase.IsFinished)
          return;
 
@@ -211,29 +234,31 @@ public class Scenario : MonoBehaviour
       currentPhase.Start();
    }
 
+   private IEnumerator explodeShip()
+   {
+      GameObject explosion = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+      explosion.name = "explosion";
+      explosion.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, 0.5f);
+      explosion.transform.position = Scenario.Instance.Ship.position;
+      while (explosion.transform.localScale.magnitude < new Vector3(200, 200, 200).magnitude)
+      {
+         explosion.transform.localScale += new Vector3(2, 2, 2);
+         yield return null;
+      }
+   }
+
    private TargetInfo calcTargetInfo()
    {
       return new TargetInfo()
       {
-         Distance = (_ship.position - _torpedo.transform.position).magnitude,
+         Distance = (_ship.transform.position - _torpedo.transform.position).magnitude,
          // TODO: use ship direction and 
          Target = _torpedo,
-         Bearing = Vector3.SignedAngle(_ship.forward, (_torpedo.transform.position - transform.position).normalized, Vector3.up)
+         Bearing = Vector3.SignedAngle(_ship.transform.forward, (_torpedo.transform.position - transform.position).normalized, Vector3.up)
       };
    }
-
-   private IScenarioPhase currentPhase => _phases[(int)_currentPhaseIndex];
-   private bool isRunning => _currentMode == Mode.Running;
-   private bool isAlive => _currentMode != Mode.Stoped && _currentMode != Mode.Finished;
-
-   private IScenarioPhase[] _phases;
-   private Mode _currentMode = Mode.Stoped;
-   private float _startTime;
-   private float _currentTime;
-   private int _currentPhaseIndex;
-
-   private static Scenario _instance;
 }
+
 
 class PhaseTargetDetected : IScenarioPhase
 {
@@ -299,10 +324,9 @@ class PhaseLaunchBouys : IScenarioPhase
    {
       if (Scenario.Instance.BuoyPackets.Length == 0)
          return false;
-      return Scenario.Instance.BuoyPackets.All(p => p.State == PacketState.OnWater);
+      return Scenario.Instance.BuoyPackets.All(p => p.IsOnWater);
    }
 }
-
 
 class PhaseBouysPreparingReady : IScenarioPhase
 {
@@ -350,7 +374,7 @@ class PhaseBouysTargetDetected : IScenarioPhase
 class PhaseLaunchRockets : IScenarioPhase
 {
    private RocketLauncher _rocketLauncher;
-   private CameraController m_cameraController;
+   private bool _rocketsMissed = false;
 
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.MissilesLaunched;
    public override string Title => "Запуск ракет";
@@ -361,14 +385,20 @@ class PhaseLaunchRockets : IScenarioPhase
       _rocketLauncher = GameObject.FindObjectOfType<RocketLauncher>();
       _rocketLauncher.LaunchRockets();
       VirtualCameraHelper.AddMemberToTargetGroup("vcam_TorpedoZone", Scenario.Instance.Ship);
-
    }
-   public override void Update() { }
+   public override void Update() 
+   {
+      if (_rocketLauncher.IsAllRocketsExploded && Scenario.Instance.TargetInfo.Target.IsActive && !_rocketsMissed)
+      {
+         _rocketsMissed = true;
+         Scenario.Instance.AddMessage("Ракеты не попали");
+      }
+   }
 
 
    private bool checkFinished()
    {
-      return _rocketLauncher.IsAllRocketsExploded();
+      return Scenario.Instance.TargetInfo.Target.IsActive == false;
    }
 }
 
@@ -448,20 +478,4 @@ static class VirtualCameraHelper
       var cam = Find(name);
       return cam != null ? AddMemberToTargetGroup(cam, t, w, r) : false;
    }
-}
-
-static class LabelHelper
-{
-   public static ScreenLabel AddLabel(GameObject o, string text)
-   {
-      var label = GameObject.Instantiate(Resources.Load<ScreenLabel>("ObjectLabel"), markersGroup);
-      label.name = o.name + "_label";
-      label.target = o.transform;
-      label.LabelText = text;
-      Debug.Log($"Add label '{label.name}' to object '{o.name}'");
-      return label;
-   }
-
-   private static Transform markersGroup => GameObject.Find("ObjectMarkers").transform;
-
 }

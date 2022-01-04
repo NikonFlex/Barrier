@@ -10,6 +10,10 @@ using UnityEngine;
 [DefaultExecutionOrder(-1)]
 public class OffScreenIndicator : MonoBehaviour
 {
+    public RectTransform viewRect;
+    public Transform _targ;
+    public static Action<Target, bool> TargetStateChanged;
+    
     [Range(0.5f, 1.0f)]
     [Tooltip("Distance offset of the indicators from the centre of the screen")]
     [SerializeField] private float screenBoundOffset = 0.9f;
@@ -18,12 +22,10 @@ public class OffScreenIndicator : MonoBehaviour
     private Camera mainCamera;
     private Vector3 screenCentre;
     private Vector3 screenBounds;
-    public RectTransform viewRect;
 
     private List<Target> targets = new List<Target>();
+    private static bool _isNeedToDrawIndecators = false;
 
-    public Transform _targ;
-    public static Action<Target, bool> TargetStateChanged;
 
     void Awake()
     {
@@ -32,7 +34,6 @@ public class OffScreenIndicator : MonoBehaviour
 
         if (viewRect != null)
         {
-            //Rect _rect = RectTransformToScreenSpace(viewRect);
             screenCentre = new Vector3(viewRect.position.x, viewRect.position.y, 0);
             screenBounds = screenCentre * screenBoundOffset;
         }
@@ -45,7 +46,12 @@ public class OffScreenIndicator : MonoBehaviour
         TargetStateChanged += HandleTargetStateChanged;
     }
 
-    public static Rect RectTransformToScreenSpace(RectTransform transform)
+   public static void ShowIndecators()
+   {
+      _isNeedToDrawIndecators = true;
+   }
+
+   public static Rect RectTransformToScreenSpace(RectTransform transform)
     {
         Vector2 size = Vector2.Scale(transform.rect.size, transform.lossyScale);
         float x = transform.position.x + transform.anchoredPosition.x;
@@ -56,7 +62,8 @@ public class OffScreenIndicator : MonoBehaviour
 
     void LateUpdate()
     {
-        DrawIndicators();
+        if (_isNeedToDrawIndecators)
+            DrawIndicators();
     }
 
     /// <summary>

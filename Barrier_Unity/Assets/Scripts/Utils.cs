@@ -126,17 +126,6 @@ static class Utils
 
          vertexList.Add(v0);
          vertexList.Add(v1);
-
-
-         //          GameObject sphere1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-         //          sphere1.transform.SetParent(m_origin.transform, false);
-         //          sphere1.transform.localScale = new Vector3(20, 20, 20);
-         //          sphere1.transform.localPosition = v0;
-         // 
-         //          GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-         //          sphere2.transform.parent = m_origin.transform;
-         //          sphere2.transform.localScale = new Vector3(10, 10, 10);
-         //          sphere2.transform.localPosition = v1;
       }
 
       var idxList = new List<int>();
