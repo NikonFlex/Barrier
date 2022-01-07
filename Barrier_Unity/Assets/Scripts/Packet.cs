@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class Packet : MonoBehaviour
 {
+   [SerializeField] private float K = 0.001f;
+   [SerializeField] private float _stopSlowDownHeight;
+   [SerializeField] private GameObject _slowDownEngine;
+
+
    private const float g = 9.8f;
    private Vector3 _speedVector;
    private Vector3 _target;
-   [SerializeField] private float K = 0.001f;
    private bool _isOnWater = false;
 
    public bool IsOnWater => _isOnWater;
@@ -16,10 +20,10 @@ public class Packet : MonoBehaviour
    {
       _speedVector = dir * V0;
       _target = targetPos;
-      StartCoroutine(Fly());
+      StartCoroutine(fly());
    }
 
-   private IEnumerator Fly()
+   private IEnumerator fly()
    {
       bool break_flag = false;
       while (!break_flag)
@@ -36,17 +40,18 @@ public class Packet : MonoBehaviour
          transform.rotation = Quaternion.LookRotation(_speedVector.normalized);
          transform.position = pos;
 
-         if ((transform.position - _target).magnitude < 100 || 
+         if ((transform.position - _target).magnitude < 100 ||
             (_speedVector.y < 0 && pos.y < VarSync.GetFloat(VarName.BuoysOpenConeHeight)))
             break_flag = true;
 
          yield return null;
       }
 
-      yield return StartCoroutine(SplashDown());
+      //yield return StartCoroutine(splashDown());
+      yield return StartCoroutine(reactiveSlowDown());
    }
 
-   private IEnumerator SplashDown()
+   private IEnumerator splashDown()
    {
       Scenario.Instance.AddMessage($"Раскрытие парашюта у '{gameObject.name}' на   высоте {transform.position.y}");
       while (transform.position.y > 0)
@@ -84,5 +89,38 @@ public class Packet : MonoBehaviour
 
       _isOnWater = true;
       gameObject.AddComponent<Buoy>();
+   }
+
+   private IEnumerator reactiveSlowDown()
+   {
+      Scenario.Instance.AddMessage($"Начало торможения у '{gameObject.name}' на   высоте {transform.position.y}");
+      _slowDownEngine.SetActive(true);
+
+      Vector3 slowDownS = _speedVector.normalized * ((transform.position.y - _stopSlowDownHeight) / _speedVector.normalized.y);
+      float a = _speedVector.magnitude * _speedVector.magnitude / (2 * slowDownS.magnitude);
+
+      while (transform.position.y > 0)
+      {
+         if (!Scenario.IsRunning)
+         {
+            yield return null;
+            continue;
+         }
+
+         _speedVector += -1 * _speedVector.normalized * a * Time.deltaTime;
+         //_speedVector.y -= g * Time.deltaTime;
+         Debug.Log($"{_speedVector.magnitude}, {gameObject.name}, {transform.position.y}");
+         Vector3 pos = transform.position;
+         pos += _speedVector * Time.deltaTime;
+         transform.position = pos;
+         transform.rotation = Quaternion.LookRotation(_speedVector.normalized);
+         yield return null;
+      }
+
+      Scenario.Instance.AddMessage($"Буй '{gameObject.name}' приводнился");
+      _isOnWater = true;
+      gameObject.AddComponent<Buoy>();
+
+      yield return null;
    }
 }
