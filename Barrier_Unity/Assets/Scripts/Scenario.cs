@@ -335,11 +335,12 @@ class PhaseBouysPreparingReady : IScenarioPhase
 
 class PhaseBouysTargetDetected : IScenarioPhase
 {
+   private BuoyGuard _bg;
+
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.TargetDetectedByBuoys;
    public override string Title => "Цель запеленгована буями";
    public override bool IsFinished => checkFinished();
 
-   private BuoyGuard _bg;
 
    public override void Start()
    {
@@ -348,6 +349,10 @@ class PhaseBouysTargetDetected : IScenarioPhase
       var zone = _bg.RealZone;
       float radius = Math.Max((zone[0] - zone[2]).magnitude, (zone[1] - zone[3]).magnitude);
       VirtualCameraHelper.AddMemberToTargetGroup(cam, _bg.DetectZone, 1, radius);
+
+      List<Transform> bouys = _bg.BouysPos();
+      for (int i = 0; i < bouys.Count; i++)
+         VirtualCameraHelper.AddMemberToTargetGroup(cam, bouys[i]);
    }
    public override void Update() {}
 
