@@ -301,7 +301,8 @@ class PhaseLaunchBouys : IScenarioPhase
                && _buoyCameraHeight > Scenario.Instance.BuoyPackets.First().transform.position.y)
          {
             _bouyCamera = VirtualCameraHelper.Activate("vcam_Buoy");
-            _bouyCamera.Follow = _bouyCamera.LookAt = Scenario.Instance.BuoyPackets.First().transform;
+            VirtualCameraHelper.AddMemberToTargetGroup(_bouyCamera, Scenario.Instance.BuoyPackets.First().transform);
+            //_bouyCamera.Follow = _bouyCamera.LookAt = Scenario.Instance.BuoyPackets.First().transform;
          }
       }
 
@@ -350,17 +351,13 @@ class PhaseBouysTargetDetected : IScenarioPhase
       float radius = Math.Max((zone[0] - zone[2]).magnitude, (zone[1] - zone[3]).magnitude);
       VirtualCameraHelper.AddMemberToTargetGroup(cam, _bg.DetectZone, 1, radius);
 
-      List<Transform> bouys = _bg.BouysPos();
-      for (int i = 0; i < bouys.Count; i++)
-         VirtualCameraHelper.AddMemberToTargetGroup(cam, bouys[i]);
+      foreach (var b in _bg.Bouys)
+         VirtualCameraHelper.AddMemberToTargetGroup(cam, b);
    }
    public override void Update() {}
 
 
-   private bool checkFinished()
-   {
-      return _bg.ScanningError < 0.1f;
-   }
+   private bool checkFinished() => _bg.ScanningError < 0.1f;
 }
 
 class PhaseLaunchRockets : IScenarioPhase

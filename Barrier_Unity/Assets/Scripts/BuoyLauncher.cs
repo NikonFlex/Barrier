@@ -32,7 +32,7 @@ public class BuoyLauncher : MonoBehaviour
       var buoysTargets = new List<Vector3>();
 
       float d = VarSync.GetFloat(VarName.BouysDistanceBetween);
-      float distance = trg.Distance - d * Mathf.Sqrt(3) / 2f;
+      float distance = trg.Distance/2 - d * Mathf.Sqrt(3) / 2f;
       Mathf.Clamp(distance, 0, VarSync.GetFloat(VarName.BuoysShootRange));
       Vector3 dirToTarget = (trg.Target.transform.position - transform.position).normalized;
       Vector3 left = Vector3.Cross(dirToTarget, Vector3.up).normalized;

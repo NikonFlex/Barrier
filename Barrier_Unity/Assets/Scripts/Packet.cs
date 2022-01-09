@@ -123,8 +123,8 @@ public class Packet : MonoBehaviour
          }
 
          _speedVector += -1 * _speedVector.normalized * a * Time.deltaTime;
+         // TODO::
          //_speedVector.y -= g * Time.deltaTime;
-         Debug.Log($"{_speedVector.magnitude}, {gameObject.name}, {transform.position.y}");
          Vector3 pos = transform.position;
          pos += _speedVector * Time.deltaTime;
          transform.position = pos;

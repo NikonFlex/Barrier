@@ -47,13 +47,7 @@ public class BuoyGuard : MonoBehaviour
          return VarSync.GetFloat(VarName.BuoysBearingError) * VarSync.GetFloat(VarName.BuoysBearingMultplier);
    }
 
-   public List<Transform> BouysPos()
-   {
-      List<Transform> bouysTransforms = new List<Transform>();
-      bouysTransforms.Add(m_bouy1.transform);
-      bouysTransforms.Add(m_bouy2.transform);
-      return bouysTransforms;
-   }
+   public Transform[] Bouys => new Transform[] { m_bouy1.transform, m_bouy2.transform };
 
    void Start()
    {
