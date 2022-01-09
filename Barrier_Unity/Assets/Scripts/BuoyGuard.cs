@@ -7,8 +7,11 @@ using UnityEngine;
 
 public class BuoyGuard : MonoBehaviour
 {
+
    [SerializeField] private Transform m_torpedo;
    [SerializeField] private Material m_material;
+   [SerializeField] private TorpedoDetectionModel _torpedoDetectionModel;
+   [SerializeField] private float _accumalatedTorpedoWayLength = 10000;
 
    private Buoy m_bouy1;
    private Buoy m_bouy2;
@@ -21,23 +24,20 @@ public class BuoyGuard : MonoBehaviour
    private GameObject m_elipseZone;
    private GameObject m_splineZone;
 
-   private bool _startDrawTrackedPosition = false;
-   private float _startScanTime = -1;
-
    private GameObject _accumalatedTorpedoWay;
-   [SerializeField] private float _accumalatedTorpedoWayLength = 10000;
 
-   [SerializeField] private TorpedoDetectionModel _torpedoDetectionModel;
+   private float _startScanTime = -1;
+   private float _scanningError = 1f;
 
+   private bool _startDrawTrackedPosition = false;
    private bool drawDebugLines = true;
 
-   private float m_detectRange => VarSync.GetFloat(VarName.BuoysDetectRange);
-   public Transform DetectZone => m_splineZone.transform;
-
-   public float _scanningError = 1f;
-   public float ScanningError => _scanningError;
-
    public Vector3[] RealZone { get; private set; }
+   public Transform DetectZone => m_splineZone.transform;
+   public float ScanningError => _scanningError;
+   private float m_detectRange => VarSync.GetFloat(VarName.BuoysDetectRange);
+   private float b1Error => Mathf.Lerp(m_errorBeg[0], m_errorEnd[0], Time.time - m_errorTime);
+   private float b2Error => Mathf.Lerp(m_errorBeg[1], m_errorEnd[1], Time.time - m_errorTime);
 
    private float getBearingError()
    {
@@ -47,8 +47,13 @@ public class BuoyGuard : MonoBehaviour
          return VarSync.GetFloat(VarName.BuoysBearingError) * VarSync.GetFloat(VarName.BuoysBearingMultplier);
    }
 
-   private float b1Error => Mathf.Lerp(m_errorBeg[0], m_errorEnd[0], Time.time - m_errorTime);
-   private float b2Error => Mathf.Lerp(m_errorBeg[1], m_errorEnd[1], Time.time - m_errorTime);
+   public List<Transform> BouysPos()
+   {
+      List<Transform> bouysTransforms = new List<Transform>();
+      bouysTransforms.Add(m_bouy1.transform);
+      bouysTransforms.Add(m_bouy2.transform);
+      return bouysTransforms;
+   }
 
    void Start()
    {
