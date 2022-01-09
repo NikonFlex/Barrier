@@ -24,6 +24,7 @@ public class Packet : MonoBehaviour
    private bool _isOnWater = false;
 
    public bool IsOnWater => _isOnWater;
+   public Transform Bobber => _bobber.transform;
 
    void Start()
    {

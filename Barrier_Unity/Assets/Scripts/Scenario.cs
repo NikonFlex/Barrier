@@ -302,6 +302,7 @@ class PhaseLaunchBouys : IScenarioPhase
          {
             _bouyCamera = VirtualCameraHelper.Activate("vcam_Buoy");
             VirtualCameraHelper.AddMemberToTargetGroup(_bouyCamera, Scenario.Instance.BuoyPackets.First().transform);
+            VirtualCameraHelper.AddMemberToTargetGroup(_bouyCamera, Scenario.Instance.BuoyPackets.First().Bobber);
             //_bouyCamera.Follow = _bouyCamera.LookAt = Scenario.Instance.BuoyPackets.First().transform;
          }
       }
