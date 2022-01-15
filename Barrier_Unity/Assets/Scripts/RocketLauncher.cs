@@ -23,6 +23,7 @@ public class RocketLauncher : MonoBehaviour
       }
    }
 
+   public bool IsAllRocketsLaunched => (_rockets.Count == _rocketNumber);
    public bool IsAllRocketsExploded => (_rockets.Count == _rocketNumber && _rockets.All(x => x.IsExploded));
 
    public void LaunchRockets()

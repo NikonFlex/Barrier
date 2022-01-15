@@ -107,6 +107,7 @@ public class Scenario : MonoBehaviour
    public TargetInfo TargetInfo => isRunning ? calcTargetInfo() : null;
    public Packet[] BuoyPackets => _buoyPackets.ToArray();
    public Buoy[] Buoys => _buoys.ToArray();
+   public Rocket[] Rockets => _rockets.ToArray();
    public Transform Ship => _ship.transform;
 
    public void OnPacketLaunched(Packet p)
@@ -384,15 +385,35 @@ class PhaseLaunchRockets : IScenarioPhase
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.MissilesLaunched;
    public override string Title => "Запуск ракет";
    public override bool IsFinished => checkFinished();
+   private float _launchTime;
+   private float _cameraDelay = 2;
+   private bool _rocketsLaunched = false;
+   CinemachineVirtualCamera _cam;
 
    public override void Start()
    {
       _rocketLauncher = GameObject.FindObjectOfType<RocketLauncher>();
       _rocketLauncher.LaunchRockets();
       VirtualCameraHelper.AddMemberToTargetGroup("vcam_TorpedoZone", Scenario.Instance.Ship);
+      _rocketsLaunched = false;
+      _cam = null;
    }
    public override void Update() 
    {
+      if (_cam == null && _rocketsLaunched && _launchTime + _cameraDelay < Scenario.Instance.ScenarioTime)
+      {
+         //          // убираем все из камеры и оставляем только ракеты и цель
+         //          VirtualCameraHelper.ClearTargetGroup(_cam);
+         _cam = VirtualCameraHelper.Activate("vcam_Rockets");
+         foreach (var r in Scenario.Instance.Rockets)
+            VirtualCameraHelper.AddMemberToTargetGroup(_cam, r.transform);
+      }
+      if (!_rocketsLaunched && _rocketLauncher.IsAllRocketsLaunched)
+      {
+         _launchTime = Scenario.Instance.ScenarioTime;
+         _rocketsLaunched = true;
+      }
+
       if (_rocketLauncher.IsAllRocketsExploded && Scenario.Instance.TargetInfo.Target.IsActive && !_rocketsMissed)
       {
          _rocketsMissed = true;
@@ -500,4 +521,12 @@ static class VirtualCameraHelper
       Debug.Log($"Remove {t.name} to target group of camera {cam.name}");
       lookAtGroup.RemoveMember(t);
    }
+
+   public static void ClearTargetGroup(CinemachineVirtualCamera cam)
+   {
+      var lookAtGroup = cam.LookAt.GetComponent<CinemachineTargetGroup>();
+      foreach (var t in lookAtGroup.m_Targets.ToList())
+         lookAtGroup.RemoveMember(t.target);
+   }
+
 }
