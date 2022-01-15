@@ -111,6 +111,7 @@ public class Scenario : MonoBehaviour
 
    public void OnPacketLaunched(Packet p)
    {
+      p.BuoyIndex = _buoyPackets.Count;
       _buoyPackets.Add(p);
       LabelHelper.AddLabel(p.gameObject, $"РГАБ {_buoyPackets.Count}");
       VirtualCameraHelper.AddMemberToTargetGroup("vcam_Launch", p.transform);
@@ -296,14 +297,28 @@ class PhaseLaunchBouys : IScenarioPhase
       }
       else
       {
+         var buoyPacket = Scenario.Instance.BuoyPackets.First();
          if (_allBouysLaunchedTime + _delay2 < Scenario.Instance.ScenarioTime
                && _bouyCamera == null
-               && _buoyCameraHeight > Scenario.Instance.BuoyPackets.First().transform.position.y)
+               //&& _buoyCameraHeight > buoyPacket.transform.position.y)
+               && buoyPacket.CalcTimeToTarget() < 3 )
          {
+            // попытка следить за тормозящим буем
             _bouyCamera = VirtualCameraHelper.Activate("vcam_Buoy");
-            VirtualCameraHelper.AddMemberToTargetGroup(_bouyCamera, Scenario.Instance.BuoyPackets.First().transform);
-            VirtualCameraHelper.AddMemberToTargetGroup(_bouyCamera, Scenario.Instance.BuoyPackets.First().Bobber);
+            GameObject targetDebugPrim = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            targetDebugPrim.transform.position = buoyPacket.TargetPos;
+            //_bouyCamera.Follow = targetDebugPrim.transform;
+//            _bouyCamera.transform.position = buoyPacket.TargetPos;
+
+            VirtualCameraHelper.AddMemberToTargetGroup(_bouyCamera, buoyPacket.transform);
+            VirtualCameraHelper.AddMemberToTargetGroup(_bouyCamera, buoyPacket.Bobber);
+            buoyPacket.Trail.SetActive(false);
             //_bouyCamera.Follow = _bouyCamera.LookAt = Scenario.Instance.BuoyPackets.First().transform;
+         }
+         else if (buoyPacket.transform.position.y < -20)
+         {
+            VirtualCameraHelper.RemoveMemberFromTargetGroup(_bouyCamera, buoyPacket.Bobber);
+
          }
       }
 
@@ -471,5 +486,18 @@ static class VirtualCameraHelper
    {
       var cam = Find(name);
       return cam != null ? AddMemberToTargetGroup(cam, t, w, r) : false;
+   }
+
+   public static void RemoveMemberFromTargetGroup(CinemachineVirtualCamera cam, Transform t)
+   {
+      var lookAtGroup = cam.LookAt.GetComponent<CinemachineTargetGroup>();
+      if (lookAtGroup == null)
+      {
+         Debug.LogError($"Can't get  CinemachineTargetGroup from lookat in camera {cam.name}");
+         return;
+      }
+
+      Debug.Log($"Remove {t.name} to target group of camera {cam.name}");
+      lookAtGroup.RemoveMember(t);
    }
 }

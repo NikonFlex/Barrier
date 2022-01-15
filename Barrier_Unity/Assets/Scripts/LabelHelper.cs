@@ -75,6 +75,17 @@ static class LabelHelper
       }
    }
 
+   public static void SetLabelText(GameObject o, string text)
+   {
+      var scl = findLabel(o);
+      if (scl)
+         scl.LabelText = text;
+      else
+      {
+         Debug.LogError($"Can't find label of object '{o.name}'");
+      }
+   }
+
    private static ScreenLabel findLabel(GameObject o)
    {
       return markersGroup.GetComponentsInChildren<ScreenLabel>(true).FirstOrDefault(scl => scl.target == o.transform);

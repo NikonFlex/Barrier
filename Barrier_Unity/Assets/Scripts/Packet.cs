@@ -7,7 +7,7 @@ public class Packet : MonoBehaviour
 {
    [SerializeField] private float K = 0.001f;
    [SerializeField] private float _stopSlowDownHeight;
-   [SerializeField] private float _stopDivingHeight;
+   [SerializeField] private float _workingDepth;
 
    [SerializeField] private GameObject _slowDownEngine;
    [SerializeField] private GameObject _bobber;
@@ -25,6 +25,7 @@ public class Packet : MonoBehaviour
 
    public bool IsOnWater => _isOnWater;
    public Transform Bobber => _bobber.transform;
+   public int BuoyIndex = -1;
 
    void Start()
    {
@@ -38,11 +39,20 @@ public class Packet : MonoBehaviour
       //LabelHelper.AddLabel(_bobber, $"РГАБ {(int)gameObject.name.Last()}"); // видимо надо как то считать
       StartCoroutine(fly());
    }
+   
+   public float CalcTimeToTarget()
+   {
+      return (new Vector2(_target.x, _target.z) - new Vector2(transform.position.x, transform.position.z)).magnitude /
+         new Vector2(_speedVector.x, _speedVector.z).magnitude; 
+   }
+
+   public Vector3 TargetPos => _target;
+
+   public GameObject Trail => _trail;
 
    private IEnumerator fly()
    {
-      bool break_flag = false;
-      while (!break_flag)
+      while (transform.position.y > 0)
       {
          if (!Scenario.IsRunning)
          {
@@ -55,11 +65,17 @@ public class Packet : MonoBehaviour
          _speedVector.y -= g * Time.deltaTime;
          transform.rotation = Quaternion.LookRotation(_speedVector.normalized);
          transform.position = pos;
+         var nextPos = pos + (_speedVector + Vector3.down * g * Time.deltaTime) * Time.deltaTime;
 
+         //          if ((transform.position - _target).magnitude < 100 ||
+         //             (_speedVector.y < 0 && pos.y < VarSync.GetFloat(VarName.BuoysOpenConeHeight)))
+         //             break_flag = true;
+         float breakAltitude = VarSync.GetFloat(VarName.BuoyBreakStartAltitude);
          if ((transform.position - _target).magnitude < 100 ||
-            (_speedVector.y < 0 && pos.y < VarSync.GetFloat(VarName.BuoysOpenConeHeight)))
-            break_flag = true;
-
+            (_speedVector.y < 0 &&
+            (pos.y < breakAltitude || nextPos.y < breakAltitude)))
+            break;
+         
          yield return null;
       }
 
@@ -110,10 +126,12 @@ public class Packet : MonoBehaviour
    private IEnumerator reactiveSlowDown()
    {
       Scenario.Instance.AddMessage($"Начало торможения у '{gameObject.name}' на   высоте {transform.position.y}");
+      Debug.Log($"{name} time to target {CalcTimeToTarget()}");
       _slowDownEngine.SetActive(true);
 
       Vector3 slowDownS = _speedVector.normalized * ((transform.position.y - _stopSlowDownHeight) / _speedVector.normalized.y);
       float a = _speedVector.magnitude * _speedVector.magnitude / (2 * slowDownS.magnitude);
+      a += g;
 
       while (transform.position.y > 1)
       {
@@ -124,8 +142,7 @@ public class Packet : MonoBehaviour
          }
 
          _speedVector += -1 * _speedVector.normalized * a * Time.deltaTime;
-         // TODO::
-         //_speedVector.y -= g * Time.deltaTime;
+         _speedVector.y -= g * Time.deltaTime;
          Vector3 pos = transform.position;
          pos += _speedVector * Time.deltaTime;
          transform.position = pos;
@@ -145,21 +162,25 @@ public class Packet : MonoBehaviour
 
       Vector3 cur_pos = gameObject.transform.position;
       _bobber.transform.position = new Vector3(cur_pos.x, 1, cur_pos.z);
-      gameObject.transform.LookAt(new Vector3(cur_pos.x, _stopDivingHeight, cur_pos.z));
+      gameObject.transform.LookAt(new Vector3(cur_pos.x, -_workingDepth, cur_pos.z));
 
-      LabelHelper.AddLabel(_bobber, LabelHelper.GetLabelText(gameObject));
-      LabelHelper.HideLabel(gameObject);
+      string labelText = LabelHelper.GetLabelText(gameObject);
+      if (BuoyIndex != 0) // следим только за первым буем. Потом решение можно переделать
+         LabelHelper.HideLabel(gameObject);
 
       float a = (g * (1000 * V - M)) / M; //ускорение в воде
 
-      while (gameObject.transform.position.y > _stopDivingHeight)
+      while (gameObject.transform.position.y > -_workingDepth)
       {
          _divingSpeed += a * Time.deltaTime; 
          gameObject.transform.position += gameObject.transform.forward * _divingSpeed * Time.deltaTime;
+         LabelHelper.SetLabelText(gameObject, $"H = {-gameObject.transform.position.y:0.#}");
          drawRopeToBopper();
          yield return null;
       }
 
+      LabelHelper.HideLabel(gameObject);
+      LabelHelper.AddLabel(_bobber, labelText);
       Scenario.Instance.AddMessage($"Буй '{gameObject.name}' погрузился");
       gameObject.AddComponent<Buoy>();
       _isOnWater = true;

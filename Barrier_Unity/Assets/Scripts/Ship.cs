@@ -36,7 +36,7 @@ public class Ship : MonoBehaviour
 
    void Start()
    {
-      m_directionLine = createDirectionLine();
+      //m_directionLine = createDirectionLine();
    }
 
    void Update()

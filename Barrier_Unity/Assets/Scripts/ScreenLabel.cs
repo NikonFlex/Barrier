@@ -40,5 +40,8 @@ public class ScreenLabel : MonoBehaviour
                 myRect.position = pos;
             }
         }
-    }
+
+      if (tMP != null && tMP.text != LabelText) 
+         tMP.text = LabelText;
+   }
 }

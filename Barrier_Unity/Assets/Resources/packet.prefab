@@ -489,8 +489,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   K: 0.1
   _stopSlowDownHeight: -2
-  _stopDivingHeight: -20
-  _divingSpeed: 5
+  _workingDepth: 50
   _slowDownEngine: {fileID: 5149667864980243890}
   _bobber: {fileID: 5283303094407934741}
   _trail: {fileID: 2823162540877959496}

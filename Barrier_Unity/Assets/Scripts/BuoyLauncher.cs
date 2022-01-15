@@ -36,9 +36,10 @@ public class BuoyLauncher : MonoBehaviour
       Mathf.Clamp(distance, 0, VarSync.GetFloat(VarName.BuoysShootRange));
       Vector3 dirToTarget = (trg.Target.transform.position - transform.position).normalized;
       Vector3 left = Vector3.Cross(dirToTarget, Vector3.up).normalized;
-      Vector3 openConeHeightPos = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
-      Vector3 p1 = left * d / 2 + dirToTarget * distance + openConeHeightPos;
-      Vector3 p2 = -left * d / 2 + dirToTarget * distance + openConeHeightPos;
+      //      Vector3 breakPos = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
+      Vector3 breakPos = Vector3.up * VarSync.GetFloat(VarName.BuoyBreakStartAltitude);
+      Vector3 p1 = left * d / 2 + dirToTarget * distance + breakPos;
+      Vector3 p2 = -left * d / 2 + dirToTarget * distance + breakPos;
       buoysTargets.Add(p1);
       buoysTargets.Add(p2);
       _buoysTargets = buoysTargets.ToArray();
