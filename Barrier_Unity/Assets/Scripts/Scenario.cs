@@ -369,7 +369,7 @@ class PhaseBouysTargetDetected : IScenarioPhase
       VirtualCameraHelper.AddMemberToTargetGroup(cam, _bg.DetectZone, 1, radius);
 
       foreach (var b in _bg.Bouys)
-         VirtualCameraHelper.AddMemberToTargetGroup(cam, b);
+         VirtualCameraHelper.AddMemberToTargetGroup(cam, b.transform);
    }
    public override void Update() {}
 

@@ -7,18 +7,14 @@ using UnityEngine;
 
 public class BuoyGuard : MonoBehaviour
 {
-
    [SerializeField] private Transform m_torpedo;
    [SerializeField] private Material m_material;
    [SerializeField] private TorpedoDetectionModel _torpedoDetectionModel;
    [SerializeField] private float _accumalatedTorpedoWayLength = 10000;
 
-   private Buoy m_bouy1;
-   private Buoy m_bouy2;
+   private List<Buoy> m_bouys = new List<Buoy>();
+   public Buoy[] Bouys => m_bouys.ToArray();
 
-   private float[] m_errorBeg = new float[2];
-   private float[] m_errorEnd = new float[2];
-   private float m_errorTime;
 
    private GameObject m_rombZone;
    private GameObject m_elipseZone;
@@ -29,53 +25,25 @@ public class BuoyGuard : MonoBehaviour
    private float _startScanTime = -1;
    private float _scanningError = 1f;
 
-   private bool _startDrawTrackedPosition = false;
-   private bool drawDebugLines = true;
+   private bool _drawDebugLines = true;
 
    public Vector3[] RealZone { get; private set; }
    public Transform DetectZone => m_splineZone.transform;
    public float ScanningError => _scanningError;
    private float m_detectRange => VarSync.GetFloat(VarName.BuoysDetectRange);
-   private float b1Error => Mathf.Lerp(m_errorBeg[0], m_errorEnd[0], Time.time - m_errorTime);
-   private float b2Error => Mathf.Lerp(m_errorBeg[1], m_errorEnd[1], Time.time - m_errorTime);
 
-   private float getBearingError()
-   {
-      if (VarSync.GetInt(VarName.Weather) == 0)
-         return VarSync.GetFloat(VarName.BuoysBearingError);
-      else
-         return VarSync.GetFloat(VarName.BuoysBearingError) * VarSync.GetFloat(VarName.BuoysBearingMultplier);
-   }
-
-   public Transform[] Bouys => new Transform[] { m_bouy1.transform, m_bouy2.transform };
 
    void Start()
    {
-      UnityEngine.Random.InitState(DateTime.UtcNow.GetHashCode());
-      m_errorTime = Time.time;
-      StartCoroutine(timerCoroutine());
-
       createZoneObject();
       _accumalatedTorpedoWay = createAccumalatedTorpedoWay();
-   }
 
-   IEnumerator timerCoroutine()
-   {
-      while (true)
-      {
-         yield return new WaitForSeconds(1);
-
-         m_errorBeg[0] = m_errorEnd[0];
-         m_errorBeg[1] = m_errorEnd[1];
-         m_errorEnd[0] = Utils.GaussRandom(getBearingError() / 2f);
-         m_errorEnd[1] = Utils.GaussRandom(getBearingError() / 2f);
-         m_errorTime = Time.time;
-      }
+      StartCoroutine(trackTargetPosition());
    }
 
    void Update()
    {
-      if (!(m_bouy1 == null || m_bouy2 == null))
+      if (m_bouys.Count > 1)
          activateZone();
       else
          return;
@@ -84,7 +52,7 @@ public class BuoyGuard : MonoBehaviour
       if (target == null || !Scenario.Instance.TargetInfo.Target.IsActive)
       {
          deactivateZone();
-         drawDebugLines = false;
+         _drawDebugLines = false;
          return;
       }
 
@@ -93,12 +61,6 @@ public class BuoyGuard : MonoBehaviour
       else
       {
          _scanningError = Mathf.Clamp01(1 - (Scenario.Instance.ScenarioTime - _startScanTime) / 5);
-      }
-
-      if (_startDrawTrackedPosition)
-      {
-         StartCoroutine(drawTrackedTargetPosition());
-         _startDrawTrackedPosition = false;
       }
 
       Vector3[] zonePoints = updateZonePoints();
@@ -146,21 +108,24 @@ public class BuoyGuard : MonoBehaviour
 
    private Vector3[] updateZonePoints()
    {
-      Vector3 vc = Quaternion.AngleAxis(b1Error, Vector3.up) * (m_torpedo.transform.position - m_bouy1.transform.position).normalized;
-      Vector3 vr = getDir(vc, getBearingError() / 2);
-      Vector3 vl = getDir(vc, -getBearingError() / 2);
+      float b1Error = m_bouys[0].Error;
+      float b2Error = m_bouys[1].Error;
 
-      Vector3 p1 = m_bouy1.transform.position;
-      Vector3 p1r = m_bouy1.transform.position + vr * m_detectRange + Vector3.up;
-      Vector3 p1l = m_bouy1.transform.position + vl * m_detectRange + Vector3.up;
+      Vector3 vc = Quaternion.AngleAxis(b1Error, Vector3.up) * (m_torpedo.position - m_bouys[0].transform.position).normalized;
+      Vector3 vr = getDir(vc, Buoy.GetBearingError() / 2);
+      Vector3 vl = getDir(vc, -Buoy.GetBearingError() / 2);
 
-      vc = Quaternion.AngleAxis(b2Error, Vector3.up) * (m_torpedo.transform.position - m_bouy2.transform.position).normalized;
-      vr = getDir(vc, getBearingError() / 2);
-      vl = getDir(vc, -getBearingError() / 2);
+      Vector3 p1 = m_bouys[0].transform.position;
+      Vector3 p1r = m_bouys[0].transform.position + vr * m_detectRange + Vector3.up;
+      Vector3 p1l = m_bouys[0].transform.position + vl * m_detectRange + Vector3.up;
 
-      Vector3 p2 = m_bouy2.transform.position;
-      Vector3 p2r = m_bouy2.transform.position + vr * m_detectRange + Vector3.up;
-      Vector3 p2l = m_bouy2.transform.position + vl * m_detectRange + Vector3.up;
+      vc = Quaternion.AngleAxis(b2Error, Vector3.up) * (m_torpedo.position - m_bouys[1].transform.position).normalized;
+      vr = getDir(vc, Buoy.GetBearingError() / 2);
+      vl = getDir(vc, -Buoy.GetBearingError() / 2);
+
+      Vector3 p2 = m_bouys[1].transform.position;
+      Vector3 p2r = m_bouys[1].transform.position + vr * m_detectRange + Vector3.up;
+      Vector3 p2l = m_bouys[1].transform.position + vl * m_detectRange + Vector3.up;
 
       Vector3 c1 = Vector3.zero;
       bool f1 = getCross(p1, p1l, p2, p2l, out c1);
@@ -206,99 +171,78 @@ public class BuoyGuard : MonoBehaviour
       m_splineZone.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
    }
 
-   private IEnumerator drawTrackedTargetPosition()
+   private IEnumerator trackTargetPosition()
    {
-      while (Scenario.Instance.TargetInfo != null && Scenario.Instance.TargetInfo.Target.IsActive)
+      while (true)
       {
-         //calculate real tracked point
-         Vector3 b1Bearing = (m_torpedo.transform.position - m_bouy1.transform.position).normalized;
-         Vector3 b2Bearing = (m_torpedo.transform.position - m_bouy2.transform.position).normalized;
-
-         Vector3 b1BearingWithError = getDir(b1Bearing, b1Error);
-         Vector3 b2BearingWithError = getDir(b2Bearing, b2Error);
-
-         Vector3 p11 = m_bouy1.transform.position;
-         Vector3 p12 = p11 + b1BearingWithError * m_detectRange;
-         Vector3 p21 = m_bouy2.transform.position;
-         Vector3 p22 = p21 + b2BearingWithError * m_detectRange;
-
-         Vector3 bouysBearingIntersection = Vector3.zero;
-         bool crossed = getCross(p11, p12, p21, p22, out bouysBearingIntersection);
-         if (!crossed)
+         if (m_bouys.Count < 2)
          {
             yield return null;
             continue;
          }
 
-         p12 = p11 + b1Bearing * m_detectRange;
-         p22 = p21 + b2Bearing * m_detectRange;
+         if (Scenario.Instance.TargetInfo != null && Scenario.Instance.TargetInfo.Target.IsActive)
+         {
+            //calculate real tracked point
+            Vector3 b1Bearing = (m_torpedo.position - m_bouys[0].transform.position).normalized;
+            Vector3 b2Bearing = (m_torpedo.position - m_bouys[1].transform.position).normalized;
 
-         Vector3 realCross = Vector3.zero;
-         crossed = getCross(p11, p12, p21, p22, out realCross);
+            Vector3 b1BearingWithError = getDir(b1Bearing, m_bouys[0].Error);
+            Vector3 b2BearingWithError = getDir(b2Bearing, m_bouys[1].Error);
 
-         Vector3 realPosition = new Vector3(realCross.x, 4, realCross.z);
+            Vector3 p11 = m_bouys[0].transform.position;
+            Vector3 p12 = p11 + b1BearingWithError * m_detectRange;
+            Vector3 p21 = m_bouys[1].transform.position;
+            Vector3 p22 = p21 + b2BearingWithError * m_detectRange;
 
-         //draw real points
-         GameObject realPointMesh = new GameObject("Real Track Point " + string.Format("{0:0.00}", Scenario.Instance.ScenarioTime));
-         realPointMesh.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(5, 30);
-         realPointMesh.AddComponent<MeshRenderer>().material.color = new Color(1, 0, 1, 0.5f);
-         realPointMesh.transform.position = realPosition;
-         Destroy(realPointMesh, 12.0f);
+            Vector3 bouysBearingIntersection = Vector3.zero;
+            bool crossed = getCross(p11, p12, p21, p22, out bouysBearingIntersection);
+            if (!crossed)
+            {
+               yield return null;
+               continue;
+            }
 
-         Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 0, bouysBearingIntersection.z);
+            Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 0, bouysBearingIntersection.z);
 
-         _torpedoDetectionModel.AddTrackPoint(trackedPosition);
+            _torpedoDetectionModel.AddTrackPoint(trackedPosition);
 
-         //draw tracked points
-         GameObject trackedPointMesh = new GameObject("Track Point " + string.Format("{0:0.00}", Scenario.Instance.ScenarioTime));
-         trackedPointMesh.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(5, 30);
-         trackedPointMesh.AddComponent<MeshRenderer>().material.color = new Color(1, 0, 0, 0.5f);
-         trackedPointMesh.transform.position = trackedPosition + Vector3.up * 5;
-         Destroy(trackedPointMesh, 12.0f);
 
-         //draw tracked points after kalman filter
-         GameObject kalmanTrackedPointMesh = new GameObject("Kalman Track Point " + string.Format("{0:0.00}", Scenario.Instance.ScenarioTime));
-         kalmanTrackedPointMesh.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(5, 30);
-         kalmanTrackedPointMesh.AddComponent<MeshRenderer>().material.color = new Color(0, 1, 0, 0.5f);
-         kalmanTrackedPointMesh.transform.position = _torpedoDetectionModel.CalcPos() + Vector3.up * 5; 
-         Destroy(kalmanTrackedPointMesh, 12.0f);
+            //draw accumalated way
+            _accumalatedTorpedoWay.GetComponent<MeshFilter>().mesh = Utils.CreateOfssetedLinedMesh(calculateAccumalatedTorpedoWayPoints(), 50);
 
-         //draw accumalated way
-         _accumalatedTorpedoWay.GetComponent<MeshFilter>().mesh = Utils.CreateOfssetedLinedMesh(calculateAccumalatedTorpedoWayPoints(), 50);
+            yield return new WaitForSeconds(1f);
+         }
 
-         yield return new WaitForSeconds(1f);
+         yield return null;
       }
    }
 
    private void OnDrawGizmos()
    {
-      if (!drawDebugLines)
+      Vector3 t1 = m_torpedo.rotation * Vector3.forward * 100 + Vector3.up * 5;
+      Vector3 t2 = m_torpedo.rotation * Quaternion.Euler(new Vector3(0, 180, 0)) * Vector3.forward * 500 + Vector3.up * 5;
+      Vector3 t3 = m_torpedo.rotation * Quaternion.Euler(new Vector3(0, 90, 0)) * Vector3.forward * 250 + Vector3.up * 5;
+      Vector3 t4 = m_torpedo.rotation * Quaternion.Euler(new Vector3(0, -90, 0)) * Vector3.forward * 250 + Vector3.up * 5;
+
+      Gizmos.color = new Color(1, 0, 1, 0.5f);
+      Gizmos.DrawLine(m_torpedo.position, m_torpedo.position + t1);
+      Gizmos.DrawLine(m_torpedo.position, m_torpedo.position + t2);
+      Gizmos.DrawLine(m_torpedo.position, m_torpedo.position + t3);
+      Gizmos.DrawLine(m_torpedo.position, m_torpedo.position + t4);
+
+      if (!_drawDebugLines)
          return;
 
       Gizmos.color = new Color(1, 0, 0, 0.25f);
 
-      if (m_bouy1 != null)
+      foreach(var b in m_bouys)
       {
-         Vector3 bearing = (m_torpedo.transform.position - m_bouy1.transform.position).normalized;
-         Vector3 bCenter = getDir(bearing, b1Error);
-         Vector3 bLeft = getDir(bearing, b1Error - getBearingError()/2f);
-         Vector3 bRight = getDir(bearing, b1Error + getBearingError() / 2f);
-         Vector3 p = new Vector3(m_bouy1.transform.position.x, 2, m_bouy1.transform.position.z);
-         Vector3 pCenter = p + bCenter * m_detectRange;
-         Vector3 pLeft = p + bLeft * m_detectRange;
-         Vector3 pRight = p + bRight * m_detectRange;
-         Gizmos.DrawLine(p, pCenter);
-         Gizmos.DrawLine(p, pLeft);
-         Gizmos.DrawLine(p, pRight);
-      }
-
-      if (m_bouy2 != null)
-      {
-         Vector3 bearing = (m_torpedo.transform.position - m_bouy2.transform.position).normalized;
-         Vector3 bCenter = getDir(bearing, b2Error);
-         Vector3 bLeft = getDir(bearing, b2Error - getBearingError() / 2f);
-         Vector3 bRight = getDir(bearing, b2Error + getBearingError() / 2f);
-         Vector3 p = new Vector3(m_bouy2.transform.position.x, 2, m_bouy2.transform.position.z);
+         Vector3 bearing = (m_torpedo.position - b.transform.position).normalized;
+         Vector3 bCenter = getDir(bearing, b.Error);
+         Vector3 bLeft = getDir(bearing, b.Error - Buoy.GetBearingError() /2f);
+         Vector3 bRight = getDir(bearing, b.Error + Buoy.GetBearingError() / 2f);
+         Vector3 p = new Vector3(b.transform.position.x, 2, b.transform.position.z);
          Vector3 pCenter = p + bCenter * m_detectRange;
          Vector3 pLeft = p + bLeft * m_detectRange;
          Vector3 pRight = p + bRight * m_detectRange;
@@ -310,27 +254,22 @@ public class BuoyGuard : MonoBehaviour
 
    public void AddBuoy(Buoy b)
    {
-      if (m_bouy1 == null)
-         m_bouy1 = b;
-      else if (m_bouy2 == null)
-      {
-         m_bouy2 = b;
-         startWork();
-      }
+      if(m_bouys.Count < 6)
+         m_bouys.Add(b);
       else
          Debug.LogError("Exceed number of buoys");
    }
 
 
-   private void startWork()
-   {
-      m_errorBeg[0] = Utils.GaussRandom(getBearingError() / 2f);
-      m_errorBeg[1] = Utils.GaussRandom(getBearingError() / 2f);
-      m_errorEnd[0] = Utils.GaussRandom(getBearingError() / 2f);
-      m_errorEnd[1] = Utils.GaussRandom(getBearingError() / 2f);
+   //private void startWork()
+   //{
+   //   m_errorBeg[0] = Utils.GaussRandom(getBearingError() / 2f);
+   //   m_errorBeg[1] = Utils.GaussRandom(getBearingError() / 2f);
+   //   m_errorEnd[0] = Utils.GaussRandom(getBearingError() / 2f);
+   //   m_errorEnd[1] = Utils.GaussRandom(getBearingError() / 2f);
       
-      _startDrawTrackedPosition = true;
-   }
+   //   _startDrawTrackedPosition = true;
+   //}
 
    private bool getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22, out Vector3 cross)
    {
@@ -354,7 +293,7 @@ public class BuoyGuard : MonoBehaviour
       cross.z = cross.z / cross.y;
       cross.y = 0;
 
-      float d = (m_torpedo.transform.position - cross).magnitude;
+      float d = (m_torpedo.position - cross).magnitude;
 
       if (d > VarSync.GetFloat(VarName.BuoysDetectRange))
          return false;

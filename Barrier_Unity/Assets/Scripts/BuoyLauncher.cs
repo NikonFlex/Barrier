@@ -10,7 +10,7 @@ public class BuoyLauncher : MonoBehaviour
    private bool _inProgress = false;
    private Vector3[] _buoysTargets;
    private int _buoysCounter = 0;
-   public readonly int NumBuoys = 2;
+   public readonly int NumBuoys = 4;
 
    public bool LaunchBuouys()
    {
@@ -36,12 +36,15 @@ public class BuoyLauncher : MonoBehaviour
       Mathf.Clamp(distance, 0, VarSync.GetFloat(VarName.BuoysShootRange));
       Vector3 dirToTarget = (trg.Target.transform.position - transform.position).normalized;
       Vector3 left = Vector3.Cross(dirToTarget, Vector3.up).normalized;
-      //      Vector3 breakPos = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
-      Vector3 breakPos = Vector3.up * VarSync.GetFloat(VarName.BuoyBreakStartAltitude);
-      Vector3 p1 = left * d / 2 + dirToTarget * distance + breakPos;
-      Vector3 p2 = -left * d / 2 + dirToTarget * distance + breakPos;
+      Vector3 openConeHeightPos = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
+      Vector3 p1 = left * d / 2 + dirToTarget * distance + openConeHeightPos;
+      Vector3 p2 = -left * d / 2 + dirToTarget * distance + openConeHeightPos;
+      Vector3 p3 = left * d / 1 + dirToTarget * distance + openConeHeightPos;
+      Vector4 p4 = -left * d / 1 + dirToTarget * distance + openConeHeightPos;
       buoysTargets.Add(p1);
       buoysTargets.Add(p2);
+      buoysTargets.Add(p3);
+      buoysTargets.Add(p4);
       _buoysTargets = buoysTargets.ToArray();
       //       var o1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
       //       o1.transform.position = p1;
@@ -68,13 +71,14 @@ public class BuoyLauncher : MonoBehaviour
    private IEnumerator aimToTarget(Vector3 pos)
    {
       Scenario.Instance.AddMessage($"Прицеливание буя {_buoysCounter}");
-      var startRotation = transform.rotation;
-      float horDelta = Utils.CalculateHorAngleDelta(gameObject.transform, pos);
-      float vertDelta = Utils.CalculateVertAngle(gameObject.transform.position, pos, _launchSpeed);
-      var finishRotation = Quaternion.Euler(-vertDelta, startRotation.eulerAngles.y + horDelta, transform.rotation.z);
-      float vertRotationPeriod = Mathf.Abs(vertDelta) / _angleSpeed;
-      float horRotationPeriod = Mathf.Abs(horDelta) / _angleSpeed;
-      var rotationPeriod = Mathf.Max(vertRotationPeriod, horRotationPeriod);
+      Quaternion startRotation = transform.rotation;
+      float horDelta = Utils.CalculateHorAngleDelta(transform, pos);
+      float vertAngle = Utils.CalculateVertAngle(transform.position, pos, _launchSpeed);
+
+      Quaternion finishRotation = Quaternion.Euler(-vertAngle, startRotation.eulerAngles.y + horDelta, startRotation.eulerAngles.z);
+
+      float a = Mathf.Abs(Quaternion.Angle(finishRotation, startRotation));
+      float rotationPeriod = a / _angleSpeed;
 
       float rotationTime = 0;
       while (rotationTime < rotationPeriod)

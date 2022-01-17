@@ -263,7 +263,9 @@ static class Utils
 
    static public float CalculateHorAngleDelta(Transform from, Vector3 to)
    {
-      float a = Vector3.SignedAngle(from.forward, (to - from.position).normalized, Vector3.up);
+      Vector3 f = new Vector3(from.forward.x, 0, from.forward.z).normalized;
+      Vector3 v = to - from.position;
+      float a = Vector3.SignedAngle(f, new Vector3(v.x, 0, v.z).normalized, Vector3.up);
       return a;
    }
 
