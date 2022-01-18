@@ -10,7 +10,7 @@ public class BuoyLauncher : MonoBehaviour
    private bool _inProgress = false;
    private Vector3[] _buoysTargets;
    private int _buoysCounter = 0;
-   public readonly int NumBuoys = 4;
+   public readonly int NumBuoys = 2;
 
    public bool LaunchBuouys()
    {
@@ -39,12 +39,16 @@ public class BuoyLauncher : MonoBehaviour
       Vector3 openConeHeightPos = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
       Vector3 p1 = left * d / 2 + dirToTarget * distance + openConeHeightPos;
       Vector3 p2 = -left * d / 2 + dirToTarget * distance + openConeHeightPos;
-      Vector3 p3 = left * d / 1 + dirToTarget * distance + openConeHeightPos;
-      Vector4 p4 = -left * d / 1 + dirToTarget * distance + openConeHeightPos;
+      Vector3 p3 = left * d / 1 + dirToTarget * (distance * 1.3f) + openConeHeightPos;
+      Vector4 p4 = -left * d / 1 + dirToTarget * (distance * 1.3f) + openConeHeightPos;
+      Vector3 p5 = left * d / 1 + dirToTarget * (distance * 1f) + openConeHeightPos;
+      Vector4 p6 = -left * d / 1 + dirToTarget * (distance * 1f) + openConeHeightPos;
       buoysTargets.Add(p1);
       buoysTargets.Add(p2);
-      buoysTargets.Add(p3);
-      buoysTargets.Add(p4);
+      //buoysTargets.Add(p3);
+      //buoysTargets.Add(p4);
+      //buoysTargets.Add(p5);
+      //buoysTargets.Add(p6);
       _buoysTargets = buoysTargets.ToArray();
       //       var o1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
       //       o1.transform.position = p1;

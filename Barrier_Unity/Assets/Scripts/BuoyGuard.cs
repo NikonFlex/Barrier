@@ -111,21 +111,23 @@ public class BuoyGuard : MonoBehaviour
       float b1Error = m_bouys[0].Error;
       float b2Error = m_bouys[1].Error;
 
-      Vector3 vc = Quaternion.AngleAxis(b1Error, Vector3.up) * (m_torpedo.position - m_bouys[0].transform.position).normalized;
-      Vector3 vr = getDir(vc, Buoy.GetBearingError() / 2);
-      Vector3 vl = getDir(vc, -Buoy.GetBearingError() / 2);
+      Vector3 vb = (m_torpedo.position - m_bouys[0].transform.position).normalized;
+      vb = new Vector3(vb.x, 0, vb.z).normalized;
+      Vector3 vr = getDir(vb, b1Error + Buoy.GetBearingError() / 2f);
+      Vector3 vl = getDir(vb, b1Error - Buoy.GetBearingError() / 2f);
 
-      Vector3 p1 = m_bouys[0].transform.position;
-      Vector3 p1r = m_bouys[0].transform.position + vr * m_detectRange + Vector3.up;
-      Vector3 p1l = m_bouys[0].transform.position + vl * m_detectRange + Vector3.up;
+      Vector3 p1 = new Vector3(m_bouys[0].transform.position.x, 0, m_bouys[0].transform.position.z);
+      Vector3 p1r = p1 + vr * m_detectRange;
+      Vector3 p1l = p1 + vl * m_detectRange;
 
-      vc = Quaternion.AngleAxis(b2Error, Vector3.up) * (m_torpedo.position - m_bouys[1].transform.position).normalized;
-      vr = getDir(vc, Buoy.GetBearingError() / 2);
-      vl = getDir(vc, -Buoy.GetBearingError() / 2);
+      vb = (m_torpedo.position - m_bouys[1].transform.position).normalized;
+      vb = new Vector3(vb.x, 0, vb.z).normalized;
+      vr = getDir(vb, b2Error + Buoy.GetBearingError() / 2f);
+      vl = getDir(vb, b2Error - Buoy.GetBearingError() / 2f);
 
-      Vector3 p2 = m_bouys[1].transform.position;
-      Vector3 p2r = m_bouys[1].transform.position + vr * m_detectRange + Vector3.up;
-      Vector3 p2l = m_bouys[1].transform.position + vl * m_detectRange + Vector3.up;
+      Vector3 p2 = new Vector3(m_bouys[1].transform.position.x, 0, m_bouys[1].transform.position.z);
+      Vector3 p2r = p2 + vr * m_detectRange;
+      Vector3 p2l = p2 + vl * m_detectRange;
 
       Vector3 c1 = Vector3.zero;
       bool f1 = getCross(p1, p1l, p2, p2l, out c1);
@@ -183,30 +185,39 @@ public class BuoyGuard : MonoBehaviour
 
          if (Scenario.Instance.TargetInfo != null && Scenario.Instance.TargetInfo.Target.IsActive)
          {
-            //calculate real tracked point
-            Vector3 b1Bearing = (m_torpedo.position - m_bouys[0].transform.position).normalized;
-            Vector3 b2Bearing = (m_torpedo.position - m_bouys[1].transform.position).normalized;
-
-            Vector3 b1BearingWithError = getDir(b1Bearing, m_bouys[0].Error);
-            Vector3 b2BearingWithError = getDir(b2Bearing, m_bouys[1].Error);
-
-            Vector3 p11 = m_bouys[0].transform.position;
-            Vector3 p12 = p11 + b1BearingWithError * m_detectRange;
-            Vector3 p21 = m_bouys[1].transform.position;
-            Vector3 p22 = p21 + b2BearingWithError * m_detectRange;
-
-            Vector3 bouysBearingIntersection = Vector3.zero;
-            bool crossed = getCross(p11, p12, p21, p22, out bouysBearingIntersection);
-            if (!crossed)
+            int idx = 0;
+            
+            for(int i = 0; i < m_bouys.Count-1; i++)
             {
-               yield return null;
-               continue;
+               for(int j = i+1; j < m_bouys.Count; j++)
+               {
+                  //calculate real tracked point
+                  Vector3 b1Bearing = (m_torpedo.position - m_bouys[i].transform.position).normalized;
+                  Vector3 b2Bearing = (m_torpedo.position - m_bouys[j].transform.position).normalized;
+
+                  Vector3 b1BearingWithError = getDir(b1Bearing, m_bouys[i].Error);
+                  Vector3 b2BearingWithError = getDir(b2Bearing, m_bouys[j].Error);
+
+                  Vector3 p11 = m_bouys[i].transform.position;
+                  Vector3 p12 = p11 + b1BearingWithError * m_detectRange;
+                  Vector3 p21 = m_bouys[j].transform.position;
+                  Vector3 p22 = p21 + b2BearingWithError * m_detectRange;
+
+                  Vector3 bouysBearingIntersection = Vector3.zero;
+                  bool crossed = getCross(p11, p12, p21, p22, out bouysBearingIntersection);
+                  //if (!crossed)
+                  //{
+                  //   yield return null;
+                  //   continue;
+                  //}
+
+                  Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 0, bouysBearingIntersection.z);
+
+                  _torpedoDetectionModel.AddTrackPoint(idx, trackedPosition);
+
+                  idx++;
+               }
             }
-
-            Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 0, bouysBearingIntersection.z);
-
-            _torpedoDetectionModel.AddTrackPoint(trackedPosition);
-
 
             //draw accumalated way
             _accumalatedTorpedoWay.GetComponent<MeshFilter>().mesh = Utils.CreateOfssetedLinedMesh(calculateAccumalatedTorpedoWayPoints(), 50);
@@ -239,6 +250,7 @@ public class BuoyGuard : MonoBehaviour
       foreach(var b in m_bouys)
       {
          Vector3 bearing = (m_torpedo.position - b.transform.position).normalized;
+         bearing = new Vector3(bearing.x, 0, bearing.z).normalized;
          Vector3 bCenter = getDir(bearing, b.Error);
          Vector3 bLeft = getDir(bearing, b.Error - Buoy.GetBearingError() /2f);
          Vector3 bRight = getDir(bearing, b.Error + Buoy.GetBearingError() / 2f);
@@ -249,6 +261,7 @@ public class BuoyGuard : MonoBehaviour
          Gizmos.DrawLine(p, pCenter);
          Gizmos.DrawLine(p, pLeft);
          Gizmos.DrawLine(p, pRight);
+
       }
    }
 
@@ -261,17 +274,7 @@ public class BuoyGuard : MonoBehaviour
    }
 
 
-   //private void startWork()
-   //{
-   //   m_errorBeg[0] = Utils.GaussRandom(getBearingError() / 2f);
-   //   m_errorBeg[1] = Utils.GaussRandom(getBearingError() / 2f);
-   //   m_errorEnd[0] = Utils.GaussRandom(getBearingError() / 2f);
-   //   m_errorEnd[1] = Utils.GaussRandom(getBearingError() / 2f);
-      
-   //   _startDrawTrackedPosition = true;
-   //}
-
-   private bool getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22, out Vector3 cross)
+    private bool getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22, out Vector3 cross)
    {
       p11.y = 1;
       p12.y = 1;

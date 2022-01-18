@@ -20,24 +20,34 @@ struct TrackedPoint
 
 public class TorpedoDetectionModel : MonoBehaviour
 {
-   private List<Vector3> _kalmanPoistions = new List<Vector3>();
-   [SerializeField] private float _kalmanK = 0.5f;
+   private List<Vector3>[] _kalmanPoistions = new List<Vector3>[15]; // 15 - number of combinations for 6 buoys
+   [SerializeField] private float _kalmanK = 1f;
 
    private bool _regressionReady = false;
    private float _a;
    private float _b;
 
-   public void AddTrackPoint(Vector3 trackedPoint)
+   private Vector3 _reg_pos;
+   
+   [SerializeField] private float _reg_direction;
+   [SerializeField] private float _reg_direction_dist;
+   [SerializeField] private float _reg_velocity;
+   [SerializeField] private float _reg_velocity_error;
+
+   public void AddTrackPoint(int idx, Vector3 trackedPoint)
    {
-      if (_kalmanPoistions.Count == 0)
-         _kalmanPoistions.Add(trackedPoint);
+      if (_kalmanPoistions[idx] == null)
+         _kalmanPoistions[idx] = new List<Vector3>();
+
+      if (_kalmanPoistions[idx].Count == 0)
+         _kalmanPoistions[idx].Add(trackedPoint);
       else
-         _kalmanPoistions.Add(_kalmanK * trackedPoint + (1 - _kalmanK) * _kalmanPoistions[_kalmanPoistions.Count - 1]);
+         _kalmanPoistions[idx].Add(_kalmanK * trackedPoint + (1 - _kalmanK) * _kalmanPoistions[idx][_kalmanPoistions[idx].Count - 1]);
 
       // use only last 10 points
-      if (_kalmanPoistions.Count > 10)
+      if (_kalmanPoistions[idx].Count > 10)
       {
-         _kalmanPoistions.RemoveAt(0);
+         _kalmanPoistions[idx].RemoveAt(0);
          calcRegression();
       }
    }
@@ -47,24 +57,18 @@ public class TorpedoDetectionModel : MonoBehaviour
       if (!_regressionReady)
          return Vector3.zero;
 
-      Vector3 p1 = new Vector3(_kalmanPoistions[0].x, 5, _a * _kalmanPoistions[0].x + _b);
-      Vector3 p2 = new Vector3(_kalmanPoistions[9].x, 5, _a * _kalmanPoistions[9].x + _b);
+      Vector3 p1 = new Vector3(_kalmanPoistions[0][0].x, 5, _a * _kalmanPoistions[0][0].x + _b);
+      Vector3 p2 = new Vector3(_kalmanPoistions[0][9].x, 5, _a * _kalmanPoistions[0][9].x + _b);
 
       return (p2 - p1).normalized;
    }
 
    public float CalcSpeed()
    {
-      float magnitudesSum = 0;
+      if (!_regressionReady)
+         return 0;
 
-      if (_kalmanPoistions.Count < 2)
-         return magnitudesSum;
-
-      // dt == 1
-      for (int i = 0; i < _kalmanPoistions.Count - 1; i++)
-         magnitudesSum += (_kalmanPoistions[i + 1] - _kalmanPoistions[i]).magnitude;
-
-      return magnitudesSum / (_kalmanPoistions.Count - 1);
+      return _reg_velocity;
    }
 
    public Vector3 CalcPos()
@@ -73,21 +77,21 @@ public class TorpedoDetectionModel : MonoBehaviour
 
       float a = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
 
-      Quaternion rot = Quaternion.Euler(0, a, 0);
-      Quaternion rot2 = Quaternion.Euler(0, -a, 0);
+      Quaternion rot_org = Quaternion.Euler(0, a, 0);
+      Quaternion rot_inv = Quaternion.Euler(0, -a, 0);
 
       Vector3 p0 = new Vector3(0, 0, _b);
 
-      Vector3 p = rot2 * (_kalmanPoistions.Last() - p0);
+      Vector3 p = rot_inv * (_reg_pos - p0);
       p = new Vector3(0, 0, p.z);
-      p = rot * p + p0;
+      p = rot_org * p + p0;
 
       return p;
    }
 
    public Vector3 CalcPrognosisPos(float deltaTime)
    {
-      return _kalmanPoistions.Last() + CalcCourse() * CalcSpeed() * deltaTime;
+      return CalcPos() + CalcCourse() * CalcSpeed() * deltaTime;
    }
 
    private float calcMean(float[] arr)
@@ -104,31 +108,55 @@ public class TorpedoDetectionModel : MonoBehaviour
       for (int i = 0; i < arr.Length; i++)
          sum += Mathf.Pow(arr[i] - m, 2);
       
-      return Mathf.Sqrt(sum / arr.Length) * 6;  // error = 3 * sigma * 2
+      return Mathf.Sqrt(sum / arr.Length) * 3;  // error = 3 * sigma
    }
 
    private void calcRegression()
    {
+      //calculate average of points for all combinations
+      Vector3[] points = new Vector3[_kalmanPoistions[0].Count];
+
+      for (int i = 0; i < _kalmanPoistions[0].Count; i++)
+      {
+         Vector3 tp = Vector3.zero;
+         int num = 0;
+
+         for (int j = 0; j < _kalmanPoistions.Length; j++)
+         {
+            if (_kalmanPoistions[j] == null)
+               break;
+
+            if (i > _kalmanPoistions[j].Count - 1)
+               break;
+
+            tp += _kalmanPoistions[j][i];
+            num++;
+         }
+
+         points[i] = tp / num;
+      }
+
+      // calculate regression line
       float x_mean = 0;
       float z_mean = 0;
 
-      for (int i = 0; i < _kalmanPoistions.Count; i++)
+      for (int i = 0; i < points.Length; i++)
       {
-         x_mean += _kalmanPoistions[i].x;
-         z_mean += _kalmanPoistions[i].z;
+         x_mean += points[i].x;
+         z_mean += points[i].z;
       }
 
-      x_mean /= _kalmanPoistions.Count;
-      z_mean /= _kalmanPoistions.Count;
+      x_mean /= points.Length;
+      z_mean /= points.Length;
 
       float xz_sum = 0;
       float x2_sum = 0;
       float z2_sum = 0;
 
-      for (int i = 0; i < _kalmanPoistions.Count; i++)
+      for (int i = 0; i < points.Length; i++)
       {
-         float dx = _kalmanPoistions[i].x - x_mean;
-         float dz = _kalmanPoistions[i].z - z_mean;
+         float dx = points[i].x - x_mean;
+         float dz = points[i].z - z_mean;
 
          xz_sum += dx * dz;
          x2_sum += dx * dx;
@@ -137,8 +165,8 @@ public class TorpedoDetectionModel : MonoBehaviour
 
       float r = xz_sum / Mathf.Sqrt(x2_sum * z2_sum);
 
-      float sx = Mathf.Sqrt(x2_sum / (_kalmanPoistions.Count - 1));
-      float sz = Mathf.Sqrt(z2_sum / (_kalmanPoistions.Count - 1));
+      float sx = Mathf.Sqrt(x2_sum / (points.Length - 1)) ;
+      float sz = Mathf.Sqrt(z2_sum / (points.Length - 1));
 
       float a = r * sz / sx;
       float b = z_mean - a * x_mean;
@@ -148,6 +176,44 @@ public class TorpedoDetectionModel : MonoBehaviour
       _b = b;
 
       _regressionReady = true;
+
+      // calculate statistics
+      Vector3 dir = CalcCourse();
+      float course = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+
+      Quaternion rot = Quaternion.Euler(0, -course, 0);
+
+      Vector3 p0 = new Vector3(0, 0, _b);
+
+      float[] dist = new float[points.Length];
+      float[] vel = new float[points.Length - 1];
+
+      for(int i = 0; i < points.Length; i++)
+      {
+         Vector3 p = rot * (points[i] - p0);
+         dist[i] = p.x;
+         
+         if (i < vel.Length)
+         {
+            Vector3 p_next = rot * (points[i + 1] - p0);
+            vel[i] = p_next.z - p.z;
+         }
+      }
+
+      _reg_pos = points[points.Length - 1];
+
+      float mean = calcMean(dist);
+      float error = calcError(dist, mean);
+
+      _reg_direction_dist = error;
+
+      mean = calcMean(vel);
+      error = calcError(vel, mean);
+
+      _reg_velocity = mean;
+      _reg_velocity_error = error;
+
+      _reg_direction = course;
    }
 
    private void OnDrawGizmos()
@@ -155,63 +221,31 @@ public class TorpedoDetectionModel : MonoBehaviour
       if (!_regressionReady)
          return;
 
-      Vector3 p1 = new Vector3(_kalmanPoistions[0].x - 100, 5, _a * (_kalmanPoistions[0].x - 100) + _b);
-      Vector3 p2 = new Vector3(_kalmanPoistions[9].x + 100, 5, _a * (_kalmanPoistions[9].x + 100) + _b);
+      Vector3 p1 = new Vector3(_kalmanPoistions[0][0].x - 200, 5, _a * (_kalmanPoistions[0][0].x - 200) + _b);
+      Vector3 p2 = new Vector3(_kalmanPoistions[0][9].x + 200, 5, _a * (_kalmanPoistions[0][9].x + 200) + _b);
 
       Gizmos.color = new Color(1, 1, 0, 0.5f);
       Gizmos.DrawLine(p1, p2);
 
-      Vector3 dir = (p2 - p1).normalized;
-
-      float a = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-
-      direction = a;
-
-      Quaternion rot  = Quaternion.Euler(0, a, 0);
-      Quaternion rot2 = Quaternion.Euler(0, -a, 0);
-
-      Vector3 p0 = new Vector3(0, 0, _b);
-
-      float[] dist = new float[_kalmanPoistions.Count];
-      float[] vel = new float[_kalmanPoistions.Count-1];
-
-      for (int i = 0; i < _kalmanPoistions.Count; i++)
+      for (int i = 0; i < _kalmanPoistions[0].Count; i++)
       {
-         Gizmos.color = new Color(1, 0, 0, 0.5f);
-         Gizmos.DrawSphere(_kalmanPoistions[i], 4f);
+         Vector3 tp = Vector3.zero;
+         float count = 0;
 
-         Vector3 p = rot2 * (_kalmanPoistions[i] - p0);
-
-         dist[i] = p.x;
-
-         if (i < vel.Length)
+         for (int j = 0; j < _kalmanPoistions.Length; j++)
          {
-            Vector3 p_next = rot2 * (_kalmanPoistions[i+1] - p0);
-            vel[i] = p_next.z - p.z;
+            if (_kalmanPoistions[j] == null)
+               break;
+
+            if (i > _kalmanPoistions[j].Count -1)
+               break;
+
+            tp += _kalmanPoistions[j][i];
+            count++;
          }
 
-         p = new Vector3(0, 0, p.z);
-         p = rot * p + p0;
-
-         Gizmos.color = new Color(1, 1, 1, 0.5f);
-         Gizmos.DrawLine(_kalmanPoistions[i], p);
+         Gizmos.color = new Color(1, 1, 1, 0.75f);
+         Gizmos.DrawSphere(tp/count, 4f);
       }
-
-      float mean = calcMean(dist);
-      float error = calcError(dist, mean);
-
-      direction_error = error;
-
-      mean = calcMean(vel);
-      error = calcError(vel, mean);
-
-      velocity = mean;
-      velocity_error = error;
-
    }
-
-   public float direction;
-   public float velocity;
-   public float direction_error;
-   public float velocity_error;
 }

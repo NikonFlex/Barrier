@@ -518,7 +518,7 @@ static class VirtualCameraHelper
          return;
       }
 
-      Debug.Log($"Remove {t.name} to target group of camera {cam.name}");
+      //Debug.Log($"Remove {t.name} to target group of camera {cam.name}");
       lookAtGroup.RemoveMember(t);
    }
 

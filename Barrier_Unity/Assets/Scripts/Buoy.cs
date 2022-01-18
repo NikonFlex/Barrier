@@ -32,6 +32,10 @@ public class Buoy : MonoBehaviour
       Scenario.Instance.OnBouyHatched(this);
 
       UnityEngine.Random.InitState(DateTime.UtcNow.GetHashCode());
+
+      m_errorBeg = 0;
+      m_errorEnd = Utils.GaussRandom(GetBearingError() / 2f);
+
       m_errorTime = Time.time;
       StartCoroutine(timerCoroutine());
    }
