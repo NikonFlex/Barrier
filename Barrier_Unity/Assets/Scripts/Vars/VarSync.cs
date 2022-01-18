@@ -68,6 +68,14 @@ public static class VarSync
       return 0f;
    }
 
+   static public string GetStringEnum(this VarName v)
+   {
+      object o = GetObject(v);
+      if (o != null && (o is float))
+         return v.GetVariants()[(int)(float)o];
+      return "";
+   }
+
    static public bool GetBool(this VarName v)
    {
       return Get(v, false);

@@ -84,7 +84,7 @@ public class Main : MonoBehaviour
             case Scenario.Mode.Paused:
             {
                tb.EnableButton(Toolbar.ButtonID.PAUSE, true);
-               tb.EnableButton(Toolbar.ButtonID.START, true);
+               tb.EnableButton(Toolbar.ButtonID.START, false);
                tb.EnableButton(Toolbar.ButtonID.STOP, true);
                tb.EnableButton(Toolbar.ButtonID.SETTINGS, false);
                break;

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class BuoyLauncher : MonoBehaviour
 {
@@ -30,6 +31,7 @@ public class BuoyLauncher : MonoBehaviour
 
       _inProgress = true;
       var buoysTargets = new List<Vector3>();
+      int numBuoys = int.Parse(VarSync.GetStringEnum(VarName.NumBuoys));
 
       float d = VarSync.GetFloat(VarName.BouysDistanceBetween);
       float distance = trg.Distance/2 - d * Mathf.Sqrt(3) / 2f;
@@ -45,15 +47,11 @@ public class BuoyLauncher : MonoBehaviour
       Vector4 p6 = -left * d / 1 + dirToTarget * (distance * 1f) + openConeHeightPos;
       buoysTargets.Add(p1);
       buoysTargets.Add(p2);
-      //buoysTargets.Add(p3);
-      //buoysTargets.Add(p4);
-      //buoysTargets.Add(p5);
-      //buoysTargets.Add(p6);
-      _buoysTargets = buoysTargets.ToArray();
-      //       var o1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-      //       o1.transform.position = p1;
-      //       var o2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-      //       o2.transform.position = p2;
+      buoysTargets.Add(p3);
+      buoysTargets.Add(p4);
+      buoysTargets.Add(p5);
+      buoysTargets.Add(p6);
+      _buoysTargets = buoysTargets.Take(numBuoys).ToArray();
       StartCoroutine(launchCoroutine());
       return true;
    }

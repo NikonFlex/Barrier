@@ -29,7 +29,7 @@ public class RocketLauncher : MonoBehaviour
    public void LaunchRockets()
    {
       _isStarted = true;
-      _rocketNumber = VarSync.GetInt(VarName.RocketNum) + 1; //count from zero
+      _rocketNumber = int.Parse(VarSync.GetStringEnum(VarName.RocketNum));
       _offestBeetweenRockets = VarSync.GetFloat(VarName.RocketDistance);
    }
 
