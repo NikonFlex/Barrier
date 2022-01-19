@@ -14,6 +14,9 @@ public class Packet : MonoBehaviour
    [SerializeField] private GameObject _trail;
    [SerializeField] private GameObject _shell;
    [SerializeField] private GameObject _pelleng;
+   [SerializeField] private GameObject _flame;
+   [SerializeField] private GameObject _signal;
+   [SerializeField] private GameObject _antenna;
 
    private LineRenderer _lineRenderer;
 
@@ -54,10 +57,14 @@ public class Packet : MonoBehaviour
    public void StartPelleng()
    {
       _pelleng.GetComponent<ParticleSystem>().Play();
+      _signal.GetComponent<ParticleSystem>().Play();
    }
 
    private IEnumerator fly()
    {
+      _flame.GetComponent<ParticleSystem>().Play();
+      var smoke = Instantiate(Resources.Load("LaunchSmoke"), gameObject.transform.position, Quaternion.Euler(0, 0, 0));
+      smoke.name = "smoke";
       while (transform.position.y > 0)
       {
          if (!Scenario.IsRunning)
@@ -82,6 +89,7 @@ public class Packet : MonoBehaviour
       }
 
       //yield return StartCoroutine(splashDown());
+      _flame.GetComponent<ParticleSystem>().Stop();
       yield return StartCoroutine(reactiveSlowDown());
    }
 
@@ -162,6 +170,8 @@ public class Packet : MonoBehaviour
       _trail.SetActive(false);
       _shell.SetActive(false);
       _bobber.transform.SetParent(null, true);
+      _antenna.GetComponent<Animator>().SetBool("Inflate", true);
+      _antenna.GetComponent<Animator>().SetBool("Raise", true);
 
       Vector3 cur_pos = gameObject.transform.position;
       _bobber.transform.position = new Vector3(cur_pos.x, 1, cur_pos.z);
