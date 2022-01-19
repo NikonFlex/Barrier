@@ -11,7 +11,7 @@ public class BuoyLauncher : MonoBehaviour
    private bool _inProgress = false;
    private Vector3[] _buoysTargets;
    private int _buoysCounter = 0;
-   public readonly int NumBuoys = 2;
+   public  int NumBuoys => int.Parse(VarSync.GetStringEnum(VarName.NumBuoys));
 
    public bool LaunchBuouys()
    {
@@ -31,7 +31,6 @@ public class BuoyLauncher : MonoBehaviour
 
       _inProgress = true;
       var buoysTargets = new List<Vector3>();
-      int numBuoys = int.Parse(VarSync.GetStringEnum(VarName.NumBuoys));
 
       float d = VarSync.GetFloat(VarName.BouysDistanceBetween);
       float distance = trg.Distance/2 - d * Mathf.Sqrt(3) / 2f;
@@ -51,7 +50,7 @@ public class BuoyLauncher : MonoBehaviour
       buoysTargets.Add(p4);
       buoysTargets.Add(p5);
       buoysTargets.Add(p6);
-      _buoysTargets = buoysTargets.Take(numBuoys).ToArray();
+      _buoysTargets = buoysTargets.Take(NumBuoys).ToArray();
       StartCoroutine(launchCoroutine());
       return true;
    }
