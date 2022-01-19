@@ -36,7 +36,6 @@ public class Packet : MonoBehaviour
    {
       _speedVector = dir * V0;
       _target = targetPos;
-      //LabelHelper.AddLabel(_bobber, $"РГАБ {(int)gameObject.name.Last()}"); // видимо надо как то считать
       StartCoroutine(fly());
    }
    
@@ -66,10 +65,6 @@ public class Packet : MonoBehaviour
          transform.rotation = Quaternion.LookRotation(_speedVector.normalized);
          transform.position = pos;
          var nextPos = pos + (_speedVector + Vector3.down * g * Time.deltaTime) * Time.deltaTime;
-
-         //          if ((transform.position - _target).magnitude < 100 ||
-         //             (_speedVector.y < 0 && pos.y < VarSync.GetFloat(VarName.BuoysOpenConeHeight)))
-         //             break_flag = true;
          float breakAltitude = VarSync.GetFloat(VarName.BuoyBreakStartAltitude);
          if ((transform.position - _target).magnitude < 100 ||
             (_speedVector.y < 0 &&
@@ -162,6 +157,7 @@ public class Packet : MonoBehaviour
 
       Vector3 cur_pos = gameObject.transform.position;
       _bobber.transform.position = new Vector3(cur_pos.x, 1, cur_pos.z);
+      _bobber.transform.LookAt(new Vector3(cur_pos.x, -_workingDepth, cur_pos.z));
       gameObject.transform.LookAt(new Vector3(cur_pos.x, -_workingDepth, cur_pos.z));
 
       string labelText = LabelHelper.GetLabelText(gameObject);
