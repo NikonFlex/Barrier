@@ -57,6 +57,7 @@ public class Buoy : MonoBehaviour
       while (Scenario.Instance.ScenarioTime - startTime < VarSync.GetFloat(VarName.BuoyReadyTime))
          yield return null;
       _state = BuoyState.Working;
+      gameObject.GetComponent<Packet>().StartPelleng();
       Scenario.Instance.AddMessage($"Буй '{gameObject.name}' начал сканирование");
       FindObjectOfType<BuoyGuard>().AddBuoy(this);
       yield return null;

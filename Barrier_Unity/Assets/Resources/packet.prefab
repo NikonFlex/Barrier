@@ -5347,6 +5347,7 @@ MonoBehaviour:
   _bobber: {fileID: 5283303094407934741}
   _trail: {fileID: 2823162540877959496}
   _shell: {fileID: 5773491685002600579}
+  _pelleng: {fileID: 2874988126699585695}
   BuoyIndex: -1
 --- !u!120 &126712464205016318
 LineRenderer:
@@ -6062,6 +6063,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 34cb4f02e0361c34ca0608bbfaca230d, type: 3}
+--- !u!1 &2874988126699585695 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8502254865008654554, guid: 34cb4f02e0361c34ca0608bbfaca230d,
+    type: 3}
+  m_PrefabInstance: {fileID: 5915497595539060805}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4546916723276503959 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7854828690853962706, guid: 34cb4f02e0361c34ca0608bbfaca230d,

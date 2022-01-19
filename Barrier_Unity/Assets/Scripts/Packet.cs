@@ -13,6 +13,7 @@ public class Packet : MonoBehaviour
    [SerializeField] private GameObject _bobber;
    [SerializeField] private GameObject _trail;
    [SerializeField] private GameObject _shell;
+   [SerializeField] private GameObject _pelleng;
 
    private LineRenderer _lineRenderer;
 
@@ -49,6 +50,11 @@ public class Packet : MonoBehaviour
    public Vector3 TargetPos => _target;
 
    public GameObject Trail => _trail;
+
+   public void StartPelleng()
+   {
+      _pelleng.GetComponent<ParticleSystem>().Play();
+   }
 
    private IEnumerator fly()
    {
