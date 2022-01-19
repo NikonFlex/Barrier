@@ -213,6 +213,8 @@ public class TorpedoDetectionModel : MonoBehaviour
       _reg_velocity = mean;
       _reg_velocity_error = error;
 
+      VarName.TargetDetectionError.Set(string.Format("{0:0}", error * 4));
+
       _reg_direction = course;
    }
 

@@ -53,7 +53,8 @@ public enum VarName
    TargetDistance,
    [VarName(Persist = false, DefaultValue = "")]
    ScenarioPhaseName,
-
+   [VarName(Persist = false, DefaultValue = "--")]
+   TargetDetectionError,
    
    [VarName(HideInInspector = true)]
    VARSYNC_LAST
