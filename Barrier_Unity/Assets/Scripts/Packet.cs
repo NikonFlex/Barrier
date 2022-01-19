@@ -160,6 +160,8 @@ public class Packet : MonoBehaviour
       _bobber.transform.LookAt(new Vector3(cur_pos.x, -_workingDepth, cur_pos.z));
       gameObject.transform.LookAt(new Vector3(cur_pos.x, -_workingDepth, cur_pos.z));
 
+      _bobber.GetComponent<BobberFloatingObjectActivation>().StartFloating();
+
       string labelText = LabelHelper.GetLabelText(gameObject);
       if (BuoyIndex != 0) // следим только за первым буем. Потом решение можно переделать
          LabelHelper.HideLabel(gameObject);
