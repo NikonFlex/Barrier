@@ -12,6 +12,7 @@ public class Packet : MonoBehaviour
    [SerializeField] private GameObject _slowDownEngine;
    [SerializeField] private GameObject _bobber;
    [SerializeField] private GameObject _trail;
+   [SerializeField] private GameObject _shell;
 
    private LineRenderer _lineRenderer;
 
@@ -153,6 +154,7 @@ public class Packet : MonoBehaviour
    {
       _slowDownEngine.SetActive(false);
       _trail.SetActive(false);
+      _shell.SetActive(false);
       _bobber.transform.SetParent(null, true);
 
       Vector3 cur_pos = gameObject.transform.position;
