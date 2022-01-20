@@ -283,6 +283,17 @@ class PhaseLaunchBouys : IScenarioPhase
    private CinemachineVirtualCamera _launchCamera = null;
    private CinemachineVirtualCamera _bouyCamera = null;
    BuoyLauncher _launcher;
+   enum BuoyLifeCicle
+   {
+      Nap,
+      Fly,
+      Break,
+      PrepapreFloat,
+      Diving,
+      PrepareWork,
+      Working
+   }
+   private BuoyLifeCicle _firstBuoyLifeCicle = BuoyLifeCicle.Nap;
 
    public override void Start()
    {
@@ -299,6 +310,7 @@ class PhaseLaunchBouys : IScenarioPhase
       {
          if (Scenario.Instance.BuoyPackets.Length == _launcher.NumBuoys)
             _allBouysLaunchedTime = Scenario.Instance.ScenarioTime;
+         _firstBuoyLifeCicle = BuoyLifeCicle.Fly;
       }
       else
       {
@@ -308,22 +320,19 @@ class PhaseLaunchBouys : IScenarioPhase
                //&& _buoyCameraHeight > buoyPacket.transform.position.y)
                && buoyPacket.CalcTimeToTarget() < 3 )
          {
-            // попытка следить за тормозящим буем
-            _bouyCamera = VirtualCameraHelper.Activate("vcam_Buoy");
-            GameObject targetDebugPrim = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            targetDebugPrim.transform.position = buoyPacket.TargetPos;
-            //_bouyCamera.Follow = targetDebugPrim.transform;
-//            _bouyCamera.transform.position = buoyPacket.TargetPos;
-
-            VirtualCameraHelper.AddMemberToTargetGroup(_bouyCamera, buoyPacket.transform);
-            VirtualCameraHelper.AddMemberToTargetGroup(_bouyCamera, buoyPacket.Bobber);
-            buoyPacket.Trail.SetActive(false);
-            //_bouyCamera.Follow = _bouyCamera.LookAt = Scenario.Instance.BuoyPackets.First().transform;
+            if (_firstBuoyLifeCicle == BuoyLifeCicle.Fly)
+            {
+               _firstBuoyLifeCicle = BuoyLifeCicle.Break;
+               // попытка следить за тормозящим буем
+               _bouyCamera = VirtualCameraHelper.Activate("vcam_Buoy");
+               VirtualCameraHelper.SetTarget(_bouyCamera, buoyPacket.Bobber);
+               buoyPacket.Trail.SetActive(false);
+            }
          }
-         else if (buoyPacket.transform.position.y < -20)
+         else if (buoyPacket.transform.position.y < -40 && _firstBuoyLifeCicle != BuoyLifeCicle.Diving)
          {
-            VirtualCameraHelper.RemoveMemberFromTargetGroup(_bouyCamera, buoyPacket.Bobber);
-
+            _firstBuoyLifeCicle = BuoyLifeCicle.Diving;
+            VirtualCameraHelper.SetTarget(_bouyCamera, buoyPacket.transform);
          }
       }
 
@@ -506,6 +515,13 @@ static class VirtualCameraHelper
 
       return true;
    }
+
+   public static bool SetTarget(CinemachineVirtualCamera cam, Transform t, float w = 1, float r = 1)
+   {
+      ClearTargetGroup(cam);
+      return AddMemberToTargetGroup(cam, t, w, r);
+   }
+
 
    public static bool AddMemberToTargetGroup(string name, Transform t, float w = 1, float r = 1)
    {
