@@ -194,7 +194,7 @@ public class Scenario : MonoBehaviour
       phases.Add(new PhaseBouysTargetDetected());
       phases.Add(new PhaseLaunchRockets());
       //phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesStrike, "Ракеты достигли цели", 2)); НЕ НУЖНА
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.ScenarioFinished, "Упражнение окончено", 2));
+      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.ScenarioFinished, "Сценарий закончен", 2));
       
       _phases = phases.ToArray();
 
