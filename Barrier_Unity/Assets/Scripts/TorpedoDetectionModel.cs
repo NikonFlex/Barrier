@@ -24,8 +24,8 @@ public class TorpedoDetectionModel : MonoBehaviour
    [SerializeField] private float _kalmanK = 1f;
 
    private bool _regressionReady = false;
-   private float _a;
-   private float _b;
+   private float _reg_a;
+   private float _reg_b;
 
    private Vector3 _reg_pos;
    
@@ -44,12 +44,19 @@ public class TorpedoDetectionModel : MonoBehaviour
       else
          _kalmanPoistions[idx].Add(_kalmanK * trackedPoint + (1 - _kalmanK) * _kalmanPoistions[idx][_kalmanPoistions[idx].Count - 1]);
 
-      // use only last 10 points
-      if (_kalmanPoistions[idx].Count > 10)
-      {
+      // use only last 20 points
+      if (_kalmanPoistions[idx].Count > 20)
          _kalmanPoistions[idx].RemoveAt(0);
+
+      if(_kalmanPoistions[0].Count > 4)
          calcRegression();
-      }
+   }
+
+   public void ClearRegression()
+   {
+      _regressionReady = false;
+      for (int i = 0; i < _kalmanPoistions.Length; i++)
+         _kalmanPoistions[i] = null;
    }
 
    public Vector3 CalcCourse()
@@ -57,8 +64,9 @@ public class TorpedoDetectionModel : MonoBehaviour
       if (!_regressionReady)
          return Vector3.zero;
 
-      Vector3 p1 = new Vector3(_kalmanPoistions[0][0].x, 5, _a * _kalmanPoistions[0][0].x + _b);
-      Vector3 p2 = new Vector3(_kalmanPoistions[0][9].x, 5, _a * _kalmanPoistions[0][9].x + _b);
+      int count = _kalmanPoistions[0].Count;
+      Vector3 p1 = new Vector3(_kalmanPoistions[0][0].x, 0, _reg_a * _kalmanPoistions[0][0].x + _reg_b);
+      Vector3 p2 = new Vector3(_kalmanPoistions[0][count-1].x, 0, _reg_a * _kalmanPoistions[0][count-1].x + _reg_b);
 
       return (p2 - p1).normalized;
    }
@@ -80,7 +88,7 @@ public class TorpedoDetectionModel : MonoBehaviour
       Quaternion rot_org = Quaternion.Euler(0, a, 0);
       Quaternion rot_inv = Quaternion.Euler(0, -a, 0);
 
-      Vector3 p0 = new Vector3(0, 0, _b);
+      Vector3 p0 = new Vector3(0, 0, _reg_b);
 
       Vector3 p = rot_inv * (_reg_pos - p0);
       p = new Vector3(0, 0, p.z);
@@ -172,8 +180,8 @@ public class TorpedoDetectionModel : MonoBehaviour
       float b = z_mean - a * x_mean;
 
       // z = ax + b
-      _a = a;
-      _b = b;
+      _reg_a = a;
+      _reg_b = b;
 
       _regressionReady = true;
 
@@ -183,7 +191,7 @@ public class TorpedoDetectionModel : MonoBehaviour
 
       Quaternion rot = Quaternion.Euler(0, -course, 0);
 
-      Vector3 p0 = new Vector3(0, 0, _b);
+      Vector3 p0 = new Vector3(0, 0, _reg_b);
 
       float[] dist = new float[points.Length];
       float[] vel = new float[points.Length - 1];
@@ -223,8 +231,9 @@ public class TorpedoDetectionModel : MonoBehaviour
       if (!_regressionReady)
          return;
 
-      Vector3 p1 = new Vector3(_kalmanPoistions[0][0].x - 200, 5, _a * (_kalmanPoistions[0][0].x - 200) + _b);
-      Vector3 p2 = new Vector3(_kalmanPoistions[0][9].x + 200, 5, _a * (_kalmanPoistions[0][9].x + 200) + _b);
+      int count = _kalmanPoistions[0].Count;
+      Vector3 p1 = new Vector3(_kalmanPoistions[0][0].x - 200, 5, _reg_a * (_kalmanPoistions[0][0].x - 200) + _reg_b);
+      Vector3 p2 = new Vector3(_kalmanPoistions[0][count-1].x + 200, 5, _reg_a * (_kalmanPoistions[0][count-1].x + 200) + _reg_b);
 
       Gizmos.color = new Color(1, 1, 0, 0.5f);
       Gizmos.DrawLine(p1, p2);
@@ -232,7 +241,7 @@ public class TorpedoDetectionModel : MonoBehaviour
       for (int i = 0; i < _kalmanPoistions[0].Count; i++)
       {
          Vector3 tp = Vector3.zero;
-         float count = 0;
+         count = 0;
 
          for (int j = 0; j < _kalmanPoistions.Length; j++)
          {
