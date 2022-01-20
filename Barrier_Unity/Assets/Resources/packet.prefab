@@ -96,7 +96,7 @@ TrailRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 0.9245283, g: 0.56464493, b: 0.02180491, a: 1}
+      key0: {r: 0.9254902, g: 0.62529147, b: 0.02352939, a: 1}
       key1: {r: 0.9528302, g: 0.58894163, b: 0, a: 1}
       key2: {r: 1, g: 1, b: 1, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
@@ -5348,6 +5348,9 @@ MonoBehaviour:
   _trail: {fileID: 2823162540877959496}
   _shell: {fileID: 5773491685002600579}
   _pelleng: {fileID: 2874988126699585695}
+  _flame: {fileID: 4710118028309276828}
+  _signal: {fileID: 6065452622476279291}
+  _antenna: {fileID: 8111791579867901865}
   BuoyIndex: -1
 --- !u!120 &126712464205016318
 LineRenderer:
@@ -5620,6 +5623,12 @@ PrefabInstance:
 --- !u!4 &5535829757081429747 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7854828690853962706, guid: 34cb4f02e0361c34ca0608bbfaca230d,
+    type: 3}
+  m_PrefabInstance: {fileID: 2437224506671334689}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6065452622476279291 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8502254865008654554, guid: 34cb4f02e0361c34ca0608bbfaca230d,
     type: 3}
   m_PrefabInstance: {fileID: 2437224506671334689}
   m_PrefabAsset: {fileID: 0}

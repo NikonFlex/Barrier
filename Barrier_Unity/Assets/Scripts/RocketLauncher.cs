@@ -73,6 +73,8 @@ public class RocketLauncher : MonoBehaviour
          rocket.AimToTarget(cur_target, _speed, _offestBeetweenRockets / 2);
          _rockets.Add(rocket);
          Scenario.Instance.OnRocketLaunched(rocket);
+         var smoke = Instantiate(Resources.Load("LaunchSmoke"), gameObject.transform.position, Quaternion.Euler(0, 0, 0));
+         smoke.name = "smoke";
 
          offset += _offestBeetweenRockets;
       }
