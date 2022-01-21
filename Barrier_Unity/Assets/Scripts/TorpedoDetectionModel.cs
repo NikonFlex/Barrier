@@ -137,6 +137,9 @@ public class TorpedoDetectionModel : MonoBehaviour
             if (i > _kalmanPoistions[j].Count - 1)
                break;
 
+            if (_kalmanPoistions[j][i].magnitude < 0.1f)
+               continue;
+            
             tp += _kalmanPoistions[j][i];
             num++;
          }

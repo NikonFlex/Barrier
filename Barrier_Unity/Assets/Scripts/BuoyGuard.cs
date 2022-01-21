@@ -205,11 +205,8 @@ public class BuoyGuard : MonoBehaviour
 
                   Vector3 bouysBearingIntersection = Vector3.zero;
                   bool crossed = getCross(p11, p12, p21, p22, out bouysBearingIntersection);
-                  //if (!crossed)
-                  //{
-                  //   yield return null;
-                  //   continue;
-                  //}
+                  if (!crossed)
+                     bouysBearingIntersection = Vector3.zero;
 
                   Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 0, bouysBearingIntersection.z);
 
@@ -220,7 +217,7 @@ public class BuoyGuard : MonoBehaviour
             }
 
             //draw accumalated way
-            _accumalatedTorpedoWay.GetComponent<MeshFilter>().mesh = Utils.CreateOfssetedLinedMesh(calculateAccumalatedTorpedoWayPoints(), 50);
+            //_accumalatedTorpedoWay.GetComponent<MeshFilter>().mesh = Utils.CreateOfssetedLinedMesh(calculateAccumalatedTorpedoWayPoints(), 50);
 
             yield return new WaitForSeconds(1f);
          }
