@@ -28,6 +28,8 @@ public class TorpedoDetectionModel : MonoBehaviour
    private float _reg_b;
 
    private Vector3 _reg_pos;
+
+   public bool RegressionReady => _regressionReady;
    
    [SerializeField] private float _reg_direction;
    [SerializeField] private float _reg_direction_dist;
@@ -197,7 +199,7 @@ public class TorpedoDetectionModel : MonoBehaviour
       Vector3 p0 = new Vector3(0, 0, _reg_b);
 
       float[] dist = new float[points.Length];
-      float[] vel = new float[points.Length - 1];
+      float[] vel = new float[points.Length-1];
 
       for(int i = 0; i < points.Length; i++)
       {
@@ -207,7 +209,7 @@ public class TorpedoDetectionModel : MonoBehaviour
          if (i < vel.Length)
          {
             Vector3 p_next = rot * (points[i + 1] - p0);
-            vel[i] = p_next.z - p.z;
+            vel[i] = (p_next.z - p.z) > 0 ? (p_next.z - p.z) : 0;
          }
       }
 
@@ -224,7 +226,7 @@ public class TorpedoDetectionModel : MonoBehaviour
       _reg_velocity = mean;
       _reg_velocity_error = error;
 
-      VarName.TargetDetectionError.Set(string.Format("{0:0}", error * 4));
+      VarName.TargetDetectionError.Set(string.Format("{0:0}", error * 4)); //4 seconds
 
       _reg_direction = course;
    }
