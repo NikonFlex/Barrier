@@ -36,11 +36,14 @@ public class TorpedoDetectionModel : MonoBehaviour
    [SerializeField] private float _reg_velocity;
    [SerializeField] private float _reg_velocity_error;
 
+   private void Start()
+   {
+      for(int i = 0; i < _kalmanPoistions.Length; i++)
+         _kalmanPoistions[i] = new List<Vector3>();
+   }
+
    public void AddTrackPoint(int idx, Vector3 trackedPoint)
    {
-      if (_kalmanPoistions[idx] == null)
-         _kalmanPoistions[idx] = new List<Vector3>();
-
       if (_kalmanPoistions[idx].Count == 0)
          _kalmanPoistions[idx].Add(trackedPoint);
       else
@@ -49,16 +52,13 @@ public class TorpedoDetectionModel : MonoBehaviour
       // use only last 20 points
       if (_kalmanPoistions[idx].Count > 20)
          _kalmanPoistions[idx].RemoveAt(0);
-
-      if(_kalmanPoistions[0].Count > 4)
-         calcRegression();
    }
 
    public void ClearRegression()
    {
       _regressionReady = false;
       for (int i = 0; i < _kalmanPoistions.Length; i++)
-         _kalmanPoistions[i] = null;
+         _kalmanPoistions[i].Clear();;
    }
 
    public Vector3 CalcCourse()
@@ -121,8 +121,11 @@ public class TorpedoDetectionModel : MonoBehaviour
       return Mathf.Sqrt(sum / arr.Length) * 3;  // error = 3 * sigma
    }
 
-   private void calcRegression()
+   public void CalcRegression()
    {
+      if (_kalmanPoistions[0].Count < 5)
+         return;
+
       //calculate average of points for all combinations
       Vector3[] points = new Vector3[_kalmanPoistions[0].Count];
 
@@ -133,12 +136,6 @@ public class TorpedoDetectionModel : MonoBehaviour
 
          for (int j = 0; j < _kalmanPoistions.Length; j++)
          {
-            if (_kalmanPoistions[j] == null)
-               break;
-
-            if (i > _kalmanPoistions[j].Count - 1)
-               break;
-
             if (_kalmanPoistions[j][i].magnitude < 0.1f)
                continue;
             
@@ -250,14 +247,12 @@ public class TorpedoDetectionModel : MonoBehaviour
 
          for (int j = 0; j < _kalmanPoistions.Length; j++)
          {
-            if (_kalmanPoistions[j] == null)
-               break;
-
-            if (i > _kalmanPoistions[j].Count -1)
-               break;
+            if (_kalmanPoistions[j][i].magnitude < 0.1f)
+               continue;
 
             tp += _kalmanPoistions[j][i];
             count++;
+            
          }
 
          Gizmos.color = new Color(1, 1, 1, 0.75f);

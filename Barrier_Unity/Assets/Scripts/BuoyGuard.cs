@@ -196,34 +196,39 @@ public class BuoyGuard : MonoBehaviour
          {
             int idx = 0;
             
-            for(int i = 0; i < _bouys.Count-1; i++)
+            for(int i = 0; i < _bouys.Count - 1; i++)
             {
                for(int j = i+1; j < _bouys.Count; j++)
                {
-                  //calculate real tracked point
-                  Vector3 b1Bearing = (_torpedo.position - _bouys[i].transform.position).normalized;
-                  Vector3 b2Bearing = (_torpedo.position - _bouys[j].transform.position).normalized;
+                     //calculate real tracked point
+                     Vector3 b1Bearing = (_torpedo.position - _bouys[i].transform.position).normalized;
+                     Vector3 b2Bearing = (_torpedo.position - _bouys[j].transform.position).normalized;
 
-                  Vector3 b1BearingWithError = getDir(b1Bearing, _bouys[i].Error);
-                  Vector3 b2BearingWithError = getDir(b2Bearing, _bouys[j].Error);
+                     Vector3 b1BearingWithError = getDir(b1Bearing, _bouys[i].Error);
+                     Vector3 b2BearingWithError = getDir(b2Bearing, _bouys[j].Error);
 
-                  Vector3 p11 = _bouys[i].transform.position;
-                  Vector3 p12 = p11 + b1BearingWithError * _detectRange;
-                  Vector3 p21 = _bouys[j].transform.position;
-                  Vector3 p22 = p21 + b2BearingWithError * _detectRange;
+                     Vector3 p11 = _bouys[i].transform.position;
+                     Vector3 p12 = p11 + b1BearingWithError * _detectRange;
+                     Vector3 p21 = _bouys[j].transform.position;
+                     Vector3 p22 = p21 + b2BearingWithError * _detectRange;
 
-                  Vector3 bouysBearingIntersection = Vector3.zero;
-                  bool crossed = getCross(p11, p12, p21, p22, out bouysBearingIntersection);
-                  if (!crossed)
-                     bouysBearingIntersection = Vector3.zero;
+                     Vector3 bouysBearingIntersection = Vector3.zero;
+                     bool crossed = getCross(p11, p12, p21, p22, out bouysBearingIntersection);
+                     if (!crossed)
+                        bouysBearingIntersection = Vector3.zero;
 
-                  Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 0, bouysBearingIntersection.z);
+                     Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 0, bouysBearingIntersection.z);
 
-                  _torpedoDetectionModel.AddTrackPoint(idx, trackedPosition);
+                     _torpedoDetectionModel.AddTrackPoint(idx, trackedPosition);
 
                   idx++;
                }
             }
+
+            for (int i = idx; i < 15; i++)
+               _torpedoDetectionModel.AddTrackPoint(i, Vector3.zero);
+
+            _torpedoDetectionModel.CalcRegression();
 
             if (_torpedoDetectionModel.RegressionReady)
             {
