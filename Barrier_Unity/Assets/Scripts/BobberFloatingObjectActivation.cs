@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BobberFloatingObjectActivation : MonoBehaviour
 {
+   [SerializeField] Crest.SimpleFloatingObject _floating;
    private Crest.SampleHeightHelper _heightHelper;
    private bool _isFloating = false;
 
@@ -16,15 +17,20 @@ public class BobberFloatingObjectActivation : MonoBehaviour
    public void StartFloating()
    {
       _heightHelper = new Crest.SampleHeightHelper();
-      _heightHelper.Init(gameObject.transform.position);
+      var pos = gameObject.transform.position;
+      transform.position = new Vector3(pos.x, 0, pos.z);
+      _heightHelper.Init(transform.position);
       _isFloating = true;
+
+//       _floating.gameObject.SetActive(true);
+//       GetComponent<Rigidbody>().isKinematic = false;
+      //Time.timeScale = 0.1f;
    }
 
    private void setPosOnWaterSurface()
    {
-      Vector3 curPos = gameObject.transform.position;
-      float height;
-      _heightHelper.Sample(out height);
-      gameObject.transform.position = new Vector3(curPos.x, height, curPos.y);
+      Vector3 curPos = transform.position;
+      _heightHelper.Sample(out float height);
+      //transform.position = new Vector3(curPos.x, height, curPos.z);
    }
 }

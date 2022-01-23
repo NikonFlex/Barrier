@@ -86,10 +86,16 @@ static class LabelHelper
       }
    }
 
+   public static void ShowLabels(bool on = true)
+   {
+      markersGroup.gameObject.SetActive(on);
+   }
+
    private static ScreenLabel findLabel(GameObject o)
    {
       return markersGroup.GetComponentsInChildren<ScreenLabel>(true).FirstOrDefault(scl => scl.target == o.transform);
    }
 
-   private static Transform markersGroup => GameObject.Find("ObjectMarkers").transform;
+   private static Transform _markersGroup;
+   private static Transform markersGroup => _markersGroup != null ? _markersGroup : _markersGroup = GameObject.Find("ObjectMarkers").transform;
 }

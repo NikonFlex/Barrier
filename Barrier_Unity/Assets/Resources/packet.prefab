@@ -9998,7 +9998,7 @@ MonoBehaviour:
   _dragInWaterRight: 0
   _dragInWaterForward: 0
   _dragInWaterRotational: 0.1
-  _debugDraw: 0
+  _debugDraw: 1
 --- !u!114 &3429774511866028872
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10011,6 +10011,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8feb0e4bf828ee24ca2c5a2ed22fad21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _floating: {fileID: 3774021467232256541}
 --- !u!1 &9171086069298741102
 GameObject:
   m_ObjectHideFlags: 0

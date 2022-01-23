@@ -184,6 +184,7 @@ public class Scenario : MonoBehaviour
    void Start()
    {
       AttributeHelper.DeserializeFromYaml("settings.yaml");
+      LabelHelper.ShowLabels(true);
       // add stub phases
       var phases = new List<IScenarioPhase>();
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 1f, _ship.transform));
@@ -322,6 +323,7 @@ class PhaseLaunchBouys : IScenarioPhase
          {
             if (_firstBuoyLifeCicle == BuoyLifeCicle.Fly)
             {
+               LabelHelper.ShowLabels(false);
                _firstBuoyLifeCicle = BuoyLifeCicle.Break;
                // попытка следить за тормозящим буем
                _bouyCamera = VirtualCameraHelper.Activate("vcam_Buoy");
@@ -383,6 +385,8 @@ class PhaseBouysTargetDetected : IScenarioPhase
 
       foreach (var b in _bg.Bouys)
          VirtualCameraHelper.AddMemberToTargetGroup(cam, b.transform);
+
+      LabelHelper.ShowLabels(true);
    }
    public override void Update() {}
 
