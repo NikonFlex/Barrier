@@ -11,11 +11,7 @@ public class LineRenderScale : MonoBehaviour
     void Start()
     {
         line = GetComponent<LineRenderer>();
-       
-    }
-
-    void Update()
-    {
         line.material.SetTextureScale("_MainTex", new Vector2(_kx, _ky));
     }
+
 }
