@@ -10282,12 +10282,22 @@ PrefabInstance:
     - target: {fileID: 6337075977000456985, guid: 34cb4f02e0361c34ca0608bbfaca230d,
         type: 3}
       propertyPath: m_RenderMode
-      value: 3
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6337075977000456985, guid: 34cb4f02e0361c34ca0608bbfaca230d,
+        type: 3}
+      propertyPath: m_MaxParticleSize
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6337075977000456985, guid: 34cb4f02e0361c34ca0608bbfaca230d,
         type: 3}
       propertyPath: m_Materials.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
+        type: 3}
+      propertyPath: prewarm
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
         type: 3}
@@ -10298,6 +10308,11 @@ PrefabInstance:
         type: 3}
       propertyPath: playOnAwake
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
+        type: 3}
+      propertyPath: useUnscaledTime
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
         type: 3}
@@ -10312,17 +10327,17 @@ PrefabInstance:
     - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
         type: 3}
       propertyPath: InitialModule.startSize.scalar
-      value: 0.3
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
         type: 3}
       propertyPath: EmissionModule.rateOverTime.scalar
-      value: 1
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
         type: 3}
       propertyPath: InitialModule.startLifetime.scalar
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
         type: 3}
@@ -10735,6 +10750,11 @@ PrefabInstance:
         type: 3}
       propertyPath: playOnAwake
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
+        type: 3}
+      propertyPath: useUnscaledTime
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
         type: 3}
