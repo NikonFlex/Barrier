@@ -191,7 +191,8 @@ public class Scenario : MonoBehaviour
       phases.Add(new PhaseTargetDetected());
       phases.Add(new PhaseLaunchBouys());
       phases.Add(new PhaseBouysPreparingReady());
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.BuoysStartScan, "Начало сканирования буями", 2f));
+      phases.Add(new PhaseBouysStartScan());
+      //phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.BuoysStartScan, "Начало сканирования буями", 2f));
       phases.Add(new PhaseBouysTargetDetected());
       phases.Add(new PhaseLaunchRockets());
       //phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesStrike, "Ракеты достигли цели", 2)); НЕ НУЖНА
@@ -362,8 +363,29 @@ class PhaseBouysPreparingReady : IScenarioPhase
       if (Scenario.Instance.Buoys.Length == 0)
          return false;
 
-      return Scenario.Instance.Buoys.All(b => b.State == BuoyState.Working);
+      return Scenario.Instance.Buoys[0].State == BuoyState.Working;
    }
+}
+
+class PhaseBouysStartScan : IScenarioPhase
+{
+   public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysStartScan;
+   public override string Title => "Буи начали сканирование";
+   public override bool IsFinished => checkFinished();
+
+   public override void Start() 
+   {
+      var cam = VirtualCameraHelper.Activate("vcam_TorpedoZone");
+      VirtualCameraHelper.AddMemberToTargetGroup(cam, Scenario.Instance.TargetInfo.Target.transform, 1);
+
+      foreach (var b in Scenario.Instance.Buoys)
+         VirtualCameraHelper.AddMemberToTargetGroup(cam, b.transform);
+
+      LabelHelper.ShowLabels(true);
+   }
+   public override void Update() { }
+
+   private bool checkFinished() => Scenario.Instance.Buoys.Any(b => b.State == BuoyState.Working);
 }
 
 class PhaseBouysTargetDetected : IScenarioPhase
@@ -374,17 +396,12 @@ class PhaseBouysTargetDetected : IScenarioPhase
    public override string Title => "Цель запеленгована буями";
    public override bool IsFinished => checkFinished();
 
-
-   public override void Start()
+   public override void Start() 
    {
       _bg = GameObject.FindObjectOfType<BuoyGuard>();
-      var cam = VirtualCameraHelper.Activate("vcam_TorpedoZone");
       var zone = _bg.RealZone;
       float radius = Math.Max((zone[0] - zone[2]).magnitude, (zone[1] - zone[3]).magnitude);
-      VirtualCameraHelper.AddMemberToTargetGroup(cam, _bg.DetectZone, 1, radius);
-
-      foreach (var b in _bg.Bouys)
-         VirtualCameraHelper.AddMemberToTargetGroup(cam, b.transform);
+      VirtualCameraHelper.AddMemberToTargetGroup("vcam_TorpedoZone", _bg.DetectZone, 1, radius);
 
       LabelHelper.ShowLabels(true);
    }

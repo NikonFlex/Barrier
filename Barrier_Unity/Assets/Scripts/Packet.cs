@@ -57,6 +57,8 @@ public class Packet : MonoBehaviour
    public void StartPelleng()
    {
       _pelleng.GetComponent<ParticleSystem>().Play();
+      float distFromBuoyToTarget = (gameObject.transform.position - _target).magnitude;
+      _signal.transform.localScale = new Vector3(distFromBuoyToTarget, distFromBuoyToTarget, distFromBuoyToTarget);
       _signal.GetComponent<ParticleSystem>().Play();
    }
 
