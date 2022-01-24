@@ -343,9 +343,9 @@ class PhaseLaunchBouys : IScenarioPhase
 
    private bool checkFinished()
    {
-      if (Scenario.Instance.BuoyPackets.Length == 0)
+      if (Scenario.Instance.Buoys.Length == 0)
          return false;
-      return Scenario.Instance.BuoyPackets.All(p => p.IsOnWater);
+      return Scenario.Instance.Buoys.Any(x => x.State == BuoyState.PreparingToWork);
    }
 }
 
@@ -363,7 +363,7 @@ class PhaseBouysPreparingReady : IScenarioPhase
       if (Scenario.Instance.Buoys.Length == 0)
          return false;
 
-      return Scenario.Instance.Buoys[0].State == BuoyState.Working;
+      return Scenario.Instance.Buoys.Any(x => x.State == BuoyState.PreparingToWork);
    }
 }
 
@@ -385,7 +385,7 @@ class PhaseBouysStartScan : IScenarioPhase
    }
    public override void Update() { }
 
-   private bool checkFinished() => Scenario.Instance.Buoys.Any(b => b.State == BuoyState.Working);
+   private bool checkFinished() => Scenario.Instance.Buoys.All(b => b.State == BuoyState.Working);
 }
 
 class PhaseBouysTargetDetected : IScenarioPhase
@@ -399,13 +399,20 @@ class PhaseBouysTargetDetected : IScenarioPhase
    public override void Start() 
    {
       _bg = GameObject.FindObjectOfType<BuoyGuard>();
-      var zone = _bg.RealZone;
-      float radius = Math.Max((zone[0] - zone[2]).magnitude, (zone[1] - zone[3]).magnitude);
-      VirtualCameraHelper.AddMemberToTargetGroup("vcam_TorpedoZone", _bg.DetectZone, 1, radius);
 
       LabelHelper.ShowLabels(true);
    }
-   public override void Update() {}
+   public override void Update() 
+   {
+      var zone = _bg.RealZone;
+      if (zone == null)
+         return;
+
+      float radius = Math.Max((zone[0] - zone[2]).magnitude, (zone[1] - zone[3]).magnitude);
+      var cam = VirtualCameraHelper.Find("vcam_TorpedoZone");
+      VirtualCameraHelper.RemoveMemberFromTargetGroup(cam, _bg.DetectZone);
+      VirtualCameraHelper.AddMemberToTargetGroup(cam, _bg.DetectZone, 1, radius);
+   }
 
 
    private bool checkFinished() => _bg.ScanningError < 0.1f;
