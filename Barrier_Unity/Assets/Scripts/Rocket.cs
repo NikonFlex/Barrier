@@ -52,17 +52,21 @@ public class Rocket : MonoBehaviour
 
    private IEnumerator explode()
    {
+      //Time.timeScale = 0.1f;
       LabelHelper.DestroyLabel(gameObject);
-      transform.forward = Vector3.zero;
+      transform.forward = Vector3.down;
       transform.position = new Vector3(transform.position.x, 2, transform.position.z);
       float cur_radius = 0;
       float adding_radius = _killRadius / 60f * 1.25f;
+      GameObject strikeEffect = Instantiate(Resources.Load("RocketStrikeFx"), transform.position, Quaternion.identity) as GameObject;
+
       while (cur_radius < _killRadius)
       {
-         cur_radius += adding_radius;
-         GetComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(cur_radius, 30);
-         GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, 0.5f);
-         yield return null;
+          cur_radius += adding_radius;
+          strikeEffect.transform.localScale = new Vector3(cur_radius / 50, cur_radius / 50, cur_radius / 50);
+//          GetComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(cur_radius, 30);
+//          GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, 0.5f);
+          yield return null;
       }
       var delta = transform.position - Scenario.Instance.TargetInfo.Target.transform.position;
       delta.y = 0;
