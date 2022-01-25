@@ -49,6 +49,11 @@ public class Main : MonoBehaviour
          case Toolbar.ButtonID.VIEW_ISO: changeView(ViewType.Iso); break;
          case Toolbar.ButtonID.VIEW_TOP: changeView(ViewType.Top); break;
          case Toolbar.ButtonID.SECTORS: showSectors(bPressed); break;
+         case Toolbar.ButtonID.EXIT:
+         {
+            Application.Quit();
+            break;
+         }
       }
    }
 
