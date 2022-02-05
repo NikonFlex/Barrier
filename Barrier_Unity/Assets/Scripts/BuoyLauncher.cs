@@ -37,13 +37,14 @@ public class BuoyLauncher : MonoBehaviour
       Mathf.Clamp(distance, 0, VarSync.GetFloat(VarName.BuoysShootRange));
       Vector3 dirToTarget = (trg.Target.transform.position - transform.position).normalized;
       Vector3 left = Vector3.Cross(dirToTarget, Vector3.up).normalized;
-      Vector3 openConeHeightPos = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
-      Vector3 p1 = left * d / 2 + dirToTarget * distance + openConeHeightPos;
-      Vector3 p2 = -left * d / 2 + dirToTarget * distance + openConeHeightPos;
-      Vector3 p3 = left * d / 1 + dirToTarget * (distance * 1.3f) + openConeHeightPos;
-      Vector4 p4 = -left * d / 1 + dirToTarget * (distance * 1.3f) + openConeHeightPos;
-      Vector3 p5 = left * d / 1 + dirToTarget * (distance * 1f) + openConeHeightPos;
-      Vector4 p6 = -left * d / 1 + dirToTarget * (distance * 1f) + openConeHeightPos;
+      //Vector3 targetHeight = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
+      Vector3 targetHeight = Vector3.up * VarSync.GetFloat(VarName.BuoyBreakStartAltitude);
+      Vector3 p1 = left * d / 2 + dirToTarget * distance + targetHeight;
+      Vector3 p2 = -left * d / 2 + dirToTarget * distance + targetHeight;
+      Vector3 p3 = left * d / 1 + dirToTarget * (distance * 1.3f) + targetHeight;
+      Vector4 p4 = -left * d / 1 + dirToTarget * (distance * 1.3f) + targetHeight;
+      Vector3 p5 = left * d / 1 + dirToTarget * (distance * 1f) + targetHeight;
+      Vector4 p6 = -left * d / 1 + dirToTarget * (distance * 1f) + targetHeight;
       buoysTargets.Add(p1);
       buoysTargets.Add(p2);
       buoysTargets.Add(p3);
@@ -99,6 +100,7 @@ public class BuoyLauncher : MonoBehaviour
       Packet packet = Instantiate(Resources.Load<Packet>("packet"), _packetPos.position, _packetPos.rotation);
       packet.name = name;
       packet.Launch(_launchSpeed, transform.forward, targetPos);
+      packet.Index = Scenario.Instance.BuoyPackets.Length;
       Scenario.Instance.OnPacketLaunched(packet);
    }
 

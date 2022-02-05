@@ -17,6 +17,7 @@ public class Packet : MonoBehaviour
    [SerializeField] private GameObject _flame;
    [SerializeField] private GameObject _signal;
    [SerializeField] private GameObject _antenna;
+   public int Index = -1;
 
    private LineRenderer _lineRenderer;
 
@@ -82,7 +83,7 @@ public class Packet : MonoBehaviour
          transform.position = pos;
          var nextPos = pos + (_speedVector + Vector3.down * g * Time.deltaTime) * Time.deltaTime;
          float breakAltitude = VarSync.GetFloat(VarName.BuoyBreakStartAltitude);
-         if ((transform.position - _target).magnitude < 100 ||
+         if (/*(transform.position - _target).magnitude < 100 ||*/
             (_speedVector.y < 0 &&
             (pos.y < breakAltitude || nextPos.y < breakAltitude)))
             break;
@@ -141,9 +142,14 @@ public class Packet : MonoBehaviour
       Debug.Log($"{name} time to target {CalcTimeToTarget()}");
       _slowDownEngine.SetActive(true);
 
+      //if (Index == 0) Time.timeScale = 0.4f;
       Vector3 slowDownS = _speedVector.normalized * ((transform.position.y - _stopSlowDownHeight) / _speedVector.normalized.y);
-      float a = _speedVector.magnitude * _speedVector.magnitude / (2 * slowDownS.magnitude);
+      // останавливаем снаряд за 3 сек
+      const float TIME_TO_STOP = 3f;
+      //float a = _speedVector.magnitude * _speedVector.magnitude / (2 * slowDownS.magnitude);
+      float a = _speedVector.magnitude / TIME_TO_STOP;
       a += g;
+//      Debug.Log($"a={a}");
 
       while (transform.position.y > 1)
       {
@@ -152,11 +158,12 @@ public class Packet : MonoBehaviour
             yield return null;
             continue;
          }
-
-         _speedVector += -1 * _speedVector.normalized * a * Time.deltaTime;
+         _speedVector -= _speedVector.normalized * a * Time.deltaTime;
          _speedVector.y -= g * Time.deltaTime;
          Vector3 pos = transform.position;
          pos += _speedVector * Time.deltaTime;
+         //if (Index == 0) Debug.Log($"V={_speedVector.magnitude}, Vy = {_speedVector.y}, h = {pos.y} ");
+
          transform.position = pos;
          transform.rotation = Quaternion.LookRotation(_speedVector.normalized);
          yield return null;
