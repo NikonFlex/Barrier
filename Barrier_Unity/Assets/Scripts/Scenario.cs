@@ -419,9 +419,9 @@ class PhaseBouysTargetDetected : IScenarioPhase
 
    private bool checkFinished()
    {
-      float r = float.Parse(VarName.TargetDetectionError.GetString());
-      const float StrikeError = 500f;
-      return r < StrikeError;
+      if (!float.TryParse(VarName.TargetDetectionError.GetString(), out float r))
+         return false;
+      return r < VarSync.GetFloat(VarName.MaxTargetDetectionError);
    }
 }
 
