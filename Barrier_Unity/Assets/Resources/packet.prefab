@@ -10171,6 +10171,7 @@ MonoBehaviour:
   _flame: {fileID: 4710118028309276828}
   _signal: {fileID: 6065452622476279291}
   _antenna: {fileID: 8111791579867901865}
+  Index: -1
   BuoyIndex: -1
 --- !u!120 &126712464205016318
 LineRenderer:
@@ -10301,7 +10302,7 @@ PrefabInstance:
     - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
         type: 3}
       propertyPath: prewarm
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7242012764069827551, guid: 34cb4f02e0361c34ca0608bbfaca230d,
         type: 3}
