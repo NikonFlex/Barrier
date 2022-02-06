@@ -54,6 +54,7 @@ public class RocketLauncher : MonoBehaviour
          {
             rotationTime += Time.deltaTime;
             transform.rotation = Quaternion.Slerp(startRotation, finishRotation, rotationTime / rotationPeriod);
+            print($"r = {transform.rotation}");
          }
          yield return null;
       }
@@ -77,6 +78,7 @@ public class RocketLauncher : MonoBehaviour
          smoke.name = "smoke";
 
          offset += _offestBeetweenRockets;
+         yield return new WaitForSeconds(0.1f);
       }
    }
 }

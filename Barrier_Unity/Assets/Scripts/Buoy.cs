@@ -6,12 +6,15 @@ using UnityEngine;
 public enum BuoyState
 {
    None,
+   OnPlace,
    PreparingToWork,
    Working
 }
 
 public class Buoy : MonoBehaviour
 {
+   [SerializeField] private GameObject _signal;
+
    public BuoyState State => _state;
    private BuoyState _state = BuoyState.None;
 
@@ -26,10 +29,10 @@ public class Buoy : MonoBehaviour
       else
          return VarSync.GetFloat(VarName.BuoysBearingError) * VarSync.GetFloat(VarName.BuoysBearingMultplier);
    }
-
-   void Start()
+   public void Born()
    {
-      Scenario.Instance.OnBouyHatched(this);
+      Scenario.Instance.OnBouyBorn(this);
+      _state = BuoyState.OnPlace;
 
       UnityEngine.Random.InitState(DateTime.UtcNow.GetHashCode());
 
@@ -38,12 +41,19 @@ public class Buoy : MonoBehaviour
 
       m_errorTime = Time.time;
       StartCoroutine(timerCoroutine());
+
    }
+
+   private void startPelleng()
+   {
+      _signal.GetComponent<ParticleSystem>().Play();
+   }
+
 
    // Update is called once per frame
    void Update()
    {
-      if (_state == BuoyState.None)
+      if (_state == BuoyState.OnPlace)
          StartCoroutine(preparingToWork());
    }
 
@@ -57,7 +67,7 @@ public class Buoy : MonoBehaviour
       while (Scenario.Instance.ScenarioTime - startTime < VarSync.GetFloat(VarName.BuoyReadyTime))
          yield return null;
       _state = BuoyState.Working;
-      gameObject.GetComponent<Packet>().StartPelleng();
+      startPelleng();
       Scenario.Instance.AddMessage($"Буй '{gameObject.name}' начал сканирование");
       FindObjectOfType<BuoyGuard>().AddBuoy(this);
       yield return null;

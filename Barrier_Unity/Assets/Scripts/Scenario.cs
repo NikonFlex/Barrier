@@ -67,7 +67,7 @@ public class TargetInfo
 
 public class Scenario : MonoBehaviour
 {
-   [SerializeField] GameObject _ship;
+   [SerializeField] Ship _ship;
    [SerializeField] Torpedo _torpedo;
    [SerializeField] private CameraController _cameraController;
    [SerializeField] private ScenarioLog _log;
@@ -108,7 +108,11 @@ public class Scenario : MonoBehaviour
    public Packet[] BuoyPackets => _buoyPackets.ToArray();
    public Buoy[] Buoys => _buoys.ToArray();
    public Rocket[] Rockets => _rockets.ToArray();
-   public Transform Ship => _ship.transform;
+   public Ship Ship => _ship;
+   public static bool IsTargetAlive => 
+      Instance.TargetInfo != null &&
+      Instance.TargetInfo.Target.IsActive;
+ 
 
    public void OnPacketLaunched(Packet p)
    {
@@ -121,12 +125,12 @@ public class Scenario : MonoBehaviour
          VirtualCameraHelper.AddMemberToTargetGroup("vcam_Buoy", p.transform);
       }
    }
-   public void OnBouyHatched(Buoy b) => _buoys.Add(b);
+   public void OnBouyBorn(Buoy b) => _buoys.Add(b);
 
    public void OnRocketLaunched(Rocket r)
    {
       _rockets.Add(r);
-      VirtualCameraHelper.AddMemberToTargetGroup("vcam_TorpedoZone", r.transform);
+      VirtualCameraHelper.AddMemberToTargetGroup("vcam_Rockets", r.transform);
       LabelHelper.AddLabel(r.gameObject, $"РАКЕТА {_rockets.Count}");
    }
 
@@ -152,7 +156,7 @@ public class Scenario : MonoBehaviour
    private void setUpShipSettings()
    {
       _ship.transform.GetComponent<Ship>().SetUpMscSettings(VarSync.GetBool(VarName.MSC_USE), VarSync.GetFloat(VarName.MSC_DISTANCE));
-      LabelHelper.ShowLabel(_ship);
+      LabelHelper.ShowLabel(_ship.gameObject);
    }
 
    public void PauseScenario()
@@ -285,17 +289,6 @@ class PhaseLaunchBouys : IScenarioPhase
    private CinemachineVirtualCamera _launchCamera = null;
    private CinemachineVirtualCamera _bouyCamera = null;
    BuoyLauncher _launcher;
-   enum BuoyLifeCicle
-   {
-      Nap,
-      Fly,
-      Break,
-      PrepapreFloat,
-      Diving,
-      PrepareWork,
-      Working
-   }
-   private BuoyLifeCicle _firstBuoyLifeCicle = BuoyLifeCicle.Nap;
 
    public override void Start()
    {
@@ -312,7 +305,6 @@ class PhaseLaunchBouys : IScenarioPhase
       {
          if (Scenario.Instance.BuoyPackets.Length == _launcher.NumBuoys)
             _allBouysLaunchedTime = Scenario.Instance.ScenarioTime;
-         _firstBuoyLifeCicle = BuoyLifeCicle.Fly;
       }
       else
       {
@@ -322,19 +314,19 @@ class PhaseLaunchBouys : IScenarioPhase
                //&& _buoyCameraHeight > buoyPacket.transform.position.y)
                && buoyPacket.CalcTimeToTarget() < 3 )
          {
-            if (_firstBuoyLifeCicle == BuoyLifeCicle.Fly)
+            if (buoyPacket.State == Packet.PacketState.Fly || buoyPacket.State == Packet.PacketState.Break)
             {
                LabelHelper.ShowLabels(false);
-               _firstBuoyLifeCicle = BuoyLifeCicle.Break;
                // попытка следить за тормозящим буем
                _bouyCamera = VirtualCameraHelper.Activate("vcam_Buoy");
-               VirtualCameraHelper.SetTarget(_bouyCamera, buoyPacket.Bobber);
+               VirtualCameraHelper.SetTarget(_bouyCamera, buoyPacket.Bopper.transform);
                buoyPacket.Trail.SetActive(false);
             }
          }
-         else if (buoyPacket.transform.position.y < -40 && _firstBuoyLifeCicle != BuoyLifeCicle.Diving)
+         else if (buoyPacket.transform.position.y < -buoyPacket.WorkingDepth/2 
+            && VirtualCameraHelper.GetTarget(_bouyCamera) != buoyPacket.transform)
          {
-            _firstBuoyLifeCicle = BuoyLifeCicle.Diving;
+            // переключаемся на ныряющий буй 
             VirtualCameraHelper.SetTarget(_bouyCamera, buoyPacket.transform);
          }
       }
@@ -354,16 +346,26 @@ class PhaseBouysPreparingReady : IScenarioPhase
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysOnPlace;
    public override string Title => "Буи готовятся";
    public override bool IsFinished => checkFinished();
+   private CinemachineVirtualCamera _bouyCamera = null;
+   private const float _delay = 2f;
+   private float _timeStartWork = float.MaxValue;
+   private Buoy targetBuoy => Scenario.Instance.Buoys.First();
 
-   public override void Start(){}
-   public override void Update(){}
+   public override void Start()
+   {
+      _bouyCamera = VirtualCameraHelper.Find("vcam_Buoy");
+      VirtualCameraHelper.SetTarget(_bouyCamera, targetBuoy.transform);
+   }
+
+   public override void Update()
+   {
+      if (_timeStartWork == float.MaxValue  && targetBuoy.State == BuoyState.Working)
+         _timeStartWork = Scenario.Instance.ScenarioTime;
+   }
 
    private bool checkFinished()
    {
-      if (Scenario.Instance.Buoys.Length == 0)
-         return false;
-
-      return Scenario.Instance.Buoys.Any(x => x.State == BuoyState.PreparingToWork);
+      return Scenario.Instance.ScenarioTime - _delay > _timeStartWork;
    }
 }
 
@@ -415,12 +417,16 @@ class PhaseBouysTargetDetected : IScenarioPhase
    }
 
 
-   private bool checkFinished() => _bg.ScanningError < 0.1f;
+   private bool checkFinished()
+   {
+      float r = float.Parse(VarName.TargetDetectionError.GetString());
+      const float StrikeError = 500f;
+      return r < StrikeError;
+   }
 }
 
 class PhaseLaunchRockets : IScenarioPhase
 {
-   private RocketLauncher _rocketLauncher;
    private bool _rocketsMissed = false;
 
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.MissilesLaunched;
@@ -433,34 +439,44 @@ class PhaseLaunchRockets : IScenarioPhase
 
    public override void Start()
    {
-      _rocketLauncher = GameObject.FindObjectOfType<RocketLauncher>();
-      _rocketLauncher.LaunchRockets();
-      VirtualCameraHelper.AddMemberToTargetGroup("vcam_TorpedoZone", Scenario.Instance.Ship);
+      Scenario.Instance.Ship.Launcher.LaunchRockets();
       _rocketsLaunched = false;
-      _cam = null;
+      //    _cam = null;
+      _cam = VirtualCameraHelper.Activate("vcam_Rockets");
+      VirtualCameraHelper.SetTarget(_cam, Scenario.Instance.Ship.Launcher.transform);
    }
+
    public override void Update() 
    {
-      if (_cam == null && _rocketsLaunched && _launchTime + _cameraDelay < Scenario.Instance.ScenarioTime)
+      if (Scenario.Instance.Ship.Launcher.IsAllRocketsLaunched)
       {
-         //          // убираем все из камеры и оставляем только ракеты и цель
-         //          VirtualCameraHelper.ClearTargetGroup(_cam);
-         _cam = VirtualCameraHelper.Activate("vcam_Rockets");
-         foreach (var r in Scenario.Instance.Rockets)
-            VirtualCameraHelper.AddMemberToTargetGroup(_cam, r.transform);
+         if (!_rocketsLaunched)
+         {
+            VirtualCameraHelper.RemoveMemberFromTargetGroup(_cam, Scenario.Instance.Ship.Launcher.transform);
+            VirtualCameraHelper.AddMemberToTargetGroup(_cam, Scenario.Instance.TargetInfo.Target.transform);
+            _rocketsLaunched = true;
+         }
       }
-      if (!_rocketsLaunched && _rocketLauncher.IsAllRocketsLaunched)
-      {
-         _launchTime = Scenario.Instance.ScenarioTime;
-         _rocketsLaunched = true;
-      }
+//       if (_cam == null && _rocketsLaunched && _launchTime + _cameraDelay < Scenario.Instance.ScenarioTime)
+//       {
+//          //          // убираем все из камеры и оставляем только ракеты и цель
+//          //          VirtualCameraHelper.ClearTargetGroup(_cam);
+//          //_cam = VirtualCameraHelper.Activate("vcam_Rockets");
+//          foreach (var r in Scenario.Instance.Rockets)
+//             VirtualCameraHelper.AddMemberToTargetGroup(_cam, r.transform);
+//       }
+//       if (!_rocketsLaunched && _rocketLauncher.IsAllRocketsLaunched)
+//       {
+//          _launchTime = Scenario.Instance.ScenarioTime;
+//          _rocketsLaunched = true;
+//       }
 
-      if (_rocketLauncher.IsAllRocketsExploded && Scenario.Instance.TargetInfo.Target.IsActive && !_rocketsMissed)
+      if (Scenario.Instance.Ship.Launcher.IsAllRocketsExploded && Scenario.IsTargetAlive && !_rocketsMissed)
       {
          _rocketsMissed = true;
          Scenario.Instance.AddMessage("Ракеты не попали");
       }
-      else if (_rocketLauncher.IsAllRocketsExploded && !Scenario.Instance.TargetInfo.Target.IsActive)
+      else if (Scenario.Instance.Ship.Launcher.IsAllRocketsExploded && !Scenario.IsTargetAlive)
       {
          Scenario.Instance.AddMessage("Ракеты попали");
       }
@@ -513,6 +529,12 @@ static class VirtualCameraHelper
    {
       var o = GameObject.Find(name);
       return o != null ? o.GetComponent<CinemachineVirtualCamera>() : null;
+   }
+
+   public static Transform GetTarget(CinemachineVirtualCamera cam)
+   {
+      var lookAtGroup = cam.LookAt.GetComponent<CinemachineTargetGroup>();
+      return lookAtGroup.m_Targets.Length > 0 ? lookAtGroup.m_Targets.First().target : null;
    }
 
    public static bool AddMemberToTargetGroup(CinemachineVirtualCamera cam, Transform t, float w = 1, float r = 1)

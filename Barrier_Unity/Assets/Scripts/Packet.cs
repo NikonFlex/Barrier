@@ -10,13 +10,11 @@ public class Packet : MonoBehaviour
    [SerializeField] private float _workingDepth;
 
    [SerializeField] private GameObject _slowDownEngine;
-   [SerializeField] private GameObject _bobber;
+   [SerializeField] private BuoyBopper _bopper;
+   [SerializeField] private Buoy _buoy;
    [SerializeField] private GameObject _trail;
    [SerializeField] private GameObject _shell;
-   [SerializeField] private GameObject _pelleng;
    [SerializeField] private GameObject _flame;
-   [SerializeField] private GameObject _signal;
-   [SerializeField] private GameObject _antenna;
    public int Index = -1;
 
    private LineRenderer _lineRenderer;
@@ -27,15 +25,25 @@ public class Packet : MonoBehaviour
    private Vector3 _speedVector;
    private Vector3 _target;
    private float _divingSpeed = 0f;
-   private bool _isOnWater = false;
 
-   public bool IsOnWater => _isOnWater;
-   public Transform Bobber => _bobber.transform;
+   public PacketState State { get; private set; }
+   public float WorkingDepth => _workingDepth;
+   public BuoyBopper Bopper => _bopper;
    public int BuoyIndex = -1;
+
+   public enum PacketState
+   {
+      None,
+      Fly,
+      Break,
+      Dive,
+      Finish
+   }
 
    void Start()
    {
       _lineRenderer = gameObject.GetComponent<LineRenderer>();
+      State = PacketState.None;
    }
 
    public void Launch(float V0, Vector3 dir, Vector3 targetPos)
@@ -55,16 +63,9 @@ public class Packet : MonoBehaviour
 
    public GameObject Trail => _trail;
 
-   public void StartPelleng()
-   {
-      _pelleng.GetComponent<ParticleSystem>().Play();
-      float distFromBuoyToTarget = (gameObject.transform.position - _target).magnitude;
-      _signal.transform.localScale = new Vector3(distFromBuoyToTarget, distFromBuoyToTarget, distFromBuoyToTarget);
-      _signal.GetComponent<ParticleSystem>().Play();
-   }
-
    private IEnumerator fly()
    {
+      State = PacketState.Fly;
       _flame.GetComponent<ParticleSystem>().Play();
       var smoke = Instantiate(Resources.Load("LaunchSmoke"), gameObject.transform.position, Quaternion.Euler(0, 0, 0));
       smoke.name = "smoke";
@@ -132,12 +133,13 @@ public class Packet : MonoBehaviour
 
       Scenario.Instance.AddMessage($"Буй '{gameObject.name}' приводнился");
 
-      _isOnWater = true;
       gameObject.AddComponent<Buoy>();
    }
 
    private IEnumerator reactiveSlowDown()
    {
+      State = PacketState.Break;
+
       Scenario.Instance.AddMessage($"Начало торможения у '{gameObject.name}' на   высоте {transform.position.y}");
       Debug.Log($"{name} time to target {CalcTimeToTarget()}");
       _slowDownEngine.SetActive(true);
@@ -175,19 +177,16 @@ public class Packet : MonoBehaviour
 
    private IEnumerator diving()
    {
+      State = PacketState.Dive;
+
       _slowDownEngine.SetActive(false);
       _trail.SetActive(false);
       _shell.SetActive(false);
-      _bobber.transform.SetParent(null, true);
-      _antenna.GetComponent<Animator>().SetBool("Inflate", true);
-      _antenna.GetComponent<Animator>().SetBool("Raise", true);
+      _buoy.gameObject.SetActive(true);
 
-      Vector3 cur_pos = gameObject.transform.position;
-      _bobber.transform.position = new Vector3(cur_pos.x, 1, cur_pos.z);
-      _bobber.transform.LookAt(new Vector3(cur_pos.x, -_workingDepth, cur_pos.z));
-      gameObject.transform.LookAt(new Vector3(cur_pos.x, -_workingDepth, cur_pos.z));
 
-      _bobber.GetComponent<BobberFloatingObjectActivation>().StartFloating();
+      transform.rotation = Quaternion.LookRotation(Vector3.down);
+      _bopper.StartWork();
 
       string labelText = LabelHelper.GetLabelText(gameObject);
       if (BuoyIndex != 0) // следим только за первым буем. Потом решение можно переделать
@@ -203,12 +202,15 @@ public class Packet : MonoBehaviour
          drawRopeToBopper();
          yield return null;
       }
+      _buoy.Born();
+      _bopper.StartPelleng();
+
 
       LabelHelper.HideLabel(gameObject);
-      LabelHelper.AddLabel(_bobber, labelText);
+      LabelHelper.AddLabel(_bopper.gameObject, labelText);
       Scenario.Instance.AddMessage($"Буй '{gameObject.name}' погрузился");
-      gameObject.AddComponent<Buoy>();
-      _isOnWater = true;
+      _buoy.Born();
+      State = PacketState.Finish;
       yield return null;
    }
 
@@ -219,9 +221,9 @@ public class Packet : MonoBehaviour
 
       List<Vector3> pos = new List<Vector3>();
       pos.Add(gameObject.transform.position);
-      pos.Add(_bobber.transform.position);
-      _lineRenderer.startWidth = 0.1f;
-      _lineRenderer.endWidth = 0.1f;
+      pos.Add(_bopper.transform.position);
+      _lineRenderer.startWidth = 0.01f;
+      _lineRenderer.endWidth = 0.01f;
       _lineRenderer.SetPositions(pos.ToArray());
       _lineRenderer.useWorldSpace = true;
    }

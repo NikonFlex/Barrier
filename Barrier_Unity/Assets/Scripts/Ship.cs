@@ -12,6 +12,7 @@ public class Ship : MonoBehaviour
    [SerializeField] private GameObject m_arrow;
    [SerializeField] private MSC _msc;
 
+   public RocketLauncher Launcher;
    public bool IsAlive => _isAlive;
 
    public void SetUpMscSettings(bool isActive, float distToShip)

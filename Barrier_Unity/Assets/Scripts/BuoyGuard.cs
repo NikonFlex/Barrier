@@ -9,6 +9,7 @@ public class BuoyGuard : MonoBehaviour
 {
    [SerializeField] private Transform _torpedo;
    [SerializeField] private Material _material;
+   [SerializeField] private Material _targetErrorZoneMaterial;
    [SerializeField] private TorpedoDetectionModel _torpedoDetectionModel;
 
    private List<Buoy> _bouys = new List<Buoy>();
@@ -39,18 +40,18 @@ public class BuoyGuard : MonoBehaviour
 
    void Update()
    {
-      if (_bouys.Count > 1)
-         activateZone();
-      else
-         return;
-
-      var target = Scenario.Instance.TargetInfo;
-      if (target == null || !Scenario.Instance.TargetInfo.Target.IsActive)
+      if (!Scenario.IsTargetAlive)
       {
          deactivateZone();
          _drawDebugLines = false;
          return;
       }
+
+      if (_bouys.Count > 1)
+         activateZone();
+      else
+         return;
+
 
       if (_startScanTime < 0)
          _startScanTime = Scenario.Instance.ScenarioTime;
@@ -80,8 +81,8 @@ public class BuoyGuard : MonoBehaviour
       _rombZone.AddComponent<MeshRenderer>().material = _material;
 
       _elipseZone = new GameObject("elipse_zone");
-      _elipseZone.AddComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
-      _elipseZone.AddComponent<MeshRenderer>().material = _material;
+       _elipseZone.AddComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
+       _elipseZone.AddComponent<MeshRenderer>().material = _material;
 
       _splineZone = new GameObject("spline_zone");
       _splineZone.AddComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
@@ -89,14 +90,15 @@ public class BuoyGuard : MonoBehaviour
 
       _detectionZone = new GameObject("detection_zone");
       _detectionZone.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(0, 32);
-      _detectionZone.AddComponent<MeshRenderer>().material = _material;
+      _detectionZone.AddComponent<MeshRenderer>().material = _targetErrorZoneMaterial;
    }
 
    private void activateZone()
    {
-      _rombZone.SetActive(true);
-      _elipseZone.SetActive(true);
-      _splineZone.SetActive(true);
+       _rombZone.SetActive(true);
+       _elipseZone.SetActive(true);
+       _splineZone.SetActive(true);
+       _detectionZone.SetActive(true);
    }
 
    private void deactivateZone()
@@ -104,6 +106,7 @@ public class BuoyGuard : MonoBehaviour
       _rombZone.SetActive(false);
       _elipseZone.SetActive(false);
       _splineZone.SetActive(false);
+      _detectionZone.SetActive(false);
    }
 
    private Vector3[] updateZonePoints()
@@ -192,7 +195,7 @@ public class BuoyGuard : MonoBehaviour
             continue;
          }
 
-         if (Scenario.Instance.TargetInfo != null && Scenario.Instance.TargetInfo.Target.IsActive)
+         if (Scenario.IsTargetAlive)
          {
             int idx = 0;
             
