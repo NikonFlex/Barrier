@@ -55,7 +55,9 @@ public enum VarName
    ScenarioPhaseName,
    [VarName(Persist = false, DefaultValue = "--")]
    TargetDetectionError,
-   
+   [VarName(DisplayText = "Максимальная погрешность обнаружения для выстрела", Persist = true, Units = "м", DefaultValue = 600f)]
+   MaxTargetDetectionError,
+
    [VarName(HideInInspector = true)]
    VARSYNC_LAST
 };
