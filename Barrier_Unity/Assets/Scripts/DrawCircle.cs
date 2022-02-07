@@ -69,6 +69,14 @@ public class DrawCircle : MonoBehaviour
         }
     }
 
+    public void SetRadius(float _radius)
+    {
+        _vertRadius = _radius;
+        _horizRadius = _radius;
+        CreatePoints();
+        UpdateValuesChanged();
+    }
+
     void UpdateValuesChanged()
     {
         _previousSegmentsValue = _segments;
