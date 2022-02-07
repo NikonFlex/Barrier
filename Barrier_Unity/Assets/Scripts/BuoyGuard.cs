@@ -19,7 +19,7 @@ public class BuoyGuard : MonoBehaviour
    private GameObject _rombZone;
    private GameObject _elipseZone;
    private GameObject _splineZone;
-   private GameObject _detectionZone;
+   private DetectionArea _detectionZone;
 
    private float _startScanTime = -1;
    private float _scanningError = 1f;
@@ -88,9 +88,12 @@ public class BuoyGuard : MonoBehaviour
       _splineZone.AddComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
       _splineZone.AddComponent<MeshRenderer>().material = _material;
 
-      _detectionZone = new GameObject("detection_zone");
-      _detectionZone.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(0, 32);
-      _detectionZone.AddComponent<MeshRenderer>().material = _targetErrorZoneMaterial;
+      _detectionZone = Instantiate(Resources.Load<DetectionArea>("DetectionArea"));
+      //_detectionZone.SetRadius(0);
+
+      //_detectionZone = new GameObject("detection_zone");
+      //_detectionZone.AddComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(0, 32);
+      //_detectionZone.AddComponent<MeshRenderer>().material = _targetErrorZoneMaterial;
    }
 
    private void activateZone()
@@ -98,7 +101,7 @@ public class BuoyGuard : MonoBehaviour
        _rombZone.SetActive(true);
        _elipseZone.SetActive(true);
        _splineZone.SetActive(true);
-       _detectionZone.SetActive(true);
+       _detectionZone.gameObject.SetActive(true);
    }
 
    private void deactivateZone()
@@ -106,7 +109,7 @@ public class BuoyGuard : MonoBehaviour
       _rombZone.SetActive(false);
       _elipseZone.SetActive(false);
       _splineZone.SetActive(false);
-      _detectionZone.SetActive(false);
+      _detectionZone.gameObject.SetActive(false);
    }
 
    private Vector3[] updateZonePoints()
@@ -179,9 +182,14 @@ public class BuoyGuard : MonoBehaviour
       if(_torpedoDetectionModel.RegressionReady)
       {
          float r = float.Parse(VarName.TargetDetectionError.GetString());
-         _detectionZone.GetComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(r, 33);
          _detectionZone.transform.position += _torpedoDetectionModel.CalcCourse() * _torpedoDetectionModel.CalcSpeed() * Time.deltaTime;
-         _detectionZone.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
+         _detectionZone.SetRadius(r);
+
+
+
+         //          _detectionZone.GetComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(r, 33);
+         //          _detectionZone.transform.position += _torpedoDetectionModel.CalcCourse() * _torpedoDetectionModel.CalcSpeed() * Time.deltaTime;
+         //          _detectionZone.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
       }
    }
 
