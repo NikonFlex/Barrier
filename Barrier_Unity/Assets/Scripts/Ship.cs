@@ -10,14 +10,16 @@ public class Ship : MonoBehaviour
    private bool _isAlive = true;
 
    [SerializeField] private GameObject m_arrow;
-   [SerializeField] private MSC _msc;
+   [SerializeField] private MPC _msc;
 
    public RocketLauncher Launcher;
    public bool IsAlive => _isAlive;
 
-   public void SetUpMscSettings(bool isActive, float distToShip)
+   public void SetUpMpcSettings(bool isActive, float distToShip)
    {
       _msc.SetUpSettings(isActive, distToShip);
+      var txtOnMark = LabelHelper.GetLabelText(_msc.gameObject);
+      LabelHelper.SetLabelText(_msc.gameObject, txtOnMark + " D = " + $"{distToShip}");
    }
 
    public IEnumerator Explode()

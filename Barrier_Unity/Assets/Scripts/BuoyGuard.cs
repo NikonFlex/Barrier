@@ -14,12 +14,14 @@ public class BuoyGuard : MonoBehaviour
 
    private List<Buoy> _bouys = new List<Buoy>();
    public Buoy[] Bouys => _bouys.ToArray();
-
+   public bool IsTorpedoFinallyDetected { get; private set; }
 
    private GameObject _rombZone;
    private GameObject _elipseZone;
    private GameObject _splineZone;
    private DetectionArea _detectionZone;
+   private float _greenDetectionZoneD;
+   private float _yellowDetectionZoneD;
 
    private float _startScanTime = -1;
    private float _scanningError = 1f;
@@ -36,6 +38,8 @@ public class BuoyGuard : MonoBehaviour
    {
       createZoneObject();
       StartCoroutine(trackTargetPosition());
+      _greenDetectionZoneD = VarSync.GetFloat(VarName.GreenZoneD);
+      _yellowDetectionZoneD = VarSync.GetFloat(VarName.YellowZoneD);
    }
 
    void Update()
@@ -89,6 +93,7 @@ public class BuoyGuard : MonoBehaviour
       _splineZone.AddComponent<MeshRenderer>().material = _material;
 
       _detectionZone = Instantiate(Resources.Load<DetectionArea>("DetectionArea"));
+      //_detectionZone.SetColor()
       //_detectionZone.SetRadius(0);
 
       //_detectionZone = new GameObject("detection_zone");
@@ -184,6 +189,7 @@ public class BuoyGuard : MonoBehaviour
          float r = float.Parse(VarName.TargetDetectionError.GetString());
          _detectionZone.transform.position += _torpedoDetectionModel.CalcCourse() * _torpedoDetectionModel.CalcSpeed() * Time.deltaTime;
          _detectionZone.SetRadius(r);
+         refreshDetectionZoneColor(r);
 
 
 
@@ -334,4 +340,17 @@ public class BuoyGuard : MonoBehaviour
    {
       return Quaternion.AngleAxis(a, Vector3.up) * v;
    }
+
+   private void refreshDetectionZoneColor(float curRaduis)
+   {
+      if (_greenDetectionZoneD <= 2 * curRaduis && 2 * curRaduis <= _yellowDetectionZoneD)
+      {
+         _detectionZone.SetColor(new Color(255, 200, 0, 51)); //yellow
+      }
+      else if (2 * curRaduis <= _greenDetectionZoneD)
+      {
+         _detectionZone.SetColor(new Color(0, 255, 0, 51)); //green
+         IsTorpedoFinallyDetected = true;
+      }
+   }   
 }

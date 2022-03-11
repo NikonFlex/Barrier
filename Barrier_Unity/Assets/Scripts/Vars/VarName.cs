@@ -4,14 +4,14 @@ using System;
 public enum VarName
 {
    UNDEFINED,
-   [VarName(DisplayText = "Пеленг на цель", Persist = true, Units = "Град", DefaultValue = 180f)]
+   [VarName(DisplayText = "КУ Цели", Persist = true, Units = "Град", DefaultValue = 180f)]
    StartBearingToTarget,
    [VarName(DisplayText = "Расстояние до цели", Persist = true, Units = "м", DefaultValue = 7000f)]
    StartDistanceToTarget,
-   [VarName(DisplayText = "Использовать МСЦ", Persist = true, DefaultValue = true)]
-   MSC_USE,
-   [VarName(DisplayText = "Дистанция МСЦ", Persist = true, DefaultValue = 800f)]
-   MSC_DISTANCE,
+   [VarName(DisplayText = "Использовать МПЦ", Persist = true, DefaultValue = true)]
+   MPC_USE,
+   [VarName(DisplayText = "Дистанция МПЦ", Persist = true, DefaultValue = 800f)]
+   MPC_DISTANCE,
    [VarName(DisplayText = "Погода", Persist = true, 
       Vt = VarType.Enum, Variants = new string[] { "Штиль", "Шторм" }, DefaultValue = 0)]
    Weather,
@@ -43,6 +43,10 @@ public enum VarName
    RocketDistance,
    [VarName(DisplayText = "Множитель погрешности обнаружения буя при шторме", Persist = true, DefaultValue = 2f)]
    BuoysBearingMultplier,
+   [VarName(DisplayText = "Диаметр зеленой зоны", Persist = true, DefaultValue = 1000f)]
+   GreenZoneD,
+   [VarName(DisplayText = "Диаметр желтой зоны", Persist = true, DefaultValue = 1500f)]
+   YellowZoneD,
 
    // runtime vars
    [VarName(Persist = false, DefaultValue = 0f, FormatPrecision = 2f)]
@@ -55,8 +59,8 @@ public enum VarName
    ScenarioPhaseName,
    [VarName(Persist = false, DefaultValue = "--")]
    TargetDetectionError,
-   [VarName(DisplayText = "Максимальная погрешность обнаружения для выстрела", Persist = true, Units = "м", DefaultValue = 600f)]
-   MaxTargetDetectionError,
+   //[VarName(DisplayText = "Максимальная погрешность обнаружения для выстрела", Persist = true, Units = "м", DefaultValue = 600f)]
+   //MaxTargetDetectionError,
 
    [VarName(HideInInspector = true)]
    VARSYNC_LAST

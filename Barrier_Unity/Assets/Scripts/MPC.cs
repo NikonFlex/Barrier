@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MSC : MonoBehaviour
+public class MPC : MonoBehaviour
 {
    [SerializeField] private GameObject _fastener;
 

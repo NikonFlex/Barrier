@@ -903,7 +903,7 @@ GameObject:
   - component: {fileID: 64447063}
   - component: {fileID: 64447062}
   m_Layer: 0
-  m_Name: MSC_prim
+  m_Name: MPC_prim
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1151,7 +1151,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.4
+  m_fontSize: 21.6
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1263,7 +1263,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.8370519, y: 1}
+    m_SensorSize: {x: 2.1556537, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -1532,7 +1532,7 @@ GameObject:
   - component: {fileID: 197994880}
   - component: {fileID: 197994881}
   m_Layer: 0
-  m_Name: MSC
+  m_Name: MPC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1728,7 +1728,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.8370519, y: 1}
+    m_SensorSize: {x: 2.1556537, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -1830,7 +1830,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.8370519, y: 1}
+    m_SensorSize: {x: 2.1556537, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -2883,7 +2883,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.4
+  m_fontSize: 21.6
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -2943,7 +2943,7 @@ GameObject:
   m_Component:
   - component: {fileID: 438952893}
   m_Layer: 0
-  m_Name: MSC_fastener
+  m_Name: MPC_fastener
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3729,7 +3729,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.4
+  m_fontSize: 21.6
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -3975,7 +3975,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.4
+  m_fontSize: 21.6
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6506,7 +6506,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.4
+  m_fontSize: 21.6
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -7842,7 +7842,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.4
+  m_fontSize: 21.6
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -11634,7 +11634,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.4
+  m_fontSize: 21.6
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -11939,7 +11939,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.4
+  m_fontSize: 21.6
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -12122,7 +12122,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.4
+  m_fontSize: 21.6
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -12334,7 +12334,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.8370519, y: 1}
+    m_SensorSize: {x: 2.1556537, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -14276,7 +14276,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2066991197}
-  m_LocalRotation: {x: -0.0005433201, y: -0.24688141, z: 0.00013841949, w: -0.9690456}
+  m_LocalRotation: {x: -0.06527352, y: 0.8715816, z: -0.120889045, w: -0.47060674}
   m_LocalPosition: {x: -2937.412, y: -21.51289, z: -5321.5825}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -14314,7 +14314,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.8370519, y: 1}
+    m_SensorSize: {x: 2.1556537, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -14623,7 +14623,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 23.4
+  m_fontSize: 21.6
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -16817,12 +16817,12 @@ PrefabInstance:
     - target: {fileID: 6309656781295862193, guid: e5f66848b0dc4ac459a9c9a323cc4758,
         type: 3}
       propertyPath: LabelText
-      value: "\u041C\u0421\u0426"
+      value: "\u041C\u041F\u0426"
       objectReference: {fileID: 0}
     - target: {fileID: 6309656781295862195, guid: e5f66848b0dc4ac459a9c9a323cc4758,
         type: 3}
       propertyPath: m_Name
-      value: MSCLabel
+      value: MPCLabel
       objectReference: {fileID: 0}
     - target: {fileID: 6309656781295862195, guid: e5f66848b0dc4ac459a9c9a323cc4758,
         type: 3}

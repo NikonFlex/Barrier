@@ -19,13 +19,14 @@ public class DetectionArea : MonoBehaviour
 
     private void Start()
     {
-        _stroke = Stroke.GetComponent<LineRenderer>();
-        _strokeCircle = Stroke.GetComponent<DrawCircle>();
-        _fillMesh = Fill.GetComponent<MeshRenderer>();
-        _fillMesh.material.color = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b, ZoneColor.a);
-        _stroke.endColor = ZoneColor;
-        _stroke.endColor = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b);
-        _stroke.startColor = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b);
+        createZone();
+        //_stroke = Stroke.GetComponent<LineRenderer>();
+        //_strokeCircle = Stroke.GetComponent<DrawCircle>();
+        //_fillMesh = Fill.GetComponent<MeshRenderer>();
+        //_fillMesh.material.color = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b, ZoneColor.a);
+        //_stroke.endColor = ZoneColor;
+        //_stroke.endColor = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b);
+        //_stroke.startColor = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b);
     }
 
     public void SetRadius(float radius)
@@ -34,9 +35,26 @@ public class DetectionArea : MonoBehaviour
         _fillMesh.transform.localScale = new Vector3(radius, radius, 1);
     }
 
+    public void SetColor(Color newColor)
+    {
+       ZoneColor = newColor;
+       createZone();
+    }
+
     private void Update()
     {
         _fillMesh.material.color = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b, Mathf.PingPong(Time.time*BlinkingRate, ZoneColor.a));
     }
+
+    private void createZone()
+    {
+        _stroke = Stroke.GetComponent<LineRenderer>();
+        _strokeCircle = Stroke.GetComponent<DrawCircle>();
+        _fillMesh = Fill.GetComponent<MeshRenderer>();
+        _fillMesh.material.color = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b, ZoneColor.a);
+        _stroke.endColor = ZoneColor;
+        _stroke.endColor = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b);
+        _stroke.startColor = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b);
+   }
 
 }
