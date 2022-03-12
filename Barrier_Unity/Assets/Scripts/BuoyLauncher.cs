@@ -34,17 +34,21 @@ public class BuoyLauncher : MonoBehaviour
 
       float d = VarSync.GetFloat(VarName.BouysDistanceBetween);
       float distance = trg.Distance/2 - d * Mathf.Sqrt(3) / 2f;
-      Mathf.Clamp(distance, 0, VarSync.GetFloat(VarName.BuoysShootRange));
+      float distance1 = distance + VarSync.GetFloat(VarName.BuoysShootRangeDiff)/2;
+      Mathf.Clamp(distance1, 100, VarSync.GetFloat(VarName.BuoysShootRange));
+      float distance2 = distance1 - VarSync.GetFloat(VarName.BuoysShootRangeDiff);
+      Mathf.Clamp(distance2, 100, VarSync.GetFloat(VarName.BuoysShootRange));
+
       Vector3 dirToTarget = (trg.Target.transform.position - transform.position).normalized;
       Vector3 left = Vector3.Cross(dirToTarget, Vector3.up).normalized;
       //Vector3 targetHeight = Vector3.up * VarSync.GetFloat(VarName.BuoysOpenConeHeight);
       Vector3 targetHeight = Vector3.up * VarSync.GetFloat(VarName.BuoyBreakStartAltitude);
-      Vector3 p1 = left * d / 2 + dirToTarget * distance + targetHeight;
-      Vector3 p2 = -left * d / 2 + dirToTarget * distance + targetHeight;
-      Vector3 p3 = left * d / 1 + dirToTarget * (distance * 1.3f) + targetHeight;
-      Vector4 p4 = -left * d / 1 + dirToTarget * (distance * 1.3f) + targetHeight;
-      Vector3 p5 = left * d / 1 + dirToTarget * (distance * 1f) + targetHeight;
-      Vector4 p6 = -left * d / 1 + dirToTarget * (distance * 1f) + targetHeight;
+      Vector3 p1 = left * d / 2 + dirToTarget * distance1 + targetHeight;
+      Vector3 p2 = -left * d / 2 + dirToTarget * distance2 + targetHeight;
+      Vector3 p3 = left * d / 1 + dirToTarget * (distance1 * 1.3f) + targetHeight;
+      Vector4 p4 = -left * d / 1 + dirToTarget * (distance2 * 1.3f) + targetHeight;
+      Vector3 p5 = left * d / 1 + dirToTarget * (distance1 * 1f) + targetHeight;
+      Vector4 p6 = -left * d / 1 + dirToTarget * (distance2 * 1f) + targetHeight;
       buoysTargets.Add(p1);
       buoysTargets.Add(p2);
       buoysTargets.Add(p3);

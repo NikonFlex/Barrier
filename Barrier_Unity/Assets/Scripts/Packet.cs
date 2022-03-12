@@ -219,8 +219,8 @@ public class Packet : MonoBehaviour
       if (!gameObject.activeSelf)
          return;
 
-      _lineRenderer.startWidth = 0.1f;
-      _lineRenderer.endWidth = 0.1f;
+      _lineRenderer.startWidth = 0.02f;
+      _lineRenderer.endWidth = 0.02f;
       _lineRenderer.SetPositions(new[] { gameObject.transform.position, _bopper.transform.position } );
       _lineRenderer.useWorldSpace = true;
    }

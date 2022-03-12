@@ -3,61 +3,61 @@
 !VarNamePersist
 Data: 
   IDictionary.Entries: 
-    BouysDistanceBetween: 
-      Value: !System.Single 1000
-      DisplayText: Расстояние между буями
-    Weather: 
-      Value: !System.Single 0
-      DisplayText: Погода
-    BuoysBearingError: 
-      Value: !System.Single 5
-      DisplayText: Погрешность пеленга буя
-    BuoysShootRange: 
-      Value: !System.Single 5000
-      DisplayText: Дальность полета буев
+    StartBearingToTarget: 
+      Value: !System.Single 180
+      DisplayText: КУ Цели
     BuoyReadyTime: 
       Value: !System.Single 3
       DisplayText: Время готовности буя
-    BuoysSettingPostionError: 
-      Value: !System.Single 500
-      DisplayText: Погрешность постановки буя
+    RocketPauseDuration: 
+      Value: !System.Single 3
+      DisplayText: Временной сдвиг пуска ракет
+    YellowZoneD: 
+      Value: !System.Single 1500
+      DisplayText: Диаметр желтой зоны
+    BuoysShootRangeDiff: 
+      Value: !System.Single 3000
+      DisplayText: Разность дальности полета буев
+    BuoyBreakStartAltitude: 
+      Value: !System.Single 50
+      DisplayText: Высота начала торможения буя
+    BuoysShootRange: 
+      Value: !System.Single 5000
+      DisplayText: Дальность полета буев
     StartDistanceToTarget: 
       Value: !System.Single 6200
       DisplayText: Расстояние до цели
     RocketDistance: 
       Value: !System.Single 500
       DisplayText: Расстояние между ракетами при ударе
+    BuoysBearingMultplier: 
+      Value: !System.Single 2
+      DisplayText: Множитель погрешности обнаружения буя при шторме
+    MPC_RANGE: 
+      Value: !System.Single 6
+      DisplayText: Дальность обнаружения МПЦ
+    MPC_DISTANCE: 
+      Value: !System.Single 800
+      DisplayText: Дистанция МПЦ
     GreenZoneD: 
       Value: !System.Single 1000
       DisplayText: Диаметр зеленой зоны
     RocketNum: 
       Value: !System.Single 3
       DisplayText: Количество ракет
-    MPC_RANGE: 
-      Value: !System.Single 6
-      DisplayText: Дальность обнаружения МПЦ
-    BuoysBearingMultplier: 
-      Value: !System.Single 2
-      DisplayText: Множитель погрешности обнаружения буя при шторме
-    YellowZoneD: 
-      Value: !System.Single 1500
-      DisplayText: Диаметр желтой зоны
     NumBuoys: 
       Value: !System.Single 2
       DisplayText: Количество буев
-    BuoyBreakStartAltitude: 
-      Value: !System.Single 50
-      DisplayText: Высота начала торможения буя
+    BouysDistanceBetween: 
+      Value: !System.Single 1000
+      DisplayText: Расстояние между буями
     BuoysDetectRange: 
       Value: !System.Single 5000
       DisplayText: Дальность обнаружения буями
-    MPC_DISTANCE: 
-      Value: !System.Single 800
-      DisplayText: Дистанция МПЦ
-    RocketPauseDuration: 
-      Value: !System.Single 3
-      DisplayText: Временной сдвиг пуска ракет
-    StartBearingToTarget: 
-      Value: !System.Single 180
-      DisplayText: КУ Цели
+    BuoysBearingError: 
+      Value: !System.Single 5
+      DisplayText: Погрешность пеленга буя
+    Weather: 
+      Value: !System.Single 0
+      DisplayText: Погода
 ...
