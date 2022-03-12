@@ -4,14 +4,16 @@ using System;
 public enum VarName
 {
    UNDEFINED,
-   [VarName(DisplayText = "КУ Цели", Persist = true, Units = "Град", DefaultValue = 180f)]
+   [VarName(DisplayText = "КУ цели", Persist = true, Units = "Град", DefaultValue = 180f)]
    StartBearingToTarget,
    [VarName(DisplayText = "Расстояние до цели", Persist = true, Units = "м", DefaultValue = 7000f)]
    StartDistanceToTarget,
-   [VarName(DisplayText = "Использовать МПЦ", Persist = true, DefaultValue = true)]
+   [VarName(DisplayText = "Использовать МПЦ", Persist = false, DefaultValue = true)]
    MPC_USE,
    [VarName(DisplayText = "Дистанция МПЦ", Persist = true, DefaultValue = 800f)]
    MPC_DISTANCE,
+   [VarName(DisplayText = "Дальность обнаружения МПЦ", Persist = true, Units = "км", DefaultValue = 10f)]
+   MPC_RANGE,
    [VarName(DisplayText = "Погода", Persist = true, 
       Vt = VarType.Enum, Variants = new string[] { "Штиль", "Шторм" }, DefaultValue = 0)]
    Weather,

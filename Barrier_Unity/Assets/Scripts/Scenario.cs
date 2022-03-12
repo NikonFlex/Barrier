@@ -7,7 +7,7 @@ using Cinemachine;
 
 public enum ScenarioPhaseState
 {
-   Idle, // цель не обнаружена.
+   Alert, // поиск цели
    TargetDetectedByAntenna,// - цель обнаружена антенной
    StartAiming,// - начало нацеливания
    BuoysLaunched,// - Буи выпущены
@@ -17,6 +17,14 @@ public enum ScenarioPhaseState
    MissilesLaunched, // - Ракеты выпущены
    MissilesStrike, //- Ракеты взорвались
    ScenarioFinished //- Окончание упражения
+}
+
+public enum TargetDetectStatus
+{
+   NoDetect,
+   MPCOnly,
+   MPCAndBuoys,
+   Buoys
 }
 
 public abstract class IScenarioPhase
@@ -89,6 +97,7 @@ public class Scenario : MonoBehaviour
    private bool isAlive => _currentMode != Mode.Stoped && _currentMode != Mode.Finished;
 
 
+
    public enum Mode
    {
       Stoped,
@@ -112,7 +121,9 @@ public class Scenario : MonoBehaviour
    public static bool IsTargetAlive => 
       Instance.TargetInfo != null &&
       Instance.TargetInfo.Target.IsActive;
- 
+   public TargetDetectStatus TargetDetectStatus { get; set; } = TargetDetectStatus.NoDetect;
+   public Vector3 PointOfFirstDetectionByMPC { get; set; }
+
 
    public void OnPacketLaunched(Packet p)
    {
@@ -142,6 +153,12 @@ public class Scenario : MonoBehaviour
       _currentTime = _startTime = Time.time;
       _currentMode = Mode.Running;
       _currentPhaseIndex = 0;
+
+      _buoyPackets.Clear();
+      _rockets.Clear();
+      _buoys.Clear();
+      TargetDetectStatus = TargetDetectStatus.NoDetect;
+
       currentPhase.Start();
    }
 
@@ -191,7 +208,7 @@ public class Scenario : MonoBehaviour
       LabelHelper.ShowLabels(true);
       // add stub phases
       var phases = new List<IScenarioPhase>();
-      phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.Idle, "Цель не обнаружена", 1f, _ship.transform));
+      phases.Add(new PhaseAlert());
       phases.Add(new PhaseTargetDetected());
       phases.Add(new PhaseLaunchBouys());
       phases.Add(new PhaseBouysPreparingReady());
@@ -246,6 +263,7 @@ public class Scenario : MonoBehaviour
       currentPhase.Start();
    }
 
+
    private TargetInfo calcTargetInfo()
    {
       return new TargetInfo()
@@ -256,6 +274,16 @@ public class Scenario : MonoBehaviour
          Bearing = Vector3.SignedAngle(_ship.transform.forward, (_torpedo.transform.position - transform.position).normalized, Vector3.up)
       };
    }
+}
+
+class PhaseAlert: IScenarioPhase
+{
+   public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.Alert;
+   public override string Title => "Поиск цели";
+   public override bool IsFinished => Scenario.Instance.TargetInfo.Distance <= VarSync.GetFloat(VarName.MPC_RANGE)*1000;
+
+   public override void Start() { }
+   public override void Update() { }
 }
 
 
@@ -269,9 +297,12 @@ class PhaseTargetDetected : IScenarioPhase
 
    public override void Start()
    {
+      Scenario.Instance.PointOfFirstDetectionByMPC = Scenario.Instance.TargetInfo.Target.transform.position;
+
       _startTime = Scenario.Instance.ScenarioTime;
       var camera = VirtualCameraHelper.Activate("vCam_ShipGroup");
       VirtualCameraHelper.AddMemberToTargetGroup(camera, Scenario.Instance.TargetInfo.Target.transform);
+      Scenario.Instance.TargetDetectStatus = TargetDetectStatus.MPCOnly;
    }
    public override void Update() { }
 }
@@ -385,7 +416,14 @@ class PhaseBouysStartScan : IScenarioPhase
 
       LabelHelper.ShowLabels(true);
    }
-   public override void Update() { }
+   public override void Update() 
+   {
+      var numWorkBuoys = Scenario.Instance.Buoys.Count(b => b.State == BuoyState.Working);
+      if (numWorkBuoys == 1)
+         Scenario.Instance.TargetDetectStatus = TargetDetectStatus.MPCAndBuoys;
+      else if (numWorkBuoys > 1)
+         Scenario.Instance.TargetDetectStatus = TargetDetectStatus.Buoys;
+   }
 
    private bool checkFinished() => Scenario.Instance.Buoys.All(b => b.State == BuoyState.Working);
 }

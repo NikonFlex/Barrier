@@ -219,12 +219,9 @@ public class Packet : MonoBehaviour
       if (!gameObject.activeSelf)
          return;
 
-      List<Vector3> pos = new List<Vector3>();
-      pos.Add(gameObject.transform.position);
-      pos.Add(_bopper.transform.position);
-      _lineRenderer.startWidth = 0.01f;
-      _lineRenderer.endWidth = 0.01f;
-      _lineRenderer.SetPositions(pos.ToArray());
+      _lineRenderer.startWidth = 0.1f;
+      _lineRenderer.endWidth = 0.1f;
+      _lineRenderer.SetPositions(new[] { gameObject.transform.position, _bopper.transform.position } );
       _lineRenderer.useWorldSpace = true;
    }
 }
