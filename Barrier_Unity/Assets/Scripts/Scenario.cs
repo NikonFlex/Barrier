@@ -155,7 +155,7 @@ public class Scenario : MonoBehaviour
 
    private void setUpShipSettings()
    {
-      _ship.transform.GetComponent<Ship>().SetUpMscSettings(VarSync.GetBool(VarName.MSC_USE), VarSync.GetFloat(VarName.MSC_DISTANCE));
+      _ship.transform.GetComponent<Ship>().SetUpMpcSettings(VarSync.GetBool(VarName.MPC_USE), VarSync.GetFloat(VarName.MPC_DISTANCE));
       LabelHelper.ShowLabel(_ship.gameObject);
    }
 
@@ -421,7 +421,8 @@ class PhaseBouysTargetDetected : IScenarioPhase
    {
       if (!float.TryParse(VarName.TargetDetectionError.GetString(), out float r))
          return false;
-      return r < VarSync.GetFloat(VarName.MaxTargetDetectionError);
+      return _bg.IsTorpedoFinallyDetected;
+      //return r < VarSync.GetFloat(VarName.MaxTargetDetectionError);
    }
 }
 

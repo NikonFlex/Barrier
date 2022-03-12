@@ -11,7 +11,7 @@ Data:
       DisplayText: Погрешность постановки буя
     StartBearingToTarget: 
       Value: !System.Single 180
-      DisplayText: Пеленг на цель
+      DisplayText: КУ Цели
     RocketNum: 
       Value: !System.Single 3
       DisplayText: Количество ракет
@@ -33,21 +33,18 @@ Data:
     RocketPauseDuration: 
       Value: !System.Single 3
       DisplayText: Временной сдвиг пуска ракет
-    MSC_DISTANCE: 
+    MPC_DISTANCE: 
       Value: !System.Single 800
-      DisplayText: Дистанция МСЦ
+      DisplayText: Дистанция МПЦ
     Weather: 
       Value: !System.Single 0
       DisplayText: Погода
     BuoyReadyTime: 
       Value: !System.Single 3
       DisplayText: Время готовности буя
-    MaxTargetDetectionError: 
-      Value: !System.Single 1000
-      DisplayText: Максимальная погрешность обнаружения для выстрела
-    MSC_USE: 
+    MPC_USE: 
       Value: True
-      DisplayText: Использовать МСЦ
+      DisplayText: Использовать МПЦ
     BouysDistanceBetween: 
       Value: !System.Single 1000
       DisplayText: Расстояние между буями

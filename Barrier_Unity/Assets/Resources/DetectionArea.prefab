@@ -332,7 +332,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Stroke: {fileID: 3565286235480897714}
   Fill: {fileID: 4448176685442309119}
-  ZoneColor: {r: 1, g: 0.5, b: 0, a: 0.2}
+  ZoneColor: {r: 1, g: 0, b: 0, a: 0.2}
   BlinkingRate: 0.5
 --- !u!1001 &3565286236043847342
 PrefabInstance:
