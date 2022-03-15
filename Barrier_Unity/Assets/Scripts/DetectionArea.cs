@@ -43,7 +43,8 @@ public class DetectionArea : MonoBehaviour
 
     private void Update()
     {
-        _fillMesh.material.color = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b, Mathf.PingPong(Time.time*BlinkingRate, ZoneColor.a));
+      var a = Mathf.PingPong(Time.time * BlinkingRate, ZoneColor.a);
+        _fillMesh.material.color = new Color(ZoneColor.r, ZoneColor.g, ZoneColor.b, a);
     }
 
     private void createZone()

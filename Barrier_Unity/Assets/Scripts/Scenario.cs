@@ -457,10 +457,7 @@ class PhaseBouysTargetDetected : IScenarioPhase
 
    private bool checkFinished()
    {
-      if (!float.TryParse(VarName.TargetDetectionError.GetString(), out float r))
-         return false;
       return _bg.IsTorpedoFinallyDetected;
-      //return r < VarSync.GetFloat(VarName.MaxTargetDetectionError);
    }
 }
 
