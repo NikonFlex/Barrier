@@ -61,7 +61,7 @@ public enum VarName
    TargetDistance,
    [VarName(Persist = false, DefaultValue = "")]
    ScenarioPhaseName,
-   [VarName(Persist = false, DefaultValue = "--")]
+   [VarName(Persist = false, DefaultValue = -25f, FormatPrecision = 1f)]
    TargetDetectionError,
    //[VarName(DisplayText = "Максимальная погрешность обнаружения для выстрела", Persist = true, Units = "м", DefaultValue = 600f)]
    //MaxTargetDetectionError,

@@ -19,7 +19,7 @@ public class Ship : MonoBehaviour
    {
       _msc.SetUpSettings(isActive, distToShip);
       var txtOnMark = LabelHelper.GetLabelText(_msc.gameObject);
-      LabelHelper.SetLabelText(_msc.gameObject, txtOnMark + " D = " + $"{distToShip}");
+      LabelHelper.SetLabelText(_msc.gameObject, txtOnMark + "\n" + "D = " + $"{distToShip}");
    }
 
    public IEnumerator Explode()

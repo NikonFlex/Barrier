@@ -5,6 +5,13 @@ using System.Linq;
 using UnityEngine;
 
 
+public enum ZoneColor
+{
+   Green,
+   Yellow,
+   Red
+}
+
 public class BuoyGuard : MonoBehaviour
 {
    [SerializeField] private Transform _torpedo;
@@ -20,8 +27,9 @@ public class BuoyGuard : MonoBehaviour
    private GameObject _elipseZone;
    private GameObject _splineZone;
    private DetectionArea _detectionZone;
-   private float _greenDetectionZoneD;
-   private float _yellowDetectionZoneD;
+   private ZoneColor _zoneColor = ZoneColor.Red;
+   private bool _yellowZoneSetted = false;
+   private bool _greenZoneSetted = false;
 
    private float _startScanTime = -1;
    private float _scanningError = 1f;
@@ -38,8 +46,6 @@ public class BuoyGuard : MonoBehaviour
    {
       createZoneObject();
       StartCoroutine(trackTargetPosition());
-      _greenDetectionZoneD = VarSync.GetFloat(VarName.GreenZoneD);
-      _yellowDetectionZoneD = VarSync.GetFloat(VarName.YellowZoneD);
    }
 
    void Update()
@@ -80,13 +86,13 @@ public class BuoyGuard : MonoBehaviour
 
    private void createZoneObject()
    {
-      _rombZone = new GameObject("romb_zone");
-      _rombZone.AddComponent<MeshFilter>().mesh = Utils.CreateRombusMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
-      _rombZone.AddComponent<MeshRenderer>().material = _material;
+      //_rombZone = new GameObject("romb_zone");
+      //_rombZone.AddComponent<MeshFilter>().mesh = Utils.CreateRombusMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
+      //_rombZone.AddComponent<MeshRenderer>().material = _material;
 
-      _elipseZone = new GameObject("elipse_zone");
-       _elipseZone.AddComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
-       _elipseZone.AddComponent<MeshRenderer>().material = _material;
+      //_elipseZone = new GameObject("elipse_zone");
+      // _elipseZone.AddComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
+      // _elipseZone.AddComponent<MeshRenderer>().material = _material;
 
       _splineZone = new GameObject("spline_zone");
       _splineZone.AddComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero);
@@ -103,16 +109,16 @@ public class BuoyGuard : MonoBehaviour
 
    private void activateZone()
    {
-       _rombZone.SetActive(true);
-       _elipseZone.SetActive(true);
+       //_rombZone.SetActive(true);
+       //_elipseZone.SetActive(true);
        _splineZone.SetActive(true);
        _detectionZone.gameObject.SetActive(true);
    }
 
    private void deactivateZone()
    {
-      _rombZone.SetActive(false);
-      _elipseZone.SetActive(false);
+      //_rombZone.SetActive(false);
+      //_elipseZone.SetActive(false);
       _splineZone.SetActive(false);
       _detectionZone.gameObject.SetActive(false);
    }
@@ -158,39 +164,37 @@ public class BuoyGuard : MonoBehaviour
    private void updateZoneMesh(Vector3 c1, Vector3 c2, Vector3 c3, Vector3 c4, Vector3[] vertices)
    {
       //draw rombus
-      _rombZone.GetComponent<MeshFilter>().mesh = Utils.CreateRombusMesh(vertices[0], vertices[1], vertices[2], vertices[3]);
-      _rombZone.transform.position = new Vector3(c1.x, 10, c1.z);
-      _rombZone.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
+      //_rombZone.GetComponent<MeshFilter>().mesh = Utils.CreateRombusMesh(vertices[0], vertices[1], vertices[2], vertices[3]);
+      //_rombZone.transform.position = new Vector3(c1.x, 10, c1.z);
+      //_rombZone.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
 
       //draw ellipse
       float magn1 = (vertices[0] - vertices[2]).magnitude / 2;
       float magn2 = (vertices[1] - vertices[3]).magnitude / 2;
-      if (magn2 > magn1)
-      {
-         _elipseZone.GetComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(vertices[0], vertices[1], vertices[2], vertices[3]);
-         _elipseZone.transform.eulerAngles = new Vector3(0, 180 - Vector3.SignedAngle((c2 - c4).normalized, Vector3.forward, Vector3.up), 0);
-      }
-      else
-      {
-         _elipseZone.GetComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(vertices[1], vertices[2], vertices[3], vertices[0]);
-         _elipseZone.transform.eulerAngles = new Vector3(0, 180 - Vector3.SignedAngle((c1 - c3).normalized, Vector3.forward, Vector3.up), 0);
-      }
-      _elipseZone.transform.position = new Vector3((c2.x + c4.x) / 2f, 10, (c2.z + c4.z) / 2f);
-      _elipseZone.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 1, Mathf.PingPong(Time.time, 0.5f));
+      //if (magn2 > magn1)
+      //{
+      //   _elipseZone.GetComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(vertices[0], vertices[1], vertices[2], vertices[3]);
+      //   _elipseZone.transform.eulerAngles = new Vector3(0, 180 - Vector3.SignedAngle((c2 - c4).normalized, Vector3.forward, Vector3.up), 0);
+      //}
+      //else
+      //{
+      //   _elipseZone.GetComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(vertices[1], vertices[2], vertices[3], vertices[0]);
+      //   _elipseZone.transform.eulerAngles = new Vector3(0, 180 - Vector3.SignedAngle((c1 - c3).normalized, Vector3.forward, Vector3.up), 0);
+      //}
+      //_elipseZone.transform.position = new Vector3((c2.x + c4.x) / 2f, 10, (c2.z + c4.z) / 2f);
+      //_elipseZone.GetComponent<MeshRenderer>().material.color = new Color(0, 0, 1, Mathf.PingPong(Time.time, 0.5f));
 
       //draw spline
-      //_splineZone.GetComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(vertices[0], vertices[1], vertices[2], vertices[3]);
-      //_splineZone.transform.position = new Vector3(c1.x, 10, c1.z);
-      //_splineZone.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
+      _splineZone.GetComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(vertices[0], vertices[1], vertices[2], vertices[3]);
+      _splineZone.transform.position = new Vector3(c1.x, 10, c1.z);
+      _splineZone.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
 
       //draw detection zone
-      if(_torpedoDetectionModel.RegressionReady)
+      if (_torpedoDetectionModel.RegressionReady)
       {
-         float r = float.Parse(VarName.TargetDetectionError.GetString());
+         float r = VarName.TargetDetectionError.GetFloat();
          _detectionZone.transform.position += _torpedoDetectionModel.CalcCourse() * _torpedoDetectionModel.CalcSpeed() * Time.deltaTime;
          _detectionZone.SetRadius(r);
-         refreshDetectionZoneColor(r);
-
 
 
          //          _detectionZone.GetComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(r, 33);
@@ -249,7 +253,12 @@ public class BuoyGuard : MonoBehaviour
 
             if (_torpedoDetectionModel.RegressionReady)
             {
+               var b = VarName.BuoysBearingError.GetFloat();
+               refreshDetectionZoneColor(VarName.BuoysBearingError.GetFloat());
                Vector3 p = _torpedoDetectionModel.CalcPrognosisPos(4f);
+               int a = 7;
+               if (float.IsNaN(p.x))
+                  a = 7;
                _detectionZone.transform.position = new Vector3(p.x, 10, p.z);
             }
 
@@ -343,13 +352,21 @@ public class BuoyGuard : MonoBehaviour
 
    private void refreshDetectionZoneColor(float curRaduis)
    {
-      if (_greenDetectionZoneD <= 2 * curRaduis && 2 * curRaduis <= _yellowDetectionZoneD)
+      float d = 2 * curRaduis;
+      if (d > VarSync.GetFloat(VarName.YellowZoneD) && _zoneColor != ZoneColor.Red)
       {
-         _detectionZone.SetColor(new Color(255, 200, 0, 51)); //yellow
+         _detectionZone.SetColor(new Color(1, 0, 0, 0.2f)); //red
+         _zoneColor = ZoneColor.Red;
       }
-      else if (2 * curRaduis <= _greenDetectionZoneD)
+      else if (VarSync.GetFloat(VarName.GreenZoneD) <= d && _zoneColor != ZoneColor.Yellow)
       {
-         _detectionZone.SetColor(new Color(0, 255, 0, 51)); //green
+         _detectionZone.SetColor(new Color(1, 0.64f, 0, 0.2f)); //yellow
+         _zoneColor = ZoneColor.Yellow;
+      }
+      else if (_zoneColor != ZoneColor.Green)
+      {
+         _detectionZone.SetColor(new Color(0, 1, 0, 0.2f)); //green
+         _zoneColor = ZoneColor.Green;
          IsTorpedoFinallyDetected = true;
       }
    }   
