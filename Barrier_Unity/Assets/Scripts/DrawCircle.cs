@@ -5,122 +5,129 @@ using UnityEngine;
 
 public class DrawCircle : MonoBehaviour
 {
-    public enum Axis { X, Y, Z };
+   public enum Axis { X, Y, Z };
 
-    [SerializeField]
-    [Tooltip("The number of lines that will be used to draw the circle. The more lines, the more the circle will be \"flexible\".")]
-    [Range(0, 1000)]
-    private int _segments = 60;
+   [SerializeField]
+   [Tooltip("The number of lines that will be used to draw the circle. The more lines, the more the circle will be \"flexible\".")]
+   [Range(0, 1000)]
+   private int _segments = 60;
 
-    [SerializeField]
-    [Tooltip("The radius of the horizontal axis.")]
-    private float _horizRadius = 10;
+   [SerializeField]
+   [Tooltip("The radius of the horizontal axis.")]
+   private float _horizRadius = 10;
 
-    [SerializeField]
-    [Tooltip("The radius of the vertical axis.")]
-    private float _vertRadius = 10;
+   [SerializeField]
+   [Tooltip("The radius of the vertical axis.")]
+   private float _vertRadius = 10;
 
-    [SerializeField]
-    [Tooltip("The offset will be applied in the direction of the axis.")]
-    private float _offset = 0;
+   [SerializeField]
+   [Tooltip("The offset will be applied in the direction of the axis.")]
+   private float _offset = 0;
 
-    [SerializeField]
-    [Tooltip("The axis about which the circle is drawn.")]
-    private Axis _axis = Axis.Z;
+   [SerializeField]
+   [Tooltip("The axis about which the circle is drawn.")]
+   private Axis _axis = Axis.Z;
 
-    [SerializeField]
-    [Tooltip("If checked, the circle will be rendered again each time one of the parameters change.")]
-    private bool _checkValuesChanged = true;
+   [SerializeField]
+   [Tooltip("If checked, the circle will be rendered again each time one of the parameters change.")]
+   private bool _checkValuesChanged = true;
 
-    private int _previousSegmentsValue;
-    private float _previousHorizRadiusValue;
-    private float _previousVertRadiusValue;
-    private float _previousOffsetValue;
-    private Axis _previousAxisValue;
+   private int _previousSegmentsValue;
+   private float _previousHorizRadiusValue;
+   private float _previousVertRadiusValue;
+   private float _previousOffsetValue;
+   private Axis _previousAxisValue;
 
-    private LineRenderer _line;
+   private LineRenderer _line;
 
-    void Start()
-    {
-        _line = gameObject.GetComponent<LineRenderer>();
 
-        _line.SetVertexCount(_segments + 1);
-        _line.useWorldSpace = false;
+   void initLine()
+   {
+      _line = gameObject.GetComponent<LineRenderer>();
 
-        UpdateValuesChanged();
+      _line.positionCount = _segments + 1;
+      _line.useWorldSpace = false;
 
-        CreatePoints();
-    }
+      UpdateValuesChanged();
 
-    void Update()
-    {
-        if (_checkValuesChanged)
-        {
-            if (_previousSegmentsValue != _segments ||
-                _previousHorizRadiusValue != _horizRadius ||
-                _previousVertRadiusValue != _vertRadius ||
-                _previousOffsetValue != _offset ||
-                _previousAxisValue != _axis)
-            {
-                CreatePoints();
-            }
+      CreatePoints();
 
-            UpdateValuesChanged();
-        }
-    }
+   }
 
-    public void SetRadius(float _radius)
-    {
-        _vertRadius = _radius;
-        _horizRadius = _radius;
-        CreatePoints();
-        UpdateValuesChanged();
-    }
+   void Update()
+   {
+      if (_line == null)
+         initLine();
 
-    void UpdateValuesChanged()
-    {
-        _previousSegmentsValue = _segments;
-        _previousHorizRadiusValue = _horizRadius;
-        _previousVertRadiusValue = _vertRadius;
-        _previousOffsetValue = _offset;
-        _previousAxisValue = _axis;
-    }
+      if (_checkValuesChanged)
+      {
+         if (_previousSegmentsValue != _segments ||
+             _previousHorizRadiusValue != _horizRadius ||
+             _previousVertRadiusValue != _vertRadius ||
+             _previousOffsetValue != _offset ||
+             _previousAxisValue != _axis)
+         {
+            CreatePoints();
+         }
 
-    void CreatePoints()
-    {
+         UpdateValuesChanged();
+      }
+   }
 
-        if (_previousSegmentsValue != _segments)
-        {
-            _line.SetVertexCount(_segments + 1);
-        }
+   public void SetRadius(float _radius)
+   {
+      _vertRadius = _radius;
+      _horizRadius = _radius;
+      if (_line == null)
+         initLine();
+      CreatePoints();
+      UpdateValuesChanged();
+   }
 
-        float x;
-        float y;
-        float z = _offset;
+   void UpdateValuesChanged()
+   {
+      _previousSegmentsValue = _segments;
+      _previousHorizRadiusValue = _horizRadius;
+      _previousVertRadiusValue = _vertRadius;
+      _previousOffsetValue = _offset;
+      _previousAxisValue = _axis;
+   }
 
-        float angle = 0f;
+   void CreatePoints()
+   {
 
-        for (int i = 0; i < (_segments + 1); i++)
-        {
-            x = Mathf.Sin(Mathf.Deg2Rad * angle) * _horizRadius;
-            y = Mathf.Cos(Mathf.Deg2Rad * angle) * _vertRadius;
+      if (_previousSegmentsValue != _segments)
+      {
+         _line.SetVertexCount(_segments + 1);
+      }
 
-            switch (_axis)
-            {
-                case Axis.X:
-                    _line.SetPosition(i, new Vector3(z, y, x));
-                    break;
-                case Axis.Y:
-                    _line.SetPosition(i, new Vector3(y, z, x));
-                    break;
-                case Axis.Z:
-                    _line.SetPosition(i, new Vector3(x, y, z));
-                    break;
-                default:
-                    break;
-            }
+      float x;
+      float y;
+      float z = _offset;
 
-            angle += (360f / _segments);
-        }
-    }
+      float angle = 0f;
+
+      for (int i = 0; i < (_segments + 1); i++)
+      {
+         x = Mathf.Sin(Mathf.Deg2Rad * angle) * _horizRadius;
+         y = Mathf.Cos(Mathf.Deg2Rad * angle) * _vertRadius;
+
+         switch (_axis)
+         {
+            case Axis.X:
+            _line.SetPosition(i, new Vector3(z, y, x));
+            break;
+            case Axis.Y:
+            _line.SetPosition(i, new Vector3(y, z, x));
+            break;
+            case Axis.Z:
+            _line.SetPosition(i, new Vector3(x, y, z));
+            break;
+            default:
+            break;
+         }
+
+         angle += (360f / _segments);
+      }
+   }
 }

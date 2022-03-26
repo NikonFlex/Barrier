@@ -15,12 +15,15 @@ public class Ship : MonoBehaviour
    public RocketLauncher Launcher;
    public bool IsAlive => _isAlive;
 
+   public MPC MPC => _msc;
    public void SetUpMpcSettings(bool isActive, float distToShip)
    {
       _msc.SetUpSettings(isActive, distToShip);
       var txtOnMark = LabelHelper.GetLabelText(_msc.gameObject);
       LabelHelper.SetLabelText(_msc.gameObject, txtOnMark + "\n" + "D = " + $"{distToShip}");
    }
+
+
 
    public IEnumerator Explode()
    {

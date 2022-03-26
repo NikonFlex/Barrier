@@ -54,7 +54,7 @@ public class RocketLauncher : MonoBehaviour
          {
             rotationTime += Time.deltaTime;
             transform.rotation = Quaternion.Slerp(startRotation, finishRotation, rotationTime / rotationPeriod);
-            print($"r = {transform.rotation}");
+            //print($"r = {transform.rotation}");
          }
          yield return null;
       }

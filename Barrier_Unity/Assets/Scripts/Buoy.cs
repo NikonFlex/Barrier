@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
 
 public enum BuoyState
 {
@@ -14,6 +15,7 @@ public enum BuoyState
 public class Buoy : MonoBehaviour
 {
    [SerializeField] private GameObject _signal;
+   [SerializeField] private GameObject _pelengPivot;
 
    public BuoyState State => _state;
    private BuoyState _state = BuoyState.None;
@@ -46,6 +48,13 @@ public class Buoy : MonoBehaviour
 
    private void startPelleng()
    {
+      _pelengPivot.GetComponent<LookAtConstraint>()
+         .AddSource(
+            new ConstraintSource 
+            {
+               sourceTransform = Scenario.Instance.TargetInfo.Target.transform,
+               weight = 1
+            });
       _signal.GetComponent<ParticleSystem>().Play();
    }
 

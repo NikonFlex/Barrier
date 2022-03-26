@@ -8,6 +8,7 @@ public class BuoyBopper : MonoBehaviour
    [SerializeField] GameObject _signal;
    [SerializeField] GameObject _antenna;
    [SerializeField] GameObject _buoyancy;
+   [SerializeField] GameObject _pelengRadius;
 
    private Crest.SampleHeightHelper _heightHelper;
    private bool _isFloating = false;
@@ -57,6 +58,8 @@ public class BuoyBopper : MonoBehaviour
    public void StartPelleng()
    {
       _signal.GetComponent<ParticleSystem>().Play();
+      _pelengRadius.SetActive(true);
+      _pelengRadius.GetComponent<DrawCircle>().SetRadius(VarSync.GetFloat(VarName.BuoysDetectRange));
    }
 
 

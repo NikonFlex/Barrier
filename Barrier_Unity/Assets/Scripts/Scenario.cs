@@ -293,7 +293,7 @@ class PhaseTargetDetected : IScenarioPhase
    public override string Title => "Цель обнаружена МСЦ";
    public override bool IsFinished => Scenario.Instance.ScenarioTime > _startTime + _duration;
    private float _startTime;
-   private float _duration = 1f;
+   private float _duration = 3f;
 
    public override void Start()
    {
@@ -302,9 +302,13 @@ class PhaseTargetDetected : IScenarioPhase
       _startTime = Scenario.Instance.ScenarioTime;
       var camera = VirtualCameraHelper.Activate("vCam_ShipGroup");
       VirtualCameraHelper.AddMemberToTargetGroup(camera, Scenario.Instance.TargetInfo.Target.transform);
+      VirtualCameraHelper.AddMemberToTargetGroup(camera, Scenario.Instance.Ship.MPC.transform);
       Scenario.Instance.TargetDetectStatus = TargetDetectStatus.MPCOnly;
    }
-   public override void Update() { }
+   public override void Update() 
+   { 
+
+   }
 }
 
 class PhaseLaunchBouys : IScenarioPhase
@@ -409,7 +413,7 @@ class PhaseBouysStartScan : IScenarioPhase
    public override void Start() 
    {
       var cam = VirtualCameraHelper.Activate("vcam_TorpedoZone");
-      VirtualCameraHelper.AddMemberToTargetGroup(cam, Scenario.Instance.TargetInfo.Target.transform, 1);
+      VirtualCameraHelper.AddMemberToTargetGroup(cam, Scenario.Instance.TargetInfo.Target.transform, 2);
 
       foreach (var b in Scenario.Instance.Buoys)
          VirtualCameraHelper.AddMemberToTargetGroup(cam, b.transform);
