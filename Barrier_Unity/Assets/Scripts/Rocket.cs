@@ -55,7 +55,7 @@ public class Rocket : MonoBehaviour
       //Time.timeScale = 0.1f;
       LabelHelper.DestroyLabel(gameObject);
       transform.forward = Vector3.down;
-      transform.position = new Vector3(transform.position.x, 2, transform.position.z);
+      Utils.SetHeight(transform, 2);
       float cur_radius = 0;
       float adding_radius = _killRadius / 60f * 1.25f;
       GameObject strikeEffect = Instantiate(Resources.Load("RocketStrikeFx"), transform.position, Quaternion.identity) as GameObject;

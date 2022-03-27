@@ -312,10 +312,7 @@ class PhaseTargetDetectedByMPC : IScenarioPhase
    {
       var t = Scenario.Instance.ScenarioTime - _startTime;
       if (t < _durationLift)
-         _camera.transform.position = 
-            new Vector3(_camera.transform.position.x, 
-                        Mathf.SmoothStep(0, Scenario.Instance.TargetInfo.Distance, t / _durationLift), 
-                        _camera.transform.position.z);
+         Utils.SetHeight(_camera.transform, Mathf.SmoothStep(0, Scenario.Instance.TargetInfo.Distance, t / _durationLift));
       else
       {
          t -= _durationLift;
@@ -436,7 +433,7 @@ class PhaseBouysStartScan : IScenarioPhase
 
       LabelHelper.ShowLabels(true);
 
-      cam.transform.position = new Vector3(cam.transform.position.x, VarSync.GetFloat(VarName.BuoysDetectRange), cam.transform.position.z);
+      Utils.SetHeight(cam.transform, VarName.BuoysDetectRange.GetFloat());
    }
    public override void Update() 
    {
@@ -447,9 +444,7 @@ class PhaseBouysStartScan : IScenarioPhase
          Scenario.Instance.TargetDetectStatus = TargetDetectStatus.Buoys;
 
       if (_timeAllBuoysStartWork < 0 && Scenario.Instance.Buoys.All(b => b.State == BuoyState.Working))
-      {
          _timeAllBuoysStartWork = Scenario.Instance.ScenarioTime;
-      }
    }
 }
 
@@ -459,14 +454,24 @@ class PhaseBouysTargetDetected : IScenarioPhase
 
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.TargetDetectedByBuoys;
    public override string Title => "Цель запеленгована буями";
-   public override bool IsFinished => checkFinished();
+   public override bool IsFinished => _bg.IsTorpedoFinallyDetected;
+   private CinemachineVirtualCamera _cam;
 
    public override void Start() 
    {
       _bg = GameObject.FindObjectOfType<BuoyGuard>();
+      _cam = VirtualCameraHelper.Find("vcam_TorpedoZone");
+      VirtualCameraHelper.ClearTargetGroup(_cam);
+      foreach (var b in Scenario.Instance.Buoys)
+         VirtualCameraHelper.AddMemberToTargetGroup(_cam, b.transform, 1, 100);
+
 
       LabelHelper.ShowLabels(true);
+      _cam.Follow = _bg.DetectZone;
+      _cam.transform.position = _bg.DetectZone.position;
+      Utils.SetHeight(_cam.transform, 1000);
    }
+
    public override void Update() 
    {
       var zone = _bg.RealZone;
@@ -474,15 +479,8 @@ class PhaseBouysTargetDetected : IScenarioPhase
          return;
 
       float radius = Math.Max((zone[0] - zone[2]).magnitude, (zone[1] - zone[3]).magnitude);
-      var cam = VirtualCameraHelper.Find("vcam_TorpedoZone");
-      VirtualCameraHelper.RemoveMemberFromTargetGroup(cam, _bg.DetectZone);
-      VirtualCameraHelper.AddMemberToTargetGroup(cam, _bg.DetectZone, 1, radius);
-   }
-
-
-   private bool checkFinished()
-   {
-      return _bg.IsTorpedoFinallyDetected;
+      VirtualCameraHelper.RemoveMemberFromTargetGroup(_cam, _bg.DetectZone);
+      VirtualCameraHelper.AddMemberToTargetGroup(_cam, _bg.DetectZone, 1, radius);
    }
 }
 

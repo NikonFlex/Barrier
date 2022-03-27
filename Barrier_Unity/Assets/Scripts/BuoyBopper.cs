@@ -34,7 +34,7 @@ public class BuoyBopper : MonoBehaviour
    {
       transform.SetParent(null, true);
 
-      transform.position = new Vector3(gameObject.transform.position.x, 1, gameObject.transform.position.z);
+      Utils.SetHeight(transform, 1);
       transform.rotation = Quaternion.LookRotation(Vector3.down);
 
       _buoyancy.GetComponent<Animator>().SetBool("Inflate", true);
@@ -45,8 +45,7 @@ public class BuoyBopper : MonoBehaviour
    public void startFloating()
    {
       _heightHelper = new Crest.SampleHeightHelper();
-      var pos = gameObject.transform.position;
-      transform.position = new Vector3(pos.x, 0, pos.z);
+      Utils.SetHeight(gameObject.transform, 0);
       _heightHelper.Init(transform.position);
       _isFloating = true;
 
@@ -68,6 +67,5 @@ public class BuoyBopper : MonoBehaviour
    {
       Vector3 curPos = transform.position;
       _heightHelper.Sample(out float height);
-      //transform.position = new Vector3(curPos.x, height, curPos.z);
    }
 }

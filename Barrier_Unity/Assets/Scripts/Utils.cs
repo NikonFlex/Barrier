@@ -288,4 +288,10 @@ static class Utils
 
       return halfRange/3f * Mathf.Sqrt(2f) * (r - 3f);
    }
+
+   static public void SetHeight(Transform t, float height)
+   {
+      t.position = new Vector3(t.position.x, height, t.position.z);
+   }
+
 }
