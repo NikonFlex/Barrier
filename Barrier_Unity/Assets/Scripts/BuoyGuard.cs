@@ -9,7 +9,8 @@ public enum ZoneColor
 {
    Green,
    Yellow,
-   Red
+   Red,
+   None
 }
 
 public class BuoyGuard : MonoBehaviour
@@ -27,7 +28,7 @@ public class BuoyGuard : MonoBehaviour
    private GameObject _elipseZone;
    private GameObject _splineZone;
    private DetectionArea _detectionZone;
-   private ZoneColor _zoneColor = ZoneColor.Red;
+   private ZoneColor _zoneColor = ZoneColor.None;
    private bool _yellowZoneSetted = false;
    private bool _greenZoneSetted = false;
 
@@ -254,11 +255,8 @@ public class BuoyGuard : MonoBehaviour
             if (_torpedoDetectionModel.RegressionReady)
             {
                var b = VarName.BuoysBearingError.GetFloat();
-               refreshDetectionZoneColor(VarName.BuoysBearingError.GetFloat());
+               refreshDetectionZoneColor(VarName.TargetDetectionError.GetFloat());
                Vector3 p = _torpedoDetectionModel.CalcPrognosisPos(4f);
-               int a = 7;
-               if (float.IsNaN(p.x))
-                  a = 7;
                _detectionZone.transform.position = new Vector3(p.x, 10, p.z);
             }
 
@@ -350,24 +348,32 @@ public class BuoyGuard : MonoBehaviour
       return Quaternion.AngleAxis(a, Vector3.up) * v;
    }
 
+   private ZoneColor calcZoneColor(float radius)
+   {
+      if (radius <= 0 || radius > VarSync.GetFloat(VarName.YellowZoneD))
+         return ZoneColor.Red;
+      if (radius > VarSync.GetFloat(VarName.GreenZoneD))
+         return ZoneColor.Yellow;
+      return ZoneColor.Green;
+   }
    private void refreshDetectionZoneColor(float curRaduis)
    {
-      float d = 2 * curRaduis;
-      if (d > VarSync.GetFloat(VarName.YellowZoneD) && _zoneColor != ZoneColor.Red)
+      ZoneColor clr = calcZoneColor(curRaduis * 2);
+      if (clr == _zoneColor)
+         return;
+      _zoneColor = clr;
+      switch (_zoneColor)
       {
-         _detectionZone.SetColor(new Color(1, 0, 0, 0.2f)); //red
-         _zoneColor = ZoneColor.Red;
+         case ZoneColor.Red:
+            _detectionZone.SetColor(new Color(1, 0, 0, 0.2f)); //red
+            break;
+         case ZoneColor.Yellow:
+            _detectionZone.SetColor(new Color(1, 0.64f, 0, 0.2f));
+            break;
+         case ZoneColor.Green:
+            _detectionZone.SetColor(new Color(0, 1, 0, 0.2f));
+            IsTorpedoFinallyDetected = true;
+            break;
       }
-      else if (VarSync.GetFloat(VarName.GreenZoneD) <= d && _zoneColor != ZoneColor.Yellow)
-      {
-         _detectionZone.SetColor(new Color(1, 0.64f, 0, 0.2f)); //yellow
-         _zoneColor = ZoneColor.Yellow;
-      }
-      else if (_zoneColor != ZoneColor.Green)
-      {
-         _detectionZone.SetColor(new Color(0, 1, 0, 0.2f)); //green
-         _zoneColor = ZoneColor.Green;
-         IsTorpedoFinallyDetected = true;
-      }
-   }   
+   }
 }

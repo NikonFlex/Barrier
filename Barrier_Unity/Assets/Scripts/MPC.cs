@@ -6,6 +6,7 @@ public class MPC : MonoBehaviour
    [SerializeField] private LineRenderer _cableRenderer;
    [SerializeField] private GameObject _beam;
 
+   public float BeamLengthCoef { get; set; } = 0;
    private float _distToShip;
    private float _offsetFromWater = 0.25f; //can't see under water
 
@@ -44,10 +45,11 @@ public class MPC : MonoBehaviour
          : Scenario.Instance.TargetInfo.Target.transform.position;
 
 
+      var beamDir = targetPoint - gameObject.transform.position;
       var beamRender = _beam.GetComponent<LineRenderer>();
       beamRender.startWidth = 0.5f;
       beamRender.endWidth = 100f;
-      beamRender.SetPositions(new[] { gameObject.transform.position, targetPoint } );
+      beamRender.SetPositions(new[] { gameObject.transform.position, gameObject.transform.position + beamDir*BeamLengthCoef } );
       beamRender.useWorldSpace = true;
 
    }

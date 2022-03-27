@@ -209,7 +209,7 @@ public class Scenario : MonoBehaviour
       // add stub phases
       var phases = new List<IScenarioPhase>();
       phases.Add(new PhaseAlert());
-      phases.Add(new PhaseTargetDetected());
+      phases.Add(new PhaseTargetDetectedByMPC());
       phases.Add(new PhaseLaunchBouys());
       phases.Add(new PhaseBouysPreparingReady());
       phases.Add(new PhaseBouysStartScan());
@@ -287,27 +287,41 @@ class PhaseAlert: IScenarioPhase
 }
 
 
-class PhaseTargetDetected : IScenarioPhase
+class PhaseTargetDetectedByMPC : IScenarioPhase
 {
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.TargetDetectedByAntenna;
-   public override string Title => "Цель обнаружена МСЦ";
-   public override bool IsFinished => Scenario.Instance.ScenarioTime > _startTime + _duration;
+   public override string Title => "Первичное обнаружение";
+   public override bool IsFinished => Scenario.Instance.ScenarioTime > _startTime + _durationLift + _durationDetect + _finishDelay;
    private float _startTime;
-   private float _duration = 3f;
+   private float _durationLift = 3f;
+   private float _durationDetect = 1f;
+   private float _finishDelay = 1f;
+   private CinemachineVirtualCamera _camera;
 
    public override void Start()
    {
       Scenario.Instance.PointOfFirstDetectionByMPC = Scenario.Instance.TargetInfo.Target.transform.position;
 
       _startTime = Scenario.Instance.ScenarioTime;
-      var camera = VirtualCameraHelper.Activate("vCam_ShipGroup");
-      VirtualCameraHelper.AddMemberToTargetGroup(camera, Scenario.Instance.TargetInfo.Target.transform);
-      VirtualCameraHelper.AddMemberToTargetGroup(camera, Scenario.Instance.Ship.MPC.transform);
+      _camera = VirtualCameraHelper.Activate("vCam_ShipGroup");
+      VirtualCameraHelper.AddMemberToTargetGroup(_camera, Scenario.Instance.TargetInfo.Target.transform, 1);
+//      VirtualCameraHelper.AddMemberToTargetGroup(camera, Scenario.Instance.Ship.MPC.transform);
       Scenario.Instance.TargetDetectStatus = TargetDetectStatus.MPCOnly;
    }
    public override void Update() 
-   { 
-
+   {
+      var t = Scenario.Instance.ScenarioTime - _startTime;
+      if (t < _durationLift)
+         _camera.transform.position = 
+            new Vector3(_camera.transform.position.x, 
+                        Mathf.SmoothStep(0, Scenario.Instance.TargetInfo.Distance, t / _durationLift), 
+                        _camera.transform.position.z);
+      else
+      {
+         t -= _durationLift;
+         Scenario.Instance.Ship.MPC.BeamLengthCoef = Mathf.SmoothStep(0, 1, t / _durationDetect);
+      }
+         
    }
 }
 
@@ -408,7 +422,9 @@ class PhaseBouysStartScan : IScenarioPhase
 {
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysStartScan;
    public override string Title => "Буи начали сканирование";
-   public override bool IsFinished => checkFinished();
+   public override bool IsFinished => _timeAllBuoysStartWork > 0 && Scenario.Instance.ScenarioTime > _timeAllBuoysStartWork + _delay;
+   private float _delay = 3;
+   private float _timeAllBuoysStartWork = -1;
 
    public override void Start() 
    {
@@ -416,9 +432,11 @@ class PhaseBouysStartScan : IScenarioPhase
       VirtualCameraHelper.AddMemberToTargetGroup(cam, Scenario.Instance.TargetInfo.Target.transform, 2);
 
       foreach (var b in Scenario.Instance.Buoys)
-         VirtualCameraHelper.AddMemberToTargetGroup(cam, b.transform);
+         VirtualCameraHelper.AddMemberToTargetGroup(cam, b.transform, 1, VarSync.GetFloat(VarName.BuoysDetectRange));
 
       LabelHelper.ShowLabels(true);
+
+      cam.transform.position = new Vector3(cam.transform.position.x, VarSync.GetFloat(VarName.BuoysDetectRange), cam.transform.position.z);
    }
    public override void Update() 
    {
@@ -427,9 +445,12 @@ class PhaseBouysStartScan : IScenarioPhase
          Scenario.Instance.TargetDetectStatus = TargetDetectStatus.MPCAndBuoys;
       else if (numWorkBuoys > 1)
          Scenario.Instance.TargetDetectStatus = TargetDetectStatus.Buoys;
-   }
 
-   private bool checkFinished() => Scenario.Instance.Buoys.All(b => b.State == BuoyState.Working);
+      if (_timeAllBuoysStartWork < 0 && Scenario.Instance.Buoys.All(b => b.State == BuoyState.Working))
+      {
+         _timeAllBuoysStartWork = Scenario.Instance.ScenarioTime;
+      }
+   }
 }
 
 class PhaseBouysTargetDetected : IScenarioPhase
