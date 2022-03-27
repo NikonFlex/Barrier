@@ -15200,7 +15200,6 @@ MonoBehaviour:
   _offset: 2
   _axis: 1
   _checkValuesChanged: 1
-  _line: {fileID: 5646712207062855946}
 --- !u!114 &5646712207062855947
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15852,12 +15851,12 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b54fb90f99a597d4bb01ce4a415c5b13,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -50
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b54fb90f99a597d4bb01ce4a415c5b13,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.255
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b54fb90f99a597d4bb01ce4a415c5b13,
         type: 3}
