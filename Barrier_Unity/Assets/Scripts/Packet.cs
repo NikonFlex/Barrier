@@ -184,7 +184,6 @@ public class Packet : MonoBehaviour
       _shell.SetActive(false);
       _buoy.gameObject.SetActive(true);
 
-
       transform.rotation = Quaternion.LookRotation(Vector3.down);
       _bopper.StartWork();
 
@@ -197,7 +196,7 @@ public class Packet : MonoBehaviour
       while (gameObject.transform.position.y > -_workingDepth)
       {
          _divingSpeed += a * Time.deltaTime; 
-         gameObject.transform.position += gameObject.transform.forward * _divingSpeed * Time.deltaTime;
+         gameObject.transform.position += Vector3.down * _divingSpeed * Time.deltaTime;
          LabelHelper.SetLabelText(gameObject, $"H = {-gameObject.transform.position.y:0.#}");
          drawRopeToBopper();
          yield return null;
@@ -209,7 +208,6 @@ public class Packet : MonoBehaviour
       LabelHelper.HideLabel(gameObject);
       LabelHelper.AddLabel(_bopper.gameObject, labelText);
       Scenario.Instance.AddMessage($"Буй '{gameObject.name}' погрузился");
-      _buoy.Born();
       State = PacketState.Finish;
       yield return null;
    }
