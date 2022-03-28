@@ -70,6 +70,7 @@ public class TargetInfo
 {
    public float Bearing = 0;
    public float Distance = -1;
+   public float Tcpa = -1;
    public Torpedo Target;
 }
 
@@ -235,6 +236,7 @@ public class Scenario : MonoBehaviour
       TargetInfo trg = calcTargetInfo();
       VarSync.Set(VarName.TargetBearing, trg != null ? trg.Bearing : 0f);
       VarSync.Set(VarName.TargetDistance, trg != null ? trg.Distance : 0f);
+      VarSync.Set(VarName.TargetTCPA, trg != null ? trg.Tcpa.ToString("N1") : "--");
 
       _currentTime += Time.deltaTime;
 
@@ -266,12 +268,25 @@ public class Scenario : MonoBehaviour
 
    private TargetInfo calcTargetInfo()
    {
+      CpaTcpa.PolarPoint own_v = new CpaTcpa.PolarPoint(_ship.m_Speed, _ship.transform.rotation.eulerAngles.y);
+      CpaTcpa.PolarPoint tgt_v = new CpaTcpa.PolarPoint(_torpedo.Speed, _torpedo.transform.rotation.eulerAngles.y);
+      
+      float distance = (_ship.transform.position - _torpedo.transform.position).magnitude;
+      float bearing = Vector3.SignedAngle(_ship.transform.forward, (_torpedo.transform.position - transform.position).normalized, Vector3.up);
+
+      CpaTcpa.PolarPoint tgt = new CpaTcpa.PolarPoint(distance, bearing);
+
+      float tcpa = 0;
+      float cpa = 0;
+      CpaTcpa.Calc(own_v, tgt_v, tgt, out cpa, out tcpa);
+
       return new TargetInfo()
       {
-         Distance = (_ship.transform.position - _torpedo.transform.position).magnitude,
+         Distance = distance,
          // TODO: use ship direction and 
          Target = _torpedo,
-         Bearing = Vector3.SignedAngle(_ship.transform.forward, (_torpedo.transform.position - transform.position).normalized, Vector3.up)
+         Bearing = bearing,
+         Tcpa = tcpa
       };
    }
 }

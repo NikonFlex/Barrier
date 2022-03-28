@@ -60,6 +60,8 @@ public enum VarName
    [VarName(Persist = false, DefaultValue = 0f, FormatPrecision = 1f)]
    TargetDistance,
    [VarName(Persist = false, DefaultValue = "")]
+   TargetTCPA,
+   [VarName(Persist = false, DefaultValue = "--")]
    ScenarioPhaseName,
    [VarName(Persist = false, DefaultValue = -25f, FormatPrecision = 1f)]
    TargetDetectionError,
