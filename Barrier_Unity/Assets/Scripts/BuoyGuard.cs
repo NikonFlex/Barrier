@@ -123,40 +123,46 @@ public class BuoyGuard : MonoBehaviour
 
    private Vector3[] updateZonePoints()
    {
-      float b1Error = _bouys[0].Error;
-      float b2Error = _bouys[1].Error;
+      for (int i = 0; i < _bouys.Count - 1; i++)
+      {
+         for (int j = i + 1; j < _bouys.Count; j++)
+         {
+            float b1Error = _bouys[i].Error;
+            float b2Error = _bouys[j].Error;
 
-      Vector3 vb = (_torpedo.position - _bouys[0].transform.position).normalized;
-      vb = new Vector3(vb.x, 0, vb.z).normalized;
-      Vector3 vr = getDir(vb, b1Error + Buoy.GetBearingError() / 2f);
-      Vector3 vl = getDir(vb, b1Error - Buoy.GetBearingError() / 2f);
+            Vector3 vb = (_torpedo.position - _bouys[i].transform.position).normalized;
+            vb = new Vector3(vb.x, 0, vb.z).normalized;
+            Vector3 vr = getDir(vb, b1Error + Buoy.GetBearingError() / 2f);
+            Vector3 vl = getDir(vb, b1Error - Buoy.GetBearingError() / 2f);
 
-      Vector3 p1 = new Vector3(_bouys[0].transform.position.x, 0, _bouys[0].transform.position.z);
-      Vector3 p1r = p1 + vr * _detectRange;
-      Vector3 p1l = p1 + vl * _detectRange;
+            Vector3 p1 = new Vector3(_bouys[i].transform.position.x, 0, _bouys[i].transform.position.z);
+            Vector3 p1r = p1 + vr * _detectRange;
+            Vector3 p1l = p1 + vl * _detectRange;
 
-      vb = (_torpedo.position - _bouys[1].transform.position).normalized;
-      vb = new Vector3(vb.x, 0, vb.z).normalized;
-      vr = getDir(vb, b2Error + Buoy.GetBearingError() / 2f);
-      vl = getDir(vb, b2Error - Buoy.GetBearingError() / 2f);
+            vb = (_torpedo.position - _bouys[j].transform.position).normalized;
+            vb = new Vector3(vb.x, 0, vb.z).normalized;
+            vr = getDir(vb, b2Error + Buoy.GetBearingError() / 2f);
+            vl = getDir(vb, b2Error - Buoy.GetBearingError() / 2f);
 
-      Vector3 p2 = new Vector3(_bouys[1].transform.position.x, 0, _bouys[1].transform.position.z);
-      Vector3 p2r = p2 + vr * _detectRange;
-      Vector3 p2l = p2 + vl * _detectRange;
+            Vector3 p2 = new Vector3(_bouys[j].transform.position.x, 0, _bouys[j].transform.position.z);
+            Vector3 p2r = p2 + vr * _detectRange;
+            Vector3 p2l = p2 + vl * _detectRange;
 
-      Vector3 c1 = Vector3.zero;
-      bool f1 = getCross(p1, p1l, p2, p2l, out c1);
-      Vector3 c2 = Vector3.zero;
-      bool f2 = getCross(p1, p1r, p2, p2l, out c2);
-      Vector3 c3 = Vector3.zero;
-      bool f3 = getCross(p1, p1r, p2, p2r, out c3);
-      Vector3 c4 = Vector3.zero;
-      bool f4 = getCross(p1, p1l, p2, p2r, out c4);
+            Vector3 c1 = Vector3.zero;
+            bool f1 = getCross(p1, p1l, p2, p2l, out c1);
+            Vector3 c2 = Vector3.zero;
+            bool f2 = getCross(p1, p1r, p2, p2l, out c2);
+            Vector3 c3 = Vector3.zero;
+            bool f3 = getCross(p1, p1r, p2, p2r, out c3);
+            Vector3 c4 = Vector3.zero;
+            bool f4 = getCross(p1, p1l, p2, p2r, out c4);
 
-      if (!(f1 && f2 && f3 && f4))
-         return new Vector3[0];
-      else
-         return new Vector3[] { c1, c2, c3, c4 };
+            if (f1 && f2 && f3 && f4)
+               return new Vector3[] { c1, c2, c3, c4 };
+         }
+      }
+      
+      return new Vector3[0];
    }
 
    private void updateZoneMesh(Vector3 c1, Vector3 c2, Vector3 c3, Vector3 c4, Vector3[] vertices)
@@ -334,7 +340,8 @@ public class BuoyGuard : MonoBehaviour
 
       float d = (_torpedo.position - cross).magnitude;
 
-      if (d > VarSync.GetFloat(VarName.BuoysDetectRange))
+      float error = Mathf.Tan(VarSync.GetFloat(VarName.BuoysBearingError) / 2f * Mathf.Deg2Rad) * VarSync.GetFloat(VarName.BuoysDetectRange);
+      if (d > error)
          return false;
 
       return true;
