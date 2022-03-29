@@ -9051,6 +9051,7 @@ MonoBehaviour:
   _torpedo: {fileID: 1723057347}
   _cameraController: {fileID: 0}
   _log: {fileID: 971280292}
+  _hitLabel: {fileID: 1943347881}
 --- !u!1 &1175411987
 GameObject:
   m_ObjectHideFlags: 0
@@ -14410,6 +14411,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1812132634}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1943347881 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6309656781295862193, guid: e5f66848b0dc4ac459a9c9a323cc4758,
+    type: 3}
+  m_PrefabInstance: {fileID: 1812132634}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dfdb937e04f8964d9e7e1ece07620ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1953439921
 GameObject:
   m_ObjectHideFlags: 0
@@ -15083,7 +15096,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2066991197}
-  m_LocalRotation: {x: -0.06527352, y: 0.8715816, z: -0.12088904, w: -0.47060677}
+  m_LocalRotation: {x: -0.06527352, y: 0.8715816, z: -0.120889045, w: -0.47060674}
   m_LocalPosition: {x: -2937.412, y: -21.51289, z: -5321.5825}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

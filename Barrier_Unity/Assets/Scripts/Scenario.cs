@@ -71,7 +71,9 @@ public class TargetInfo
    public float Bearing = 0;
    public float Distance = -1;
    public float Tcpa = -1;
+   public Vector3 TcpaPoint = Vector3.zero;
    public Torpedo Target;
+
 }
 
 public class Scenario : MonoBehaviour
@@ -80,6 +82,7 @@ public class Scenario : MonoBehaviour
    [SerializeField] Torpedo _torpedo;
    [SerializeField] private CameraController _cameraController;
    [SerializeField] private ScenarioLog _log;
+   [SerializeField] private ScreenLabel _hitLabel;
 
    private List<Packet> _buoyPackets = new List<Packet>();
    private List<Rocket> _rockets = new List<Rocket>();
@@ -96,8 +99,6 @@ public class Scenario : MonoBehaviour
    private IScenarioPhase currentPhase => _phases[(int)_currentPhaseIndex];
    private bool isRunning => _currentMode == Mode.Running;
    private bool isAlive => _currentMode != Mode.Stoped && _currentMode != Mode.Finished;
-
-
 
    public enum Mode
    {
@@ -124,7 +125,6 @@ public class Scenario : MonoBehaviour
       Instance.TargetInfo.Target.IsActive;
    public TargetDetectStatus TargetDetectStatus { get; set; } = TargetDetectStatus.NoDetect;
    public Vector3 PointOfFirstDetectionByMPC { get; set; }
-
 
    public void OnPacketLaunched(Packet p)
    {
@@ -224,6 +224,7 @@ public class Scenario : MonoBehaviour
 
       VirtualCameraHelper.Activate("vCam_ShipGroup");
    }
+
    // Update is called once per frame
    void Update()
    {
@@ -236,11 +237,25 @@ public class Scenario : MonoBehaviour
       TargetInfo trg = calcTargetInfo();
       VarSync.Set(VarName.TargetBearing, trg != null ? trg.Bearing : 0f);
       VarSync.Set(VarName.TargetDistance, trg != null ? trg.Distance : 0f);
-      VarSync.Set(VarName.TargetTCPA, trg != null ? trg.Tcpa.ToString("N1") : "--");
+      VarSync.Set(VarName.TargetTCPA, trg != null ? trg.Tcpa : 0f);
+      
 
       _currentTime += Time.deltaTime;
 
       currentPhase.Update();
+
+      if (currentPhase.ScenarioState > ScenarioPhaseState.Alert)
+      {
+         if (_hitLabel.gameObject.activeSelf == false)
+         {
+            _hitLabel.target = new GameObject("hitObject").transform;
+            _hitLabel.gameObject.SetActive(true);
+         }
+         else
+         {
+            _hitLabel.target.transform.position = trg.TcpaPoint;
+         }
+      }
 
       //взрыв корабля
       if (Scenario.Instance.TargetInfo.Distance <= 15 && _ship.transform.GetComponent<Ship>().IsAlive)
@@ -280,13 +295,16 @@ public class Scenario : MonoBehaviour
       float cpa = 0;
       CpaTcpa.Calc(own_v, tgt_v, tgt, out cpa, out tcpa);
 
-      return new TargetInfo()
+      Vector3 tcpaPoint = _torpedo.transform.position + _torpedo.transform.forward * _torpedo.Speed * tcpa;
+
+      return new TargetInfo()                                                                             
       {
          Distance = distance,
          // TODO: use ship direction and 
          Target = _torpedo,
          Bearing = bearing,
-         Tcpa = tcpa
+         Tcpa = tcpa,
+         TcpaPoint = tcpaPoint
       };
    }
 }

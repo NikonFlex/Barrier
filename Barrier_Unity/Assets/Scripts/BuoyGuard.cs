@@ -21,7 +21,6 @@ public class BuoyGuard : MonoBehaviour
    [SerializeField] private TorpedoDetectionModel _torpedoDetectionModel;
 
    private List<Buoy> _bouys = new List<Buoy>();
-   public Buoy[] Bouys => _bouys.ToArray();
    public bool IsTorpedoFinallyDetected { get; private set; }
 
    private GameObject _rombZone;
@@ -42,7 +41,6 @@ public class BuoyGuard : MonoBehaviour
    public float ScanningError => _scanningError;
    private float _detectRange => VarSync.GetFloat(VarName.BuoysDetectRange);
 
-
    void Start()
    {
       createZoneObject();
@@ -62,7 +60,6 @@ public class BuoyGuard : MonoBehaviour
          activateZone();
       else
          return;
-
 
       if (_startScanTime < 0)
          _startScanTime = Scenario.Instance.ScenarioTime;
@@ -313,7 +310,7 @@ public class BuoyGuard : MonoBehaviour
          Debug.LogError("Exceed number of buoys");
    }
 
-    private bool getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22, out Vector3 cross)
+   private bool getCross(Vector3 p11, Vector3 p12, Vector3 p21, Vector3 p22, out Vector3 cross)
    {
       p11.y = 1;
       p12.y = 1;
@@ -356,6 +353,7 @@ public class BuoyGuard : MonoBehaviour
          return ZoneColor.Yellow;
       return ZoneColor.Green;
    }
+   
    private void refreshDetectionZoneColor(float curRaduis)
    {
       ZoneColor clr = calcZoneColor(curRaduis * 2);

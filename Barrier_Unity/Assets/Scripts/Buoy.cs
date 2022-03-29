@@ -31,6 +31,7 @@ public class Buoy : MonoBehaviour
       else
          return VarSync.GetFloat(VarName.BuoysBearingError) * VarSync.GetFloat(VarName.BuoysBearingMultplier);
    }
+
    public void Born()
    {
       Scenario.Instance.OnBouyBorn(this);
@@ -43,7 +44,6 @@ public class Buoy : MonoBehaviour
 
       m_errorTime = Time.time;
       StartCoroutine(timerCoroutine());
-
    }
 
    private void startPelleng()

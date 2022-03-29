@@ -59,7 +59,7 @@ public enum VarName
    TargetBearing,
    [VarName(Persist = false, DefaultValue = 0f, FormatPrecision = 1f)]
    TargetDistance,
-   [VarName(Persist = false, DefaultValue = "")]
+   [VarName(Persist = false, DefaultValue = 0f, FormatPrecision = 1f)]
    TargetTCPA,
    [VarName(Persist = false, DefaultValue = "--")]
    ScenarioPhaseName,
