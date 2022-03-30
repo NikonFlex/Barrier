@@ -11,6 +11,7 @@ public class RocketLauncher : MonoBehaviour
 
    private int _rocketNumber;
    private float _offestBeetweenRockets;
+   private float _destroyRadius;
    private List<Rocket> _rockets = new List<Rocket>();
    private bool _isStarted = false;
 
@@ -31,6 +32,7 @@ public class RocketLauncher : MonoBehaviour
       _isStarted = true;
       _rocketNumber = int.Parse(VarSync.GetStringEnum(VarName.RocketNum));
       _offestBeetweenRockets = VarSync.GetFloat(VarName.RocketDistance);
+      _destroyRadius = VarSync.GetFloat(VarName.RocketDestroyRadius);
    }
 
    private IEnumerator LaunchRocketsCoroutine()
@@ -71,7 +73,7 @@ public class RocketLauncher : MonoBehaviour
 
          Rocket rocket = Instantiate(Resources.Load<Rocket>("rocket"), gameObject.transform.position, Quaternion.Euler(0, 0, 0));
          rocket.name = $"rocket_{i}";
-         rocket.AimToTarget(cur_target, _speed, _offestBeetweenRockets / 2);
+         rocket.AimToTarget(cur_target, _speed, _destroyRadius);
          _rockets.Add(rocket);
          Scenario.Instance.OnRocketLaunched(rocket);
          var smoke = Instantiate(Resources.Load("LaunchSmoke"), gameObject.transform.position, Quaternion.Euler(0, 0, 0));
