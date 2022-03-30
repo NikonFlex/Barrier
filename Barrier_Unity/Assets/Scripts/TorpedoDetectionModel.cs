@@ -145,8 +145,8 @@ public class TorpedoDetectionModel : MonoBehaviour
             n++;
          }
 
-         if (num > 0)
-            pointsList.Add(tp / num);
+         if (n > 0)
+            pointsList.Add(tp / n);
       }
 
       var points = pointsList.ToArray();
