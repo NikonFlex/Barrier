@@ -50,6 +50,9 @@ public class Buoy : MonoBehaviour
 
    private void startPelleng()
    {
+      if (!_pelengPivot)
+         return;
+
       _pelengPivot.GetComponent<LookAtConstraint>()
          .AddSource(
             new ConstraintSource 
@@ -57,7 +60,7 @@ public class Buoy : MonoBehaviour
                sourceTransform = Scenario.Instance.TargetInfo.Target.transform,
                weight = 1
             });
-      //_signal.GetComponent<ParticleSystem>().Play();
+     
    }
 
 

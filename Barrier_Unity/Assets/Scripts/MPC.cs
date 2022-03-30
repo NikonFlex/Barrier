@@ -5,6 +5,7 @@ public class MPC : MonoBehaviour
    [SerializeField] private GameObject _fastener;
    [SerializeField] private LineRenderer _cableRenderer;
    [SerializeField] private GameObject _beam;
+   [SerializeField] private Buoy _buoy;
 
    public float BeamLengthCoef { get; set; } = 0;
    private float _distToShip;
@@ -59,6 +60,8 @@ public class MPC : MonoBehaviour
       gameObject.SetActive(isActive);
       _distToShip = distToShip;
       LabelHelper.ShowLabel(gameObject);
+
+      _buoy.Born();
    }
 
    public void SetPosition(Vector3 newShipPos, Vector3 shipForward)
@@ -66,8 +69,8 @@ public class MPC : MonoBehaviour
       if (!gameObject.activeSelf)
          return;
 
-      newShipPos.y += _offsetFromWater;
-      gameObject.transform.position = newShipPos + -shipForward * _distToShip;
+      newShipPos.y += _offsetFromWater; 
+      gameObject.transform.position = newShipPos - shipForward * _distToShip;
       drawFastener();
    }
 }
