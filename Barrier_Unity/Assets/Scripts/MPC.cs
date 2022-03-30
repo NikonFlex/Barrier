@@ -32,8 +32,10 @@ public class MPC : MonoBehaviour
       if (!gameObject.activeSelf)
          return;
 
-      if (Scenario.Instance.TargetDetectStatus == TargetDetectStatus.NoDetect ||
-          Scenario.Instance.TargetDetectStatus == TargetDetectStatus.Buoys )
+      if (Scenario.Instance.TargetInfo == null ||
+          Scenario.Instance.TargetDetectStatus == TargetDetectStatus.NoDetect ||
+          Scenario.Instance.TargetDetectStatus == TargetDetectStatus.Buoys ||
+          Scenario.Instance.TargetDetectStatus == TargetDetectStatus.MPCAndBuoys)
       {
          _beam.SetActive(false);
          return;

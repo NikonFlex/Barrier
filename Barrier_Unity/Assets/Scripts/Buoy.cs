@@ -44,8 +44,6 @@ public class Buoy : MonoBehaviour
 
       m_errorTime = Time.time;
       StartCoroutine(timerCoroutine());
-
-      _signal.GetComponent<ParticleSystem>().Play();
    }
 
    private void startPelleng()
@@ -60,7 +58,9 @@ public class Buoy : MonoBehaviour
                sourceTransform = Scenario.Instance.TargetInfo.Target.transform,
                weight = 1
             });
-     
+
+      if(_signal)
+         _signal.GetComponent<ParticleSystem>().Play();
    }
 
 
