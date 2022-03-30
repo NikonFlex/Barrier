@@ -158,7 +158,9 @@ public class BuoyGuard : MonoBehaviour
             bool f4 = getCross(p1, p1l, p2, p2r, out c4);
 
             if (f1 && f2 && f3 && f4)
+            {
                return new Vector3[] { c1, c2, c3, c4 };
+            }
          }
       }
       
