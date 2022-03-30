@@ -27,7 +27,7 @@ Data:
     BuoyReadyTime: 
       Value: !System.Single 3
       DisplayText: Время готовности буя
-    BouysDistanceBetween: 
+    BuoysDistanceBetween: 
       Value: !System.Single 1000
       DisplayText: Расстояние между буями
     StartDistanceToTarget: 

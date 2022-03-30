@@ -20,7 +20,7 @@ public class BuoyGuard : MonoBehaviour
    [SerializeField] private Material _targetErrorZoneMaterial;
    [SerializeField] private TorpedoDetectionModel _torpedoDetectionModel;
 
-   private List<Buoy> _bouys = new List<Buoy>();
+   private List<Buoy> _buoys = new List<Buoy>();
    public bool IsTorpedoFinallyDetected { get; private set; }
 
    private GameObject _rombZone;
@@ -56,7 +56,7 @@ public class BuoyGuard : MonoBehaviour
          return;
       }
 
-      if (_bouys.Count > 1)
+      if (_buoys.Count > 1)
          activateZone();
       else
          return;
@@ -123,28 +123,28 @@ public class BuoyGuard : MonoBehaviour
 
    private Vector3[] updateZonePoints()
    {
-      for (int i = 0; i < _bouys.Count - 1; i++)
+      for (int i = 0; i < _buoys.Count - 1; i++)
       {
-         for (int j = i + 1; j < _bouys.Count; j++)
+         for (int j = i + 1; j < _buoys.Count; j++)
          {
-            float b1Error = _bouys[i].Error;
-            float b2Error = _bouys[j].Error;
+            float b1Error = _buoys[i].Error;
+            float b2Error = _buoys[j].Error;
 
-            Vector3 vb = (_torpedo.position - _bouys[i].transform.position).normalized;
+            Vector3 vb = (_torpedo.position - _buoys[i].transform.position).normalized;
             vb = new Vector3(vb.x, 0, vb.z).normalized;
             Vector3 vr = getDir(vb, b1Error + Buoy.GetBearingError() / 2f);
             Vector3 vl = getDir(vb, b1Error - Buoy.GetBearingError() / 2f);
 
-            Vector3 p1 = new Vector3(_bouys[i].transform.position.x, 0, _bouys[i].transform.position.z);
+            Vector3 p1 = new Vector3(_buoys[i].transform.position.x, 0, _buoys[i].transform.position.z);
             Vector3 p1r = p1 + vr * _detectRange;
             Vector3 p1l = p1 + vl * _detectRange;
 
-            vb = (_torpedo.position - _bouys[j].transform.position).normalized;
+            vb = (_torpedo.position - _buoys[j].transform.position).normalized;
             vb = new Vector3(vb.x, 0, vb.z).normalized;
             vr = getDir(vb, b2Error + Buoy.GetBearingError() / 2f);
             vl = getDir(vb, b2Error - Buoy.GetBearingError() / 2f);
 
-            Vector3 p2 = new Vector3(_bouys[j].transform.position.x, 0, _bouys[j].transform.position.z);
+            Vector3 p2 = new Vector3(_buoys[j].transform.position.x, 0, _buoys[j].transform.position.z);
             Vector3 p2r = p2 + vr * _detectRange;
             Vector3 p2l = p2 + vl * _detectRange;
 
@@ -211,7 +211,7 @@ public class BuoyGuard : MonoBehaviour
    {
       while (true)
       {
-         if (_bouys.Count < 2)
+         if (_buoys.Count < 2)
          {
             yield return null;
             continue;
@@ -221,20 +221,20 @@ public class BuoyGuard : MonoBehaviour
          {
             int idx = 0;
             
-            for(int i = 0; i < _bouys.Count - 1; i++)
+            for(int i = 0; i < _buoys.Count - 1; i++)
             {
-               for(int j = i+1; j < _bouys.Count; j++)
+               for(int j = i+1; j < _buoys.Count; j++)
                {
                      //calculate real tracked point
-                     Vector3 b1Bearing = (_torpedo.position - _bouys[i].transform.position).normalized;
-                     Vector3 b2Bearing = (_torpedo.position - _bouys[j].transform.position).normalized;
+                     Vector3 b1Bearing = (_torpedo.position - _buoys[i].transform.position).normalized;
+                     Vector3 b2Bearing = (_torpedo.position - _buoys[j].transform.position).normalized;
 
-                     Vector3 b1BearingWithError = getDir(b1Bearing, _bouys[i].Error);
-                     Vector3 b2BearingWithError = getDir(b2Bearing, _bouys[j].Error);
+                     Vector3 b1BearingWithError = getDir(b1Bearing, _buoys[i].Error);
+                     Vector3 b2BearingWithError = getDir(b2Bearing, _buoys[j].Error);
 
-                     Vector3 p11 = _bouys[i].transform.position;
+                     Vector3 p11 = _buoys[i].transform.position;
                      Vector3 p12 = p11 + b1BearingWithError * _detectRange;
-                     Vector3 p21 = _bouys[j].transform.position;
+                     Vector3 p21 = _buoys[j].transform.position;
                      Vector3 p22 = p21 + b2BearingWithError * _detectRange;
 
                      Vector3 bouysBearingIntersection = Vector3.zero;
@@ -290,7 +290,7 @@ public class BuoyGuard : MonoBehaviour
 
       Gizmos.color = new Color(1, 0, 0, 0.25f);
 
-      foreach(var b in _bouys)
+      foreach(var b in _buoys)
       {
          Vector3 bearing = (_torpedo.position - b.transform.position).normalized;
          bearing = new Vector3(bearing.x, 0, bearing.z).normalized;
@@ -310,8 +310,8 @@ public class BuoyGuard : MonoBehaviour
 
    public void AddBuoy(Buoy b)
    {
-      if(_bouys.Count < 6)
-         _bouys.Add(b);
+      if(_buoys.Count < 6)
+         _buoys.Add(b);
       else
          Debug.LogError("Exceed number of buoys");
    }

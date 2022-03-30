@@ -27,9 +27,9 @@ public enum VarName
    [VarName(DisplayText = "Разность дальности полета буев", Persist = true, Units = "м", DefaultValue = 1000f)]
    BuoysShootRangeDiff,
    [VarName(DisplayText = "Расстояние между буями", Persist = true, Units = "м", DefaultValue = 1000f)]
-   BouysDistanceBetween,
+   BuoysDistanceBetween,
    [VarName(DisplayText = "Высота открытия парашюта", Persist = false, Units = "м", DefaultValue = 200f)]
-    BuoysOpenConeHeight,
+   BuoysOpenConeHeight,
    [VarName(DisplayText = "Высота начала торможения буя", Persist = true, Units = "м", DefaultValue = 50f)]
    BuoyBreakStartAltitude,
    [VarName(DisplayText = "Погрешность постановки буя", Persist = false, Units = "м", DefaultValue = 500f)]

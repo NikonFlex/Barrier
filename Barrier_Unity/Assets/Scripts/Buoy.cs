@@ -34,7 +34,7 @@ public class Buoy : MonoBehaviour
 
    public void Born()
    {
-      Scenario.Instance.OnBouyBorn(this);
+      Scenario.Instance.OnBuoyBorn(this);
       _state = BuoyState.OnPlace;
 
       UnityEngine.Random.InitState(DateTime.UtcNow.GetHashCode());
@@ -44,6 +44,8 @@ public class Buoy : MonoBehaviour
 
       m_errorTime = Time.time;
       StartCoroutine(timerCoroutine());
+
+      _signal.GetComponent<ParticleSystem>().Play();
    }
 
    private void startPelleng()
@@ -55,7 +57,7 @@ public class Buoy : MonoBehaviour
                sourceTransform = Scenario.Instance.TargetInfo.Target.transform,
                weight = 1
             });
-      _signal.GetComponent<ParticleSystem>().Play();
+      //_signal.GetComponent<ParticleSystem>().Play();
    }
 
 

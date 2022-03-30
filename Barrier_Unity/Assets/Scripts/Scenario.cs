@@ -137,7 +137,7 @@ public class Scenario : MonoBehaviour
          VirtualCameraHelper.AddMemberToTargetGroup("vcam_Buoy", p.transform);
       }
    }
-   public void OnBouyBorn(Buoy b) => _buoys.Add(b);
+   public void OnBuoyBorn(Buoy b) => _buoys.Add(b);
 
    public void OnRocketLaunched(Rocket r)
    {
@@ -211,11 +211,11 @@ public class Scenario : MonoBehaviour
       var phases = new List<IScenarioPhase>();
       phases.Add(new PhaseAlert());
       phases.Add(new PhaseTargetDetectedByMPC());
-      phases.Add(new PhaseLaunchBouys());
-      phases.Add(new PhaseBouysPreparingReady());
-      phases.Add(new PhaseBouysStartScan());
+      phases.Add(new PhaseLaunchBuoys());
+      phases.Add(new PhaseBuoysPreparingReady());
+      phases.Add(new PhaseBuoysStartScan());
       //phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.BuoysStartScan, "Начало сканирования буями", 2f));
-      phases.Add(new PhaseBouysTargetDetected());
+      phases.Add(new PhaseBuoysTargetDetected());
       phases.Add(new PhaseLaunchRockets());
       //phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.MissilesStrike, "Ракеты достигли цели", 2)); НЕ НУЖНА
       phases.Add(new ScnenarioPhaseStub(ScenarioPhaseState.ScenarioFinished, "Сценарий закончен", 2));
@@ -355,7 +355,7 @@ class PhaseTargetDetectedByMPC : IScenarioPhase
    }
 }
 
-class PhaseLaunchBouys : IScenarioPhase
+class PhaseLaunchBuoys : IScenarioPhase
 {
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysLaunched;
    public override string Title => "Запуск буев";
@@ -364,7 +364,7 @@ class PhaseLaunchBouys : IScenarioPhase
    public float _delay2 = 1;
    public float _buoyCameraHeight = 15;
    private float _startTime;
-   private float _allBouysLaunchedTime = 0;
+   private float _allBuoysLaunchedTime = 0;
    private CinemachineVirtualCamera _launchCamera = null;
    private CinemachineVirtualCamera _bouyCamera = null;
    BuoyLauncher _launcher;
@@ -380,15 +380,15 @@ class PhaseLaunchBouys : IScenarioPhase
       if (_startTime + _delay1 >= Scenario.Instance.ScenarioTime && _launchCamera == null)
          _launchCamera = VirtualCameraHelper.Activate("vcam_Launch");
 
-      if (_allBouysLaunchedTime == 0)
+      if (_allBuoysLaunchedTime == 0)
       {
          if (Scenario.Instance.BuoyPackets.Length == _launcher.NumBuoys)
-            _allBouysLaunchedTime = Scenario.Instance.ScenarioTime;
+            _allBuoysLaunchedTime = Scenario.Instance.ScenarioTime;
       }
       else
       {
          var buoyPacket = Scenario.Instance.BuoyPackets.First();
-         if (_allBouysLaunchedTime + _delay2 < Scenario.Instance.ScenarioTime
+         if (_allBuoysLaunchedTime + _delay2 < Scenario.Instance.ScenarioTime
                && _bouyCamera == null
                //&& _buoyCameraHeight > buoyPacket.transform.position.y)
                && buoyPacket.CalcTimeToTarget() < 3 )
@@ -420,7 +420,7 @@ class PhaseLaunchBouys : IScenarioPhase
    }
 }
 
-class PhaseBouysPreparingReady : IScenarioPhase
+class PhaseBuoysPreparingReady : IScenarioPhase
 {
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysOnPlace;
    public override string Title => "Буи готовятся";
@@ -448,7 +448,7 @@ class PhaseBouysPreparingReady : IScenarioPhase
    }
 }
 
-class PhaseBouysStartScan : IScenarioPhase
+class PhaseBuoysStartScan : IScenarioPhase
 {
    public override ScenarioPhaseState ScenarioState => ScenarioPhaseState.BuoysStartScan;
    public override string Title => "Буи начали сканирование";
@@ -481,7 +481,7 @@ class PhaseBouysStartScan : IScenarioPhase
    }
 }
 
-class PhaseBouysTargetDetected : IScenarioPhase
+class PhaseBuoysTargetDetected : IScenarioPhase
 {
    private BuoyGuard _bg;
 
@@ -644,7 +644,7 @@ static class VirtualCameraHelper
          return false;
       }
 
-      Debug.Log($"Add {t.name} to target group of camera {cam.name}");
+      //Debug.Log($"Add {t.name} to target group of camera {cam.name}");
 
       int index = lookAtGroup.FindMember(t);
       if (index != -1)
