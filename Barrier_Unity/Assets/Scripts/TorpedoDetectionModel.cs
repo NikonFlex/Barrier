@@ -21,6 +21,7 @@ struct TrackedPoint
 public class TorpedoDetectionModel : MonoBehaviour
 {
    private List<Vector3>[] _kalmanPoistions = new List<Vector3>[15]; // 15 - number of combinations for 6 buoys
+   private List<Vector3> _points = new List<Vector3>();
    [SerializeField] private float _kalmanK = 1f;
 
    private bool _regressionReady = false;
@@ -58,7 +59,7 @@ public class TorpedoDetectionModel : MonoBehaviour
    {
       _regressionReady = false;
       for (int i = 0; i < _kalmanPoistions.Length; i++)
-         _kalmanPoistions[i].Clear();;
+         _kalmanPoistions[i].Clear();
    }
 
    public Vector3 CalcCourse()
@@ -66,12 +67,11 @@ public class TorpedoDetectionModel : MonoBehaviour
       if (!_regressionReady)
          return Vector3.zero;
 
-      int count = _kalmanPoistions[0].Count;
-      Vector3 p1 = new Vector3(_kalmanPoistions[0][0].x, 0, _reg_a * _kalmanPoistions[0][0].x + _reg_b);
-      Vector3 p2 = new Vector3(_kalmanPoistions[0][count-1].x, 0, _reg_a * _kalmanPoistions[0][count-1].x + _reg_b);
-
+      Vector3 p1 = new Vector3(_points.First().x, 0, _reg_a * _points.First().x + _reg_b);
+      Vector3 p2 = new Vector3(_points.Last().x, 0, _reg_a * _points.Last().x + _reg_b);
+                                                                      
       return (p2 - p1).normalized;
-   }
+   }                                                   
 
    public float CalcSpeed()
    {
@@ -123,16 +123,18 @@ public class TorpedoDetectionModel : MonoBehaviour
 
    public void CalcRegression()
    {
+      _regressionReady = false;
+   
       if (_kalmanPoistions[0].Count < 5)
          return;
 
       //calculate average of points for all combinations
-      Vector3[] points = new Vector3[_kalmanPoistions[0].Count];
+      _points.Clear();
 
       for (int i = 0; i < _kalmanPoistions[0].Count; i++)
       {
          Vector3 tp = Vector3.zero;
-         int num = 0;
+         int n = 0;
 
          for (int j = 0; j < _kalmanPoistions.Length; j++)
          {
@@ -140,33 +142,37 @@ public class TorpedoDetectionModel : MonoBehaviour
                continue;
             
             tp += _kalmanPoistions[j][i];
-            num++;
+            n++;
          }
 
-         points[i] = tp / num;
+         if(n > 0)
+            _points.Add(tp / n);
       }
+
+      if (_points.Count < 2)
+         return;
 
       // calculate regression line
       float x_mean = 0;
       float z_mean = 0;
 
-      for (int i = 0; i < points.Length; i++)
+      foreach (var p in _points)
       {
-         x_mean += points[i].x;
-         z_mean += points[i].z;
+         x_mean += p.x;
+         z_mean += p.z;
       }
 
-      x_mean /= points.Length;
-      z_mean /= points.Length;
+      x_mean /= _points.Count;
+      z_mean /= _points.Count;
 
       float xz_sum = 0;
       float x2_sum = 0;
       float z2_sum = 0;
 
-      for (int i = 0; i < points.Length; i++)
+      foreach (var p in _points)
       {
-         float dx = points[i].x - x_mean;
-         float dz = points[i].z - z_mean;
+         float dx = p.x - x_mean;
+         float dz = p.z - z_mean;
 
          xz_sum += dx * dz;
          x2_sum += dx * dx;
@@ -175,8 +181,8 @@ public class TorpedoDetectionModel : MonoBehaviour
 
       float r = xz_sum / Mathf.Sqrt(x2_sum * z2_sum);
 
-      float sx = Mathf.Sqrt(x2_sum / (points.Length - 1)) ;
-      float sz = Mathf.Sqrt(z2_sum / (points.Length - 1));
+      float sx = Mathf.Sqrt(x2_sum / (_points.Count - 1));
+      float sz = Mathf.Sqrt(z2_sum / (_points.Count - 1));
 
       float a = r * sz / sx;
       float b = z_mean - a * x_mean;
@@ -195,22 +201,22 @@ public class TorpedoDetectionModel : MonoBehaviour
 
       Vector3 p0 = new Vector3(0, 0, _reg_b);
 
-      float[] dist = new float[points.Length];
-      float[] vel = new float[points.Length-1];
+      float[] dist = new float[_points.Count];
+      float[] vel = new float[_points.Count-1];
 
-      for(int i = 0; i < points.Length; i++)
+      for(int i = 0; i < _points.Count; i++)
       {
-         Vector3 p = rot * (points[i] - p0);
+         Vector3 p = rot * (_points[i] - p0);
          dist[i] = p.x;
          
          if (i < vel.Length)
          {
-            Vector3 p_next = rot * (points[i + 1] - p0);
+            Vector3 p_next = rot * (_points[i + 1] - p0);
             vel[i] = (p_next.z - p.z) > 0 ? (p_next.z - p.z) : 0;
          }
       }
 
-      _reg_pos = points[points.Length - 1];
+      _reg_pos = _points.Last();
 
       float mean = calcMean(dist);
       float error = calcError(dist, mean);
@@ -233,30 +239,17 @@ public class TorpedoDetectionModel : MonoBehaviour
       if (!_regressionReady)
          return;
 
-      int count = _kalmanPoistions[0].Count;
-      Vector3 p1 = new Vector3(_kalmanPoistions[0][0].x - 200, 5, _reg_a * (_kalmanPoistions[0][0].x - 200) + _reg_b);
-      Vector3 p2 = new Vector3(_kalmanPoistions[0][count-1].x + 200, 5, _reg_a * (_kalmanPoistions[0][count-1].x + 200) + _reg_b);
+      int count = _points.Count;
+      Vector3 p1 = new Vector3(_points[0].x - 200, 5, _reg_a * (_points[0].x - 200) + _reg_b);
+      Vector3 p2 = new Vector3(_points[count-1].x + 200, 5, _reg_a * (_points[count-1].x + 200) + _reg_b);
 
       Gizmos.color = new Color(1, 1, 0, 0.5f);
       Gizmos.DrawLine(p1, p2);
 
-      for (int i = 0; i < _kalmanPoistions[0].Count; i++)
+      foreach (var p in _points)
       {
-         Vector3 tp = Vector3.zero;
-         count = 0;
-
-         for (int j = 0; j < _kalmanPoistions.Length; j++)
-         {
-            if (_kalmanPoistions[j][i].magnitude < 0.1f)
-               continue;
-
-            tp += _kalmanPoistions[j][i];
-            count++;
-            
-         }
-
          Gizmos.color = new Color(1, 1, 1, 0.75f);
-         Gizmos.DrawSphere(tp/count, 4f);
-      }
+         Gizmos.DrawSphere(p, 4f);
+      }                     
    }
 }

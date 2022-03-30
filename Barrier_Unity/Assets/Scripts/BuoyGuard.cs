@@ -32,7 +32,7 @@ public class BuoyGuard : MonoBehaviour
    private bool _greenZoneSetted = false;
 
    private float _startScanTime = -1;
-   private float _scanningError = 1f;
+   private float _scanningError = 1f;                            
 
    private bool _drawDebugLines = true;
 
@@ -52,7 +52,7 @@ public class BuoyGuard : MonoBehaviour
       if (!Scenario.IsTargetAlive)
       {
          deactivateZone();
-         _drawDebugLines = false;
+         //_drawDebugLines = false;
          return;
       }
 
@@ -173,8 +173,8 @@ public class BuoyGuard : MonoBehaviour
       //_rombZone.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
 
       //draw ellipse
-      float magn1 = (vertices[0] - vertices[2]).magnitude / 2;
-      float magn2 = (vertices[1] - vertices[3]).magnitude / 2;
+      //float magn1 = (vertices[0] - vertices[2]).magnitude / 2;
+      //float magn2 = (vertices[1] - vertices[3]).magnitude / 2;
       //if (magn2 > magn1)
       //{
       //   _elipseZone.GetComponent<MeshFilter>().mesh = Utils.CreateEllipseMesh(vertices[0], vertices[1], vertices[2], vertices[3]);
@@ -199,11 +199,6 @@ public class BuoyGuard : MonoBehaviour
          float r = VarName.TargetDetectionError.GetFloat();
          _detectionZone.transform.position += _torpedoDetectionModel.CalcCourse() * _torpedoDetectionModel.CalcSpeed() * Time.deltaTime;
          _detectionZone.SetRadius(r);
-
-
-         //          _detectionZone.GetComponent<MeshFilter>().mesh = Utils.CreateCircleMesh(r, 33);
-         //          _detectionZone.transform.position += _torpedoDetectionModel.CalcCourse() * _torpedoDetectionModel.CalcSpeed() * Time.deltaTime;
-         //          _detectionZone.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
       }
    }
 
@@ -284,11 +279,11 @@ public class BuoyGuard : MonoBehaviour
       Gizmos.DrawLine(t0, t0 + t2);
       Gizmos.DrawLine(t0, t0 + t3);
       Gizmos.DrawLine(t0, t0 + t4);
-
+                          
       if (!_drawDebugLines)
          return;
 
-      Gizmos.color = new Color(1, 0, 0, 0.25f);
+      Gizmos.color = new Color(0, 1, 1, 0.25f);
 
       foreach(var b in _buoys)
       {
@@ -301,10 +296,9 @@ public class BuoyGuard : MonoBehaviour
          Vector3 pCenter = p + bCenter * _detectRange;
          Vector3 pLeft = p + bLeft * _detectRange;
          Vector3 pRight = p + bRight * _detectRange;
-         Gizmos.DrawLine(p, pCenter);
+         //Gizmos.DrawLine(p, pCenter);
          Gizmos.DrawLine(p, pLeft);
          Gizmos.DrawLine(p, pRight);
-
       }
    }
 
@@ -340,7 +334,7 @@ public class BuoyGuard : MonoBehaviour
 
       float d = (_torpedo.position - cross).magnitude;
 
-      float error = Mathf.Tan(VarSync.GetFloat(VarName.BuoysBearingError) / 2f * Mathf.Deg2Rad) * VarSync.GetFloat(VarName.BuoysDetectRange);
+      float error = Mathf.Tan(VarSync.GetFloat(VarName.BuoysBearingError) / 2f * Mathf.Deg2Rad) * VarSync.GetFloat(VarName.BuoysDetectRange) * 2f;
       if (d > error)
          return false;
 
