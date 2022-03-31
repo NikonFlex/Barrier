@@ -148,7 +148,7 @@ public class TorpedoDetectionModel : MonoBehaviour
          if (n > 0)
             _points.Add(tp / n);
       }
-      if (!_points.Any())
+      if (_points.Count < 2)
          return;
 
 
