@@ -9,7 +9,6 @@ public enum ScenarioPhaseState
 {
    Alert, // поиск цели
    TargetDetectedByAntenna,// - цель обнаружена антенной
-   StartAiming,// - начало нацеливания
    BuoysLaunched,// - Буи выпущены
    BuoysOnPlace,  // - Буи приводнились
    BuoysStartScan, // - Начало сканирования буями

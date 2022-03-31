@@ -129,7 +129,7 @@ public class TorpedoDetectionModel : MonoBehaviour
          return;
 
       //calculate average of points for all combinations
-      List<Vector3> pointsList = new();
+      _points.Clear();
 
       for (int i = 0; i < _kalmanPoistions[0].Count; i++)
       {
@@ -146,10 +146,12 @@ public class TorpedoDetectionModel : MonoBehaviour
          }
 
          if (n > 0)
-            pointsList.Add(tp / n);
+            _points.Add(tp / n);
       }
+      if (!_points.Any())
+         return;
 
-      var points = pointsList.ToArray();
+
       // calculate regression line
       float x_mean = 0;
       float z_mean = 0;
