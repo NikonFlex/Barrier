@@ -35,6 +35,7 @@ public class BuoyGuard : MonoBehaviour
    private float _scanningError = 1f;                            
 
    private bool _drawDebugLines = true;
+   private float _rocketSpeed;
 
    public Vector3[] RealZone { get; private set; }
    public Transform DetectZone => _splineZone.transform;
@@ -43,6 +44,7 @@ public class BuoyGuard : MonoBehaviour
 
    void Start()
    {
+      _rocketSpeed = FindObjectOfType<RocketLauncher>().RocketSpeed;
       createZoneObject();
       StartCoroutine(trackTargetPosition());
    }
@@ -256,7 +258,8 @@ public class BuoyGuard : MonoBehaviour
             {
                var b = VarName.BuoysBearingError.GetFloat();
                refreshDetectionZoneColor(VarName.TargetDetectionError.GetFloat());
-               Vector3 p = _torpedoDetectionModel.CalcPrognosisPos(4f);
+               float timeToShoot = Scenario.Instance.TargetInfo.Distance/(_rocketSpeed + _torpedoDetectionModel.CalcSpeed());
+               Vector3 p = _torpedoDetectionModel.CalcPrognosisPos(timeToShoot);
                _detectionZone.transform.position = new Vector3(p.x, 10, p.z);
             }
 

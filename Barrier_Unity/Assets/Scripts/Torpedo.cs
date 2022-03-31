@@ -10,10 +10,10 @@ public class Torpedo : MonoBehaviour
    
    [SerializeField] GameObject m_targetShip;
    
-   [SerializeField] float m_predictTime = 4;
-   [SerializeField] GameObject m_predictObject;
+   [SerializeField] Transform m_predictPosition;
 
    private bool _isAlive = true;
+   private float _rocketSpeed;
 
    public bool IsActive => _isAlive;
 
@@ -25,14 +25,13 @@ public class Torpedo : MonoBehaviour
 
    void Start()
    {
+      _rocketSpeed = FindObjectOfType<RocketLauncher>().RocketSpeed;
    }
 
    void Update()
    {
-
       if (!Scenario.IsRunning)
          return;
-
 
       float step = m_speed * Time.deltaTime;
       Vector3 pos = transform.position;
@@ -44,7 +43,8 @@ public class Torpedo : MonoBehaviour
       pos += transform.forward*step;
       transform.position = pos;
 
-      m_predictObject.transform.position = transform.position + transform.forward * m_speed * m_predictTime;
+      float predictTime = Scenario.Instance.TargetInfo.Distance / (m_speed + _rocketSpeed);
+      m_predictPosition.transform.position = transform.position + transform.forward * m_speed * predictTime;
    }
 
    public float Speed => m_speed;

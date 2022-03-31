@@ -15,6 +15,8 @@ public class RocketLauncher : MonoBehaviour
    private List<Rocket> _rockets = new List<Rocket>();
    private bool _isStarted = false;
 
+   public float RocketSpeed => _speed;
+
    void Update()
    {
       if (_isStarted)

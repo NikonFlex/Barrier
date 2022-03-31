@@ -501,6 +501,7 @@ class PhaseBuoysTargetDetected : IScenarioPhase
       LabelHelper.ShowLabels(true);
       _cam.Follow = _bg.DetectZone;
       _cam.transform.position = _bg.DetectZone.position;
+      VirtualCameraHelper.AddMemberToTargetGroup(_cam, _bg.DetectZone, 1, 1000);
       Utils.SetHeight(_cam.transform, 1000);
    }
 
@@ -511,8 +512,6 @@ class PhaseBuoysTargetDetected : IScenarioPhase
          return;
 
       float radius = Math.Max((zone[0] - zone[2]).magnitude, (zone[1] - zone[3]).magnitude);
-      VirtualCameraHelper.RemoveMemberFromTargetGroup(_cam, _bg.DetectZone);
-      VirtualCameraHelper.AddMemberToTargetGroup(_cam, _bg.DetectZone, 1, radius);
    }
 }
 
