@@ -32,7 +32,7 @@ public class BuoyGuard : MonoBehaviour
    private bool _greenZoneSetted = false;
 
    private float _startScanTime = -1;
-   private float _scanningError = 1f;                            
+   private float _scanningError = 1f;
 
    private bool _drawDebugLines = true;
    private float _rocketSpeed;
@@ -109,10 +109,10 @@ public class BuoyGuard : MonoBehaviour
 
    private void activateZone()
    {
-       //_rombZone.SetActive(true);
-       //_elipseZone.SetActive(true);
-       _splineZone.SetActive(true);
-       _detectionZone.gameObject.SetActive(true);
+      //_rombZone.SetActive(true);
+      //_elipseZone.SetActive(true);
+      _splineZone.SetActive(true);
+      _detectionZone.gameObject.SetActive(true);
    }
 
    private void deactivateZone()
@@ -127,8 +127,14 @@ public class BuoyGuard : MonoBehaviour
    {
       for (int i = 0; i < _buoys.Count - 1; i++)
       {
+         if (_buoys[i].State != BuoyState.Working)
+            continue;
+
          for (int j = i + 1; j < _buoys.Count; j++)
          {
+            if (_buoys[j].State != BuoyState.Working)
+               continue;
+
             float b1Error = _buoys[i].Error;
             float b2Error = _buoys[j].Error;
 
@@ -165,7 +171,7 @@ public class BuoyGuard : MonoBehaviour
             }
          }
       }
-      
+
       return new Vector3[0];
    }
 
@@ -194,7 +200,7 @@ public class BuoyGuard : MonoBehaviour
 
       //draw spline
       _splineZone.GetComponent<MeshFilter>().mesh = Utils.CreateSplineMesh(vertices[0], vertices[1], vertices[2], vertices[3]);
-      _splineZone.transform.position = new Vector3(c1.x, 10, c1.z);
+      _splineZone.transform.position = new Vector3(c1.x, 3f, c1.z);
       _splineZone.GetComponent<MeshRenderer>().material.color = new Color(1, 0, 0, Mathf.PingPong(Time.time, 0.5f));
 
       //draw detection zone
@@ -219,31 +225,38 @@ public class BuoyGuard : MonoBehaviour
          if (Scenario.IsTargetAlive)
          {
             int idx = 0;
-            
-            for(int i = 0; i < _buoys.Count - 1; i++)
+
+            for (int i = 0; i < _buoys.Count - 1; i++)
             {
-               for(int j = i+1; j < _buoys.Count; j++)
+               for (int j = i + 1; j < _buoys.Count; j++)
                {
-                     //calculate real tracked point
-                     Vector3 b1Bearing = (_torpedo.position - _buoys[i].transform.position).normalized;
-                     Vector3 b2Bearing = (_torpedo.position - _buoys[j].transform.position).normalized;
+                  if (_buoys[i].State != BuoyState.Working || _buoys[j].State != BuoyState.Working)
+                  {
+                     _torpedoDetectionModel.AddTrackPoint(idx, Vector3.zero);
+                     idx++;
+                     continue;
+                  }
 
-                     Vector3 b1BearingWithError = getDir(b1Bearing, _buoys[i].Error);
-                     Vector3 b2BearingWithError = getDir(b2Bearing, _buoys[j].Error);
+                  //calculate real tracked point
+                  Vector3 b1Bearing = (_torpedo.position - _buoys[i].transform.position).normalized;
+                  Vector3 b2Bearing = (_torpedo.position - _buoys[j].transform.position).normalized;
 
-                     Vector3 p11 = _buoys[i].transform.position;
-                     Vector3 p12 = p11 + b1BearingWithError * _detectRange;
-                     Vector3 p21 = _buoys[j].transform.position;
-                     Vector3 p22 = p21 + b2BearingWithError * _detectRange;
+                  Vector3 b1BearingWithError = getDir(b1Bearing, _buoys[i].Error);
+                  Vector3 b2BearingWithError = getDir(b2Bearing, _buoys[j].Error);
 
-                     Vector3 bouysBearingIntersection = Vector3.zero;
-                     bool crossed = getCross(p11, p12, p21, p22, out bouysBearingIntersection);
-                     if (!crossed)
-                        bouysBearingIntersection = Vector3.zero;
+                  Vector3 p11 = _buoys[i].transform.position;
+                  Vector3 p12 = p11 + b1BearingWithError * _detectRange;
+                  Vector3 p21 = _buoys[j].transform.position;
+                  Vector3 p22 = p21 + b2BearingWithError * _detectRange;
 
-                     Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 0, bouysBearingIntersection.z);
+                  Vector3 bouysBearingIntersection = Vector3.zero;
+                  bool crossed = getCross(p11, p12, p21, p22, out bouysBearingIntersection);
+                  if (!crossed)
+                     bouysBearingIntersection = Vector3.zero;
 
-                     _torpedoDetectionModel.AddTrackPoint(idx, trackedPosition);
+                  Vector3 trackedPosition = new Vector3(bouysBearingIntersection.x, 0, bouysBearingIntersection.z);
+
+                  _torpedoDetectionModel.AddTrackPoint(idx, trackedPosition);
 
                   idx++;
                }
@@ -256,11 +269,10 @@ public class BuoyGuard : MonoBehaviour
 
             if (_torpedoDetectionModel.RegressionReady)
             {
-               var b = VarName.BuoysBearingError.GetFloat();
                refreshDetectionZoneColor(VarName.TargetDetectionError.GetFloat());
-               float timeToShoot = Scenario.Instance.TargetInfo.Distance/(_rocketSpeed + _torpedoDetectionModel.CalcSpeed());
+               float timeToShoot = Scenario.Instance.TargetInfo.Distance / (_rocketSpeed + _torpedoDetectionModel.CalcSpeed());
                Vector3 p = _torpedoDetectionModel.CalcPrognosisPos(timeToShoot);
-               _detectionZone.transform.position = new Vector3(p.x, 10, p.z);
+               _detectionZone.transform.position = new Vector3(p.x, 1.5f, p.z);
             }
 
             yield return new WaitForSeconds(1f);
@@ -284,18 +296,21 @@ public class BuoyGuard : MonoBehaviour
       Gizmos.DrawLine(t0, t0 + t2);
       Gizmos.DrawLine(t0, t0 + t3);
       Gizmos.DrawLine(t0, t0 + t4);
-                          
+
       if (!_drawDebugLines)
          return;
 
       Gizmos.color = new Color(0, 1, 1, 0.25f);
 
-      foreach(var b in _buoys)
+      foreach (var b in _buoys)
       {
+         if (b.State != BuoyState.Working)
+            continue;
+
          Vector3 bearing = (_torpedo.position - b.transform.position).normalized;
          bearing = new Vector3(bearing.x, 0, bearing.z).normalized;
          Vector3 bCenter = getDir(bearing, b.Error);
-         Vector3 bLeft = getDir(bearing, b.Error - Buoy.GetBearingError() /2f);
+         Vector3 bLeft = getDir(bearing, b.Error - Buoy.GetBearingError() / 2f);
          Vector3 bRight = getDir(bearing, b.Error + Buoy.GetBearingError() / 2f);
          Vector3 p = new Vector3(b.transform.position.x, 2, b.transform.position.z);
          Vector3 pCenter = p + bCenter * _detectRange;
@@ -309,7 +324,7 @@ public class BuoyGuard : MonoBehaviour
 
    public void AddBuoy(Buoy b)
    {
-      if(_buoys.Count < 6)
+      if (_buoys.Count < 6)
          _buoys.Add(b);
       else
          Debug.LogError("Exceed number of buoys");
@@ -327,7 +342,7 @@ public class BuoyGuard : MonoBehaviour
 
       cross = Vector3.Cross(f1, f2);
 
-      if (Mathf.Abs(cross.y) < 0.0001f)
+      if (Mathf.Abs(cross.y) < 1f)
       {
          cross = Vector3.zero;
          return false;
@@ -339,8 +354,7 @@ public class BuoyGuard : MonoBehaviour
 
       float d = (_torpedo.position - cross).magnitude;
 
-      float error = Mathf.Tan(VarSync.GetFloat(VarName.BuoysBearingError) / 2f * Mathf.Deg2Rad) * VarSync.GetFloat(VarName.BuoysDetectRange) * 2f;
-      if (d > error)
+      if (d > VarSync.GetFloat(VarName.BuoysDetectRange))
          return false;
 
       return true;
@@ -359,7 +373,7 @@ public class BuoyGuard : MonoBehaviour
          return ZoneColor.Yellow;
       return ZoneColor.Green;
    }
-   
+
    private void refreshDetectionZoneColor(float curRaduis)
    {
       ZoneColor clr = calcZoneColor(curRaduis * 2);

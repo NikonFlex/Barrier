@@ -46,6 +46,11 @@ public class Buoy : MonoBehaviour
       StartCoroutine(timerCoroutine());
    }
 
+   public void Deactivate()
+   {
+      _state = BuoyState.None;
+   }
+
    private void startPelleng()
    {
       if (!_pelengPivot)

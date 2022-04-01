@@ -25,6 +25,9 @@ public class MPC : MonoBehaviour
    void Update()
    {
       drawBeam();
+
+      if (Scenario.Instance.TargetDetectStatus == TargetDetectStatus.Buoys)
+         _buoy.Deactivate();
    }
 
    private void drawBeam()
@@ -42,7 +45,7 @@ public class MPC : MonoBehaviour
       }
 
       _beam.SetActive(true);
-
+      
       Vector3 targetPoint = Scenario.Instance.TargetDetectStatus == TargetDetectStatus.MPCOnly
          ? Scenario.Instance.PointOfFirstDetectionByMPC 
          : Scenario.Instance.TargetInfo.Target.transform.position;

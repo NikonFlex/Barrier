@@ -245,6 +245,7 @@ public class TorpedoDetectionModel : MonoBehaviour
 
       Gizmos.color = new Color(1, 1, 0, 0.5f);
       Gizmos.DrawLine(p1, p2);
+      Gizmos.DrawSphere(p2, 5f);
 
       foreach (var p in _points)
       {
