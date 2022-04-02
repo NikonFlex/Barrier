@@ -310,7 +310,8 @@ public class BuoyGuard : MonoBehaviour
 
       float d = (_torpedo.position - cross).magnitude;
 
-      if (d > VarSync.GetFloat(VarName.BuoysDetectRange))
+      float error = Mathf.Tan(VarName.BuoysBearingError.GetFloat() / 2 * Mathf.Deg2Rad) * VarSync.GetFloat(VarName.BuoysDetectRange) * 2f;
+      if (d > error)
          return false;
 
       return true;
