@@ -6,6 +6,9 @@ public class MPC : MonoBehaviour
    [SerializeField] private LineRenderer _cableRenderer;
    [SerializeField] private GameObject _beam;
    [SerializeField] private Buoy _buoy;
+   private TorpedoDetectionModel _torpedoDetectionModel;
+   private bool _deactivate = true;
+   
 
    public float BeamLengthCoef { get; set; } = 0;
    private float _distToShip;
@@ -22,12 +25,21 @@ public class MPC : MonoBehaviour
       _cableRenderer.useWorldSpace = true;
    }
 
+   private void Start()
+   {
+      _torpedoDetectionModel = FindObjectOfType<TorpedoDetectionModel>();
+   }
+
    void Update()
    {
       drawBeam();
 
-      if (Scenario.Instance.TargetDetectStatus == TargetDetectStatus.Buoys)
+      if (_deactivate && Scenario.Instance.TargetDetectStatus == TargetDetectStatus.Buoys)
+      {
          _buoy.Deactivate();
+         _torpedoDetectionModel.ClearRegression();
+         _deactivate = false;
+      }
    }
 
    private void drawBeam()
@@ -57,7 +69,6 @@ public class MPC : MonoBehaviour
       beamRender.endWidth = 100f;
       beamRender.SetPositions(new[] { gameObject.transform.position, gameObject.transform.position + beamDir*BeamLengthCoef } );
       beamRender.useWorldSpace = true;
-
    }
 
    public void SetUpSettings(bool isActive, float distToShip)
