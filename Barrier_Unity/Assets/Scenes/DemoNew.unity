@@ -1172,7 +1172,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.45
+  m_fontSize: 19.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -1246,7 +1246,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 110076544}
-  m_LocalRotation: {x: 0.09049416, y: 0.8499478, z: -0.15530357, w: 0.4952579}
+  m_LocalRotation: {x: 0.09127874, y: 0.84743124, z: -0.15484373, w: 0.49955177}
   m_LocalPosition: {x: -1020, y: 461, z: 761}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1284,7 +1284,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.6697499, y: 1}
+    m_SensorSize: {x: 1.7664577, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -1768,7 +1768,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.6697499, y: 1}
+    m_SensorSize: {x: 1.7664577, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -1870,7 +1870,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.6697499, y: 1}
+    m_SensorSize: {x: 1.7664577, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -2923,7 +2923,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.45
+  m_fontSize: 19.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -3769,7 +3769,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.45
+  m_fontSize: 19.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -4015,7 +4015,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.45
+  m_fontSize: 19.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -6719,7 +6719,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.45
+  m_fontSize: 19.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -7253,7 +7253,7 @@ GameObject:
   - component: {fileID: 963194229}
   m_Layer: 0
   m_Name: Iso Camera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7696,7 +7696,7 @@ GameObject:
   - component: {fileID: 1025756881}
   m_Layer: 0
   m_Name: FreeCamera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7865,7 +7865,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1035623154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8076,7 +8076,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.45
+  m_fontSize: 19.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -8537,7 +8537,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1082155327}
-  m_LocalRotation: {x: 0.09049416, y: 0.8499478, z: -0.15530357, w: 0.4952579}
+  m_LocalRotation: {x: 0.09127874, y: 0.84743124, z: -0.15484373, w: 0.49955177}
   m_LocalPosition: {x: -44.662598, y: 21.243683, z: -23.948364}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -8596,8 +8596,8 @@ MonoBehaviour:
   m_UpdateMethod: 2
   m_BlendUpdateMethod: 1
   m_DefaultBlend:
-    m_Style: 0
-    m_Time: 0.3
+    m_Style: 6
+    m_Time: 0.01
     m_CustomCurve:
       serializedVersion: 2
       m_Curve: []
@@ -8624,7 +8624,7 @@ GameObject:
   - component: {fileID: 1086414018}
   m_Layer: 0
   m_Name: Top Camera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -10122,7 +10122,7 @@ GameObject:
   - component: {fileID: 1334063378}
   m_Layer: 0
   m_Name: Map Camera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11043,7 +11043,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18.9
+  m_fontSize: 19.45
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -12027,7 +12027,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.45
+  m_fontSize: 19.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -12333,7 +12333,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.45
+  m_fontSize: 19.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -12516,7 +12516,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.45
+  m_fontSize: 19.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -12690,7 +12690,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1697420731}
-  m_LocalRotation: {x: 0.031356547, y: -0.604286, z: 0.023810586, w: 0.7957941}
+  m_LocalRotation: {x: 0.031356547, y: -0.604286, z: 0.023810588, w: 0.7957941}
   m_LocalPosition: {x: 53.1, y: -10.7, z: -22.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -12728,7 +12728,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.6697499, y: 1}
+    m_SensorSize: {x: 1.7664577, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -13598,6 +13598,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6309656781295862193, guid: e5f66848b0dc4ac459a9c9a323cc4758,
         type: 3}
+      propertyPath: cam
+      value: 
+      objectReference: {fileID: 1082155331}
+    - target: {fileID: 6309656781295862193, guid: e5f66848b0dc4ac459a9c9a323cc4758,
+        type: 3}
       propertyPath: target
       value: 
       objectReference: {fileID: 543450653066634939}
@@ -14393,7 +14398,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.45
+  m_fontSize: 19.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -15146,7 +15151,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2066991197}
-  m_LocalRotation: {x: 0.06527351, y: -0.8715817, z: 0.12088905, w: 0.47060665}
+  m_LocalRotation: {x: -0.06527352, y: 0.8715816, z: -0.12088904, w: -0.4706068}
   m_LocalPosition: {x: -2937.412, y: -21.51289, z: -5321.5825}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -15184,7 +15189,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.6697499, y: 1}
+    m_SensorSize: {x: 1.7664577, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -15493,7 +15498,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20.45
+  m_fontSize: 19.85
   m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -15772,7 +15777,7 @@ GameObject:
   - component: {fileID: 2131364504}
   m_Layer: 0
   m_Name: FollowCamera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
