@@ -3,24 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-struct TrackedPoint
-{
-   private float time;
-   private Vector3 pos;
+//struct TrackedPoint
+//{
+//   private float time;
+//   private Vector3 pos;
 
-   public TrackedPoint(float time_, Vector3 pos_)
-   {
-      time = time_;
-      pos = pos_;
-   }
+//   public TrackedPoint(float time_, Vector3 pos_)
+//   {
+//      time = time_;
+//      pos = pos_;
+//   }
 
-   public float Time => time;
-   public Vector3 Pos => pos;
-}
+//   public float Time => time;
+//   public Vector3 Pos => pos;
+//}
 
 public class TorpedoDetectionModel : MonoBehaviour
 {
-   private List<Vector3>[] _kalmanPoistions = new List<Vector3>[15]; // 15 - number of combinations for 6 buoys
+   private List<Vector3>[] _rawPoints = new List<Vector3>[15]; // 15 - number of combinations for 6 buoys
    private List<Vector3> _points = new List<Vector3>();
    [SerializeField] private float _kalmanK = 1f;
 
@@ -39,27 +39,27 @@ public class TorpedoDetectionModel : MonoBehaviour
 
    private void Start()
    {
-      for(int i = 0; i < _kalmanPoistions.Length; i++)
-         _kalmanPoistions[i] = new List<Vector3>();
+      for(int i = 0; i < _rawPoints.Length; i++)
+         _rawPoints[i] = new List<Vector3>();
    }
 
    public void AddTrackPoint(int idx, Vector3 trackedPoint)
    {
-      if (_kalmanPoistions[idx].Count == 0)
-         _kalmanPoistions[idx].Add(trackedPoint);
+      if (_rawPoints[idx].Count == 0)
+         _rawPoints[idx].Add(trackedPoint);
       else
-         _kalmanPoistions[idx].Add(_kalmanK * trackedPoint + (1 - _kalmanK) * _kalmanPoistions[idx][_kalmanPoistions[idx].Count - 1]);
+         _rawPoints[idx].Add(_kalmanK * trackedPoint + (1 - _kalmanK) * _rawPoints[idx][_rawPoints[idx].Count - 1]);
 
       // use only last 20 points
-      if (_kalmanPoistions[idx].Count > 20)
-         _kalmanPoistions[idx].RemoveAt(0);
+      if (_rawPoints[idx].Count > 20)
+         _rawPoints[idx].RemoveAt(0);
    }
 
    public void ClearRegression()
    {
       _regressionReady = false;
-      for (int i = 0; i < _kalmanPoistions.Length; i++)
-         _kalmanPoistions[i].Clear();
+      for (int i = 0; i < _rawPoints.Length; i++)
+         _rawPoints[i].Clear();
    }
 
    public Vector3 CalcCourse()
@@ -125,23 +125,23 @@ public class TorpedoDetectionModel : MonoBehaviour
    {
       _regressionReady = false;
    
-      if (_kalmanPoistions[0].Count < 5)
+      if (_rawPoints[0].Count < 5)
          return;
 
       //calculate average of points for all combinations
       _points.Clear();
 
-      for (int i = 0; i < _kalmanPoistions[0].Count; i++)
+      for (int i = 0; i < _rawPoints[0].Count; i++)
       {
          Vector3 tp = Vector3.zero;
          int n = 0;
 
-         for (int j = 0; j < _kalmanPoistions.Length; j++)
+         for (int j = 0; j < _rawPoints.Length; j++)
          {
-            if (_kalmanPoistions[j][i].magnitude < 0.1f)
+            if (_rawPoints[j][i].magnitude < 0.1f)
                continue;
             
-            tp += _kalmanPoistions[j][i];
+            tp += _rawPoints[j][i];
             n++;
          }
 
@@ -236,21 +236,25 @@ public class TorpedoDetectionModel : MonoBehaviour
 
    private void OnDrawGizmos()
    {
-      if (!_regressionReady)
-         return;
+      if (_regressionReady)
+      {
+         Vector3 p1 = new Vector3(_points.First().x - 200, 5, _reg_a * (_points.First().x - 200) + _reg_b);
+         Vector3 p2 = new Vector3(_points.Last().x + 200, 5, _reg_a * (_points.Last().x + 200) + _reg_b);
 
-      int count = _points.Count;
-      Vector3 p1 = new Vector3(_points[0].x - 200, 5, _reg_a * (_points[0].x - 200) + _reg_b);
-      Vector3 p2 = new Vector3(_points[count-1].x + 200, 5, _reg_a * (_points[count-1].x + 200) + _reg_b);
+         Gizmos.color = new Color(1, 1, 0, 0.5f);
+         Gizmos.DrawLine(p1, p2);
+         Gizmos.DrawSphere(p2, 5f);
+      }
 
-      Gizmos.color = new Color(1, 1, 0, 0.5f);
-      Gizmos.DrawLine(p1, p2);
-      Gizmos.DrawSphere(p2, 5f);
-
-      foreach (var p in _points)
+      if (_points.Count > 1)
       {
          Gizmos.color = new Color(1, 1, 1, 0.75f);
-         Gizmos.DrawSphere(p, 4f);
-      }                     
+         for (int i = 0; i < _points.Count - 1; i++)
+         {
+            Gizmos.DrawSphere(_points[i], 5f);
+            Gizmos.DrawLine(_points[i], _points[i + 1]);
+         }
+         Gizmos.DrawSphere(_points.Last(), 5f);
+      }
    }
 }
