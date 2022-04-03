@@ -262,18 +262,18 @@ public class BuoyGuard : MonoBehaviour
          Vector3 bearing = (_torpedo.position - b.transform.position).normalized;
          bearing = new Vector3(bearing.x, 0, bearing.z).normalized;
          Vector3 bCenter = getDir(bearing, b.Error);
-         Vector3 bLeft = getDir(bearing, 0/*b.Error*/ - Buoy.GetBearingError() / 2f);
-         Vector3 bRight = getDir(bearing, 0/*b.Error*/ + Buoy.GetBearingError() / 2f);
+         Vector3 bLeft = getDir(bearing, b.Error - Buoy.GetBearingError() / 2f);
+         Vector3 bRight = getDir(bearing, b.Error + Buoy.GetBearingError() / 2f);
          Vector3 p = new Vector3(b.transform.position.x, 2, b.transform.position.z);
          Vector3 pCenter = p + bCenter * _detectRange;
          Vector3 pLeft = p + bLeft * _detectRange;
          Vector3 pRight = p + bRight * _detectRange;
 
-         Gizmos.color = Color.blue + new Color(0, 0, 0, 0.5f);
+         Gizmos.color = Color.blue + new Color(0, 0, 0, 0.25f);
          Gizmos.DrawLine(p, pLeft);
          Gizmos.DrawLine(p, pRight);
 
-         Gizmos.color = Color.yellow + new Color(0, 0, 0, 0.5f); 
+         Gizmos.color = Color.yellow + new Color(0, 0, 0, 0.25f); 
          Gizmos.DrawLine(p, pCenter);
       }
    }
