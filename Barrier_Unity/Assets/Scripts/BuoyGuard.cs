@@ -269,11 +269,11 @@ public class BuoyGuard : MonoBehaviour
          Vector3 pLeft = p + bLeft * _detectRange;
          Vector3 pRight = p + bRight * _detectRange;
 
-         Gizmos.color = Color.blue + new Color(0, 0, 0, 0.25f);
+         Gizmos.color = Color.blue * new Color(1, 1, 1, 0.25f);
          Gizmos.DrawLine(p, pLeft);
          Gizmos.DrawLine(p, pRight);
 
-         Gizmos.color = Color.yellow + new Color(0, 0, 0, 0.25f); 
+         Gizmos.color = Color.yellow * new Color(1, 1, 1, 0.25f); 
          Gizmos.DrawLine(p, pCenter);
       }
    }

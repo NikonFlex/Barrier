@@ -3,21 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-//struct TrackedPoint
-//{
-//   private float time;
-//   private Vector3 pos;
-
-//   public TrackedPoint(float time_, Vector3 pos_)
-//   {
-//      time = time_;
-//      pos = pos_;
-//   }
-
-//   public float Time => time;
-//   public Vector3 Pos => pos;
-//}
-
 public class TorpedoDetectionModel : MonoBehaviour
 {
    private List<Vector3>[] _rawPoints = new List<Vector3>[15]; // 15 - number of combinations for 6 buoys
@@ -33,7 +18,6 @@ public class TorpedoDetectionModel : MonoBehaviour
    public bool RegressionReady => _regressionReady;
    
    [SerializeField] private float _reg_direction;
-   [SerializeField] private float _reg_direction_dist;
    [SerializeField] private float _reg_velocity;
    [SerializeField] private float _reg_velocity_error;
 
@@ -50,8 +34,8 @@ public class TorpedoDetectionModel : MonoBehaviour
       else
          _rawPoints[idx].Add(_kalmanK * trackedPoint + (1 - _kalmanK) * _rawPoints[idx][_rawPoints[idx].Count - 1]);
 
-      // use only last 20 points
-      if (_rawPoints[idx].Count > 20)
+      // use only last 10 points
+      if (_rawPoints[idx].Count > 10)
          _rawPoints[idx].RemoveAt(0);
    }
 
@@ -83,20 +67,7 @@ public class TorpedoDetectionModel : MonoBehaviour
 
    public Vector3 CalcPos()
    {
-      Vector3 dir = CalcCourse();
-
-      float a = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
-
-      Quaternion rot_org = Quaternion.Euler(0, a, 0);
-      Quaternion rot_inv = Quaternion.Euler(0, -a, 0);
-
-      Vector3 p0 = new Vector3(0, 0, _reg_b);
-
-      Vector3 p = rot_inv * (_reg_pos - p0);
-      p = new Vector3(0, 0, p.z);
-      p = rot_org * p + p0;
-
-      return p;
+      return _reg_pos;
    }
 
    public Vector3 CalcPrognosisPos(float deltaTime)
@@ -197,41 +168,34 @@ public class TorpedoDetectionModel : MonoBehaviour
       Vector3 dir = CalcCourse();
       float course = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
 
-      Quaternion rot = Quaternion.Euler(0, -course, 0);
+      Quaternion rot_org = Quaternion.Euler(0, course, 0);
+      Quaternion rot_inv = Quaternion.Euler(0, -course, 0);
 
       Vector3 p0 = new Vector3(0, 0, _reg_b);
 
-      float[] dist = new float[_points.Count];
-      float[] vel = new float[_points.Count-1];
+      List<float> velList = new();
 
-      for(int i = 0; i < _points.Count; i++)
+      for(int i = 0; i < _points.Count - 1; i++)
       {
-         Vector3 p = rot * (_points[i] - p0);
-         dist[i] = p.x;
-         
-         if (i < vel.Length)
+         Vector3 p1 = rot_inv * (_points[i] - p0);
+         Vector3 p2 = rot_inv * (_points[i + 1] - p0);
+
+         if ((p2.z - p1.z) > 0)
          {
-            Vector3 p_next = rot * (_points[i + 1] - p0);
-            vel[i] = (p_next.z - p.z) > 0 ? (p_next.z - p.z) : 0;
+            velList.Add(p2.z - p1.z);
+            _reg_pos = rot_org * new Vector3(0, 0, p2.z) + p0;
          }
       }
 
-      _reg_pos = _points.Last();
-
-      float mean = calcMean(dist);
-      float error = calcError(dist, mean);
-
-      _reg_direction_dist = error;
-
-      mean = calcMean(vel);
-      error = calcError(vel, mean);
-
-      _reg_velocity = mean;
-      _reg_velocity_error = error;
+      float[] vel = velList.ToArray();
+      float mean = calcMean(vel);
+      float error = calcError(vel, mean);
 
       VarName.TargetDetectionError.Set(error * 4); //4 seconds
 
       _reg_direction = course;
+      _reg_velocity = mean;
+      _reg_velocity_error = error;
    }
 
    private void OnDrawGizmos()
@@ -243,18 +207,18 @@ public class TorpedoDetectionModel : MonoBehaviour
 
          Gizmos.color = new Color(1, 1, 0, 0.5f);
          Gizmos.DrawLine(p1, p2);
-         Gizmos.DrawSphere(p2, 5f);
       }
 
       if (_points.Count > 1)
       {
-         Gizmos.color = new Color(1, 1, 1, 0.75f);
+         Gizmos.color = Color.white * new Color(1, 1, 1, 0.5f);
          for (int i = 0; i < _points.Count - 1; i++)
          {
             Gizmos.DrawSphere(_points[i], 5f);
             Gizmos.DrawLine(_points[i], _points[i + 1]);
          }
-         Gizmos.DrawSphere(_points.Last(), 5f);
+         Gizmos.color = Color.blue * new Color(1, 1, 1, 0.5f);
+         Gizmos.DrawSphere(_reg_pos, 5f);
       }
    }
 }

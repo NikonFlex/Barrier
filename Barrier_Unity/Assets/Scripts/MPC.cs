@@ -77,7 +77,9 @@ public class MPC : MonoBehaviour
       _distToShip = distToShip;
       LabelHelper.ShowLabel(gameObject);
 
-      _buoy.Born();
+      int bc = VarSync.GetInt(VarName.NumBuoys);
+      if(bc == 0) // one buoy
+         _buoy.Born();
    }
 
    public void SetPosition(Vector3 newShipPos, Vector3 shipForward)
