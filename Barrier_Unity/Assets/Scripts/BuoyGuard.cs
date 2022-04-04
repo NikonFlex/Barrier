@@ -187,7 +187,10 @@ public class BuoyGuard : MonoBehaviour
             {
                for (int j = i + 1; j < _buoys.Count; j++)
                {
-                  if (_buoys[i].State != BuoyState.Working || _buoys[j].State != BuoyState.Working)
+                  float d1 = (_buoys[i].transform.position - _torpedo.position).magnitude;
+                  float d2 = (_buoys[j].transform.position - _torpedo.position).magnitude;
+
+                  if (_buoys[i].State != BuoyState.Working || _buoys[j].State != BuoyState.Working || d1 > _detectRange || d2 > _detectRange)
                   {
                      _torpedoDetectionModel.AddTrackPoint(idx, Vector3.zero);
                      idx++;
@@ -226,8 +229,10 @@ public class BuoyGuard : MonoBehaviour
 
             if (_torpedoDetectionModel.RegressionReady)
             {
-               refreshDetectionZoneColor(VarName.TargetDetectionError.GetFloat());
                float timeToShoot = Scenario.Instance.TargetInfo.Distance / (_rocketSpeed + _torpedoDetectionModel.CalcSpeed());
+               float targetDetectionError = _torpedoDetectionModel.RegressionError * timeToShoot;
+               VarName.TargetDetectionError.Set(targetDetectionError);
+               refreshDetectionZoneColor(targetDetectionError);
                Vector3 p = _torpedoDetectionModel.CalcPrognosisPos(timeToShoot);
                _detectionZone.transform.position = new Vector3(p.x, 1.5f, p.z);
             }

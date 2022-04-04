@@ -3,19 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+class TrackPoint
+{
+   public float time;
+   public Vector3 point;
+}
+
 public class TorpedoDetectionModel : MonoBehaviour
 {
    private List<Vector3>[] _rawPoints = new List<Vector3>[15]; // 15 - number of combinations for 6 buoys
    private List<Vector3> _points = new List<Vector3>();
+   private List<TrackPoint> _route = new List<TrackPoint>();
+   private List<float> _velocities = new List<float>();
+
    [SerializeField] private float _kalmanK = 1f;
 
    private bool _regressionReady = false;
    private float _reg_a;
    private float _reg_b;
 
-   private Vector3 _reg_pos;
-
    public bool RegressionReady => _regressionReady;
+   public float RegressionError => _reg_velocity_error;
    
    [SerializeField] private float _reg_direction;
    [SerializeField] private float _reg_velocity;
@@ -44,11 +52,15 @@ public class TorpedoDetectionModel : MonoBehaviour
       _regressionReady = false;
       for (int i = 0; i < _rawPoints.Length; i++)
          _rawPoints[i].Clear();
+
+      _points.Clear();
+      _route.Clear();
+      _velocities.Clear();
    }
 
    public Vector3 CalcCourse()
    {
-      if (!_regressionReady)
+      if (_points.Count < 2)
          return Vector3.zero;
 
       Vector3 p1 = new Vector3(_points.First().x, 0, _reg_a * _points.First().x + _reg_b);
@@ -67,7 +79,7 @@ public class TorpedoDetectionModel : MonoBehaviour
 
    public Vector3 CalcPos()
    {
-      return _reg_pos;
+      return _route.Last().point;
    }
 
    public Vector3 CalcPrognosisPos(float deltaTime)
@@ -162,8 +174,6 @@ public class TorpedoDetectionModel : MonoBehaviour
       _reg_a = a;
       _reg_b = b;
 
-      _regressionReady = true;
-
       // calculate statistics
       Vector3 dir = CalcCourse();
       float course = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
@@ -173,7 +183,7 @@ public class TorpedoDetectionModel : MonoBehaviour
 
       Vector3 p0 = new Vector3(0, 0, _reg_b);
 
-      List<float> velList = new();
+      Vector3 head = Vector3.zero;
 
       for(int i = 0; i < _points.Count - 1; i++)
       {
@@ -181,29 +191,45 @@ public class TorpedoDetectionModel : MonoBehaviour
          Vector3 p2 = rot_inv * (_points[i + 1] - p0);
 
          if ((p2.z - p1.z) > 0)
-         {
-            velList.Add(p2.z - p1.z);
-            _reg_pos = rot_org * new Vector3(0, 0, p2.z) + p0;
-         }
+            head = rot_org * new Vector3(0, 0, p2.z) + p0;
       }
 
-      float[] vel = velList.ToArray();
-      float mean = calcMean(vel);
-      float error = calcError(vel, mean);
+      if (head.magnitude > 0.1f)
+      {
+         TrackPoint trackPoint = new TrackPoint() { time = Time.time, point = head };
+         _route.Add(trackPoint);
+         if (_route.Count > 10)
+            _route.RemoveAt(0);
+      }
 
-      VarName.TargetDetectionError.Set(error * 4); //4 seconds
+      if(_route.Count > 1)
+      {
+         float dt = _route.Last().time - _route.First().time;
+         _velocities.Add((_route.Last().point - _route.First().point).magnitude / dt);
+         if (_velocities.Count > 10)
+            _velocities.RemoveAt(0);
+      }
 
-      _reg_direction = course;
-      _reg_velocity = mean;
-      _reg_velocity_error = error;
+      if(_velocities.Count > 1)
+      {
+         float[] vel = _velocities.ToArray();
+         float mean = calcMean(vel);
+         float error = calcError(vel, mean);
+
+         _reg_direction = course;
+         _reg_velocity = mean;
+         _reg_velocity_error = error;
+
+         _regressionReady = true;
+      }
    }
 
    private void OnDrawGizmos()
    {
       if (_regressionReady)
       {
-         Vector3 p1 = new Vector3(_points.First().x - 200, 5, _reg_a * (_points.First().x - 200) + _reg_b);
-         Vector3 p2 = new Vector3(_points.Last().x + 200, 5, _reg_a * (_points.Last().x + 200) + _reg_b);
+         Vector3 p1 = new Vector3(_route.First().point.x, 5, _reg_a * (_route.First().point.x) + _reg_b);
+         Vector3 p2 = new Vector3(_route.Last().point.x, 5, _reg_a * (_route.Last().point.x) + _reg_b);
 
          Gizmos.color = new Color(1, 1, 0, 0.5f);
          Gizmos.DrawLine(p1, p2);
@@ -218,7 +244,12 @@ public class TorpedoDetectionModel : MonoBehaviour
             Gizmos.DrawLine(_points[i], _points[i + 1]);
          }
          Gizmos.color = Color.blue * new Color(1, 1, 1, 0.5f);
-         Gizmos.DrawSphere(_reg_pos, 5f);
+      }
+
+      foreach(var p in _route)
+      {
+         Gizmos.color = Color.blue * new Color(1, 1, 1, 0.5f);
+         Gizmos.DrawSphere(p.point, 5f);
       }
    }
 }
